@@ -1,7 +1,7 @@
 // Mermaid diagrams in the live editor under the packaged CSP (hashed style-src):
 // lazy runtime, drawing only visible diagrams, the source-hash/theme cache,
-// theme changes, turning diagrams off, editing with a preview, errors and the
-// strict security level.
+// theme changes, turning diagrams off, editing with a preview, errors, the
+// strict security level and wide diagrams fitting the pane.
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -147,6 +147,20 @@ try {
   await other.waitForFunction(() => document.querySelector('.mermaid-diagram img')?.naturalWidth > 0, null, {timeout: 20000});
   const looseSize = await other.locator('.mermaid-diagram img').first().evaluate(image => [image.naturalWidth, image.naturalHeight]);
   assert.deepEqual(strictSize, looseSize, 'labels are measured with their styles under the hashed style-src');
+  // A diagram wider than the pane shrinks to fit (the default size) and never
+  // widens the article: prose keeps wrapping at the pane's edge. (CodeMirror's
+  // own styles, which make .cm-scroller a flex box as in the app, apply only here.)
+  const wide = 'flowchart LR\n    ' + Array.from({length: 14}, (_, i) => `N${i}[Step number ${i + 1} of the long chain]`).join(' --> ');
+  await other.evaluate(source => window.harness.open(`# A heading long enough to wrap when the article is no wider than its pane\n\n${'Prose that should wrap. '.repeat(40)}\n\n\`\`\`mermaid\n${source}\n\`\`\`\n`), wide);
+  await other.waitForFunction(() => document.querySelector('.mermaid-diagram')?.dataset.state === 'ready' && document.querySelector('.mermaid-diagram img')?.naturalWidth > 0, null, {timeout: 20000}); await other.evaluate(() => window.harness.settle());
+  const fit = await other.evaluate(() => {const content = document.querySelector('.cm-content'), scroller = document.querySelector('.cm-scroller'), image = document.querySelector('.mermaid-diagram img'); return {content: content.getBoundingClientRect().width, scroller: scroller.clientWidth, overflow: scroller.scrollWidth - scroller.clientWidth, image: image.getBoundingClientRect().width, natural: image.naturalWidth};});
+  assert(fit.natural > fit.scroller, 'the test diagram is wider than the pane: ' + JSON.stringify(fit));
+  assert(fit.content <= fit.scroller, 'a wide diagram never makes .cm-content wider than .cm-scroller: ' + JSON.stringify(fit));
+  assert(fit.overflow <= 0 && fit.image < fit.scroller, 'the diagram shrinks to the pane: ' + JSON.stringify(fit));
+  // At its natural size the diagram scrolls inside its frame, still without widening the article.
+  await other.evaluate(() => window.harness.appearance({mermaidSize: 'natural'})); await other.evaluate(() => window.harness.settle());
+  const natural = await other.evaluate(() => {const content = document.querySelector('.cm-content'), scroller = document.querySelector('.cm-scroller'), box = document.querySelector('.mermaid-diagram'); return {content: content.getBoundingClientRect().width, scroller: scroller.clientWidth, frame: box.scrollWidth - box.clientWidth};});
+  assert(natural.content <= natural.scroller && natural.frame > 0, 'a natural-size diagram scrolls in its frame: ' + JSON.stringify(natural));
   await other.goto(pathToFileURL(bare).href);
   await other.evaluate(source => window.harness.open('```mermaid\n' + source + '\n```\n'), flowchart); await other.evaluate(() => window.harness.settle());
   assert.equal(await other.locator('.mermaid-diagram').count(), 0, 'without the runtime no diagram is attempted');
@@ -155,5 +169,5 @@ try {
   // DOMPurify pass, the image conversion); those are reported against the document.
   assert.deepEqual(blocked.filter(Boolean), [], 'no style attribute on a shown element is refused by the CSP');
   assert.deepEqual(errors, []);
-  console.log('Mermaid verification passed: lazy runtime, visible-only drawing, cache, themes, editing preview, errors, strict security and CSP measurement.');
+  console.log('Mermaid verification passed: lazy runtime, visible-only drawing, cache, themes, editing preview, errors, strict security, CSP measurement and wide diagrams.');
 } finally {await browser.close();}

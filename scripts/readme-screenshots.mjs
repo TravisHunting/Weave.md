@@ -1,7 +1,5 @@
 // Regenerates the README screenshots in docs/images from the read-only dynamic
 // preview of knowledge-example: node scripts/readme-screenshots.mjs [name]
-// Windows narrower than about 1500 px let wide Mermaid diagrams push the article
-// past the pane, so the viewport stays wide.
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import os from 'node:os';

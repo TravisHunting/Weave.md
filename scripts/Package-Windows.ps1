@@ -64,7 +64,7 @@ Search uses chunk-based SQLite FTS5/BM25. No models or downloads are used.
 Rust and SQLite are embedded in the executable. Git is installed separately.
 Microsoft Edge WebView2 Runtime is required. This portable build is unsigned.
 weave_lite.html is Weave Lite: open it in a web browser and choose a Markdown folder to read it, with nothing installed.
-See README.md for recovery, first-run and developer details.
+See README.md for an overview; docs/USER_GUIDE.md in the source repository covers recovery and first-run details, and scripts/README.md development.
 "@ | Set-Content -LiteralPath (Join-Path $output 'START-HERE.txt') -Encoding UTF8
     if (-not $NoZip) { Compress-Archive -LiteralPath $output -DestinationPath "$output.zip"; Write-Host "Distribution zip: $output.zip" }
     Write-Host "Portable app: $output"

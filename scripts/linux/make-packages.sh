@@ -49,7 +49,7 @@ weave_lite.html is Weave Lite: open it in a web browser and choose a Markdown
 folder to read it, with nothing installed.
 If the window stays blank (some virtual machines and graphics drivers), start
 Weave with WEBKIT_DISABLE_DMABUF_RENDERER=1 weave
-See README.md for recovery, first-run and developer details.
+See README.md for an overview; docs/USER_GUIDE.md in the source repository covers recovery and first-run details, and scripts/README.md development.
 Built from $state.
 EOF
 }

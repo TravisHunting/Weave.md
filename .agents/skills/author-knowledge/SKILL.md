@@ -5,7 +5,7 @@ description: Create or amend Weave Markdown articles and filepath relationships 
 
 # Author Weave knowledge
 
-Read AGENTS.md and README.md. Inspect the selected library and related articles before changing them. Knowledge lives in ordinary Markdown; graph and search indexes can be rebuilt from it. Work in the user-selected library, such as `knowledge-example/`, without assuming its name is `knowledge` or making articles depend on the app repository.
+Read AGENTS.md and docs/AUTHORING.md. Inspect the selected library and related articles before changing them. Knowledge lives in ordinary Markdown; graph and search indexes can be rebuilt from it. Work in the user-selected library, such as `knowledge-example/`, without assuming its name is `knowledge` or making articles depend on the app repository.
 
 ## Write useful articles
 

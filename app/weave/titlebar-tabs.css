@@ -1,0 +1,16 @@
+/* Tabs in the title bar (Settings › Appearance › Tabs; root data-titlebar-tabs,
+   on by default). The shell starts at the top of the window: the rail and the
+   sidebars begin below a band one tab strip tall, and the article column's tab
+   strips form the top row. The title bar floats over that row, transparent,
+   with its two control clusters at the ends; titlebar-tabs.mjs keeps each strip
+   clear of them (--reserve-left/--reserve-right) and makes empty row space move
+   the window. Loaded after the skins, so it applies to every skin. */
+:root[data-titlebar-tabs=true]:where(:not([data-layout=mobile]))[data-skin]{--titlebar-height:var(--tab-height)}
+:root[data-titlebar-tabs=true]:where(:not([data-layout=mobile])) #titlebar{position:absolute;top:0;left:0;right:0;z-index:16;background:transparent;border-bottom-color:transparent;pointer-events:none}
+:root[data-titlebar-tabs=true]:where(:not([data-layout=mobile])) #titlebar :is(.titlebar-start,.titlebar-end){pointer-events:auto}
+:root[data-titlebar-tabs=true]:where(:not([data-layout=mobile])) .shell{height:calc(100dvh - var(--footer-height));background:linear-gradient(var(--surface-tab-row),var(--surface-tab-row)) left top/100% var(--titlebar-height) no-repeat}
+:root[data-titlebar-tabs=true]:where(:not([data-layout=mobile])) .shell>:not(main){margin-top:var(--titlebar-height)}
+/* Skins give the sidebars margins (floating cards); the row offset still wins. */
+:root[data-titlebar-tabs=true]:where(:not([data-layout=mobile])) .shell>:is(.rail,#sidebar,#sidebar-resize,#right-sidebar-resize,#right-sidebar){margin-top:var(--titlebar-height)}
+:root[data-titlebar-tabs=true]:where(:not([data-layout=mobile])) #tab-bar::before{content:"";flex:none;order:-1;width:var(--reserve-left,0px)}
+:root[data-titlebar-tabs=true]:where(:not([data-layout=mobile])) #tab-bar::after{content:"";flex:none;order:99;width:max(var(--reserve-right,0px),24px)}

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>app.weave.knowledge</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <name>Weave</name>
+  <summary>Read, link and search local Markdown knowledge</summary>
+  <description>
+    <p>Weave is a local-first Markdown workspace with typed links, a structural graph and relevance-ranked full-text search. Open Knowledge Format Markdown files in folders you own are the source of truth.</p>
+    <p>Several workspaces can be open at once, each with its own Files and Git sections. Weave includes split view, Kanban boards kept in article frontmatter, built-in Git, and export of a whole workspace as one read-only HTML file.</p>
+  </description>
+  <launchable type="desktop-id">weave.desktop</launchable>
+  <provides>
+    <binary>weave</binary>
+  </provides>
+  <categories>
+    <category>Office</category>
+  </categories>
+  <content_rating type="oars-1.1"/>
+</component>

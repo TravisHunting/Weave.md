@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Weave
+GenericName=Markdown Knowledge Workspace
+Comment=Read, link and search local Markdown knowledge
+Exec=weave
+Icon=weave
+Terminal=false
+Categories=Office;
+Keywords=markdown;notes;knowledge;wiki;graph;kanban;
+StartupNotify=true
+StartupWMClass=weave

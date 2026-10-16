@@ -1,0 +1,113 @@
+/* The skin contract: every visual decision a skin may change, with the Classic
+   skin's values. Colour schemes own the palette (--bg, --paper, --ink, --muted,
+   --line, --accent, --wash, --code, …, written on the root by appearance.mjs);
+   skins (skins/*.css) own shape, type, density, surfaces and depth, and derive
+   any colour they need from the palette so every skin works with every scheme. */
+:root{
+  /* Type */
+  --ui-font:'Segoe UI',system-ui,Arial,sans-serif;
+  --ui-font-size:13px;
+  --display-font:Georgia,serif;
+  --ui-mono-font:Consolas,'Cascadia Mono',monospace;
+  --panel-title-size:13px;
+  --panel-title-weight:700;
+  --panel-title-transform:none;
+  --panel-title-spacing:.5px;
+  /* Shape */
+  --radius-inline:3px;
+  --radius-block:5px;
+  --radius-control:5px;
+  --radius-row:6px;
+  --radius-menu:7px;
+  --radius-card:8px;
+  --radius-dialog:10px;
+  --radius-window:12px;
+  --radius-rail:8px;
+  --radius-tab:8px 8px 0 0;
+  --radius-main:10px 0 0 0;
+  --radius-pill:999px;
+  /* Depth */
+  --shadow-card:0 1px 2px #0000000f;
+  --shadow-float:0 2px 12px #00000014;
+  --shadow-popover:0 6px 22px #0002;
+  --shadow-menu:0 8px 28px #0003;
+  --shadow-dialog:0 24px 70px #0005;
+  --overlay-filter:none;
+  /* Density and geometry */
+  --titlebar-height:36px;
+  --footer-height:19px;
+  --rail-width:36px;
+  --rail-button-size:32px;
+  --rail-button-height:35px;
+  --rail-gap:5px;
+  --tab-height:36px;
+  --tab-font-size:12px;
+  --tab-max-width:260px;
+  --tab-title-max-width:222px;
+  --tab-curve:0px;
+  --tab-curve-fill:var(--surface-tab-active);
+  --tree-row-height:28px;
+  --tree-font-size:13px;
+  --sidebar-padding:10px;
+  --control-padding:6px 9px;
+  /* Lines and surfaces */
+  --divider:var(--line);
+  --gutter:var(--line);
+  --control-border:var(--line);
+  --indent-guide:var(--line);
+  --app-background:var(--bg);
+  --surface-titlebar:var(--titleBar,var(--paper));
+  --surface-rail:transparent;
+  --surface-sidebar:transparent;
+  --surface-sticky:var(--bg);
+  --surface-main:var(--paper);
+  --surface-tabbar:var(--bg);
+  --surface-tab:transparent;
+  --surface-tab-active:var(--paper);
+  --surface-button:var(--paper);
+  --surface-input:var(--paper);
+  --surface-menu:var(--paper);
+  --surface-footer:transparent;
+  --surface-hover:var(--wash);
+  --surface-selected:var(--wash);
+  --tab-indicator:inset 0 2px;
+  --surface-tab-row:var(--surface-tabbar);
+  /* The one bar between the graph and the article */
+  --pane-bar-height:8px;
+  --pane-bar-background:var(--bg);
+  --pane-bar-border:var(--divider);
+  --rail-indicator:none;
+  /* Scrollbars: the article's own scrollbar, and (when a skin sets them) every other one */
+  --scrollbar-size:12px;
+  --scrollbar-thumb-size:8px;
+  --scrollbar-thumb-hover-size:8px;
+  --scrollbar-radius:6px;
+  --scrollbar-track:color-mix(in srgb,var(--ink) 10%,var(--paper));
+  --scrollbar-thumb:color-mix(in srgb,var(--ink) 55%,var(--paper));
+  --scrollbar-thumb-hover:var(--muted);
+  --native-scrollbar-width:auto;
+  --native-scrollbar-color:auto;
+  /* Mermaid diagrams: label font, node corners and outlines are drawn into the
+     diagram; the frame around it is ordinary chrome */
+  --diagram-font:var(--ui-font);
+  --diagram-radius:var(--radius-block);
+  --diagram-stroke-width:1px;
+  --surface-diagram:color-mix(in srgb,var(--code) 45%,var(--paper));
+  --diagram-frame-border:var(--line);
+  --diagram-frame-radius:var(--radius-card);
+  --diagram-frame-shadow:none;
+  /* Icons and motion */
+  --icon-stroke:1.7;
+  --ui-transition:0s;
+  /* Status colours shared by every skin */
+  --danger:#b64436;
+  --warning:#d97706;
+  --warning-ink:#b45309;
+  --edit-off:#a43c37;
+  --edit-on:#28764b;
+  --edit-ink:#fff;
+  --search-match:#ffe08a;
+  --search-match-ink:#302600;
+  --diff-add:#3ca66a;
+  --diff-remove:#d05d55;
+}

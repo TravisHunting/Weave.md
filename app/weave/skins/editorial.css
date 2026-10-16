@@ -1,0 +1,72 @@
+/* Editorial: reading-first. The chrome shares the article's paper, rules are
+   hairlines, headings are set in a serif, tabs are underlined titles and
+   controls are quiet outlined pills. Article fonts stay the reader's choice. */
+:root[data-skin~=editorial]{
+  --hairline:color-mix(in srgb,var(--ink) 11%,var(--paper));
+  --display-font:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+  --panel-title-size:17px;--panel-title-weight:400;--panel-title-spacing:0;
+  --radius-inline:2px;--radius-block:4px;--radius-control:var(--radius-pill);--radius-row:4px;--radius-menu:6px;--radius-card:6px;--radius-dialog:8px;--radius-window:10px;--radius-rail:6px;--radius-tab:0;--radius-main:0;
+  --shadow-card:none;--shadow-float:0 6px 24px -12px #00000040;--shadow-popover:0 10px 30px -14px #00000052;--shadow-menu:0 14px 36px -16px #0000005c;--shadow-dialog:0 30px 80px -30px #00000073;
+  --titlebar-height:40px;--footer-height:24px;--rail-width:40px;--rail-button-size:34px;--rail-button-height:34px;--rail-gap:8px;
+  --tab-height:40px;--tab-font-size:13px;--tree-row-height:31px;--sidebar-padding:14px;--control-padding:4px 13px;
+  --divider:var(--hairline);--gutter:transparent;--control-border:color-mix(in srgb,var(--ink) 22%,var(--paper));--indent-guide:transparent;
+  --app-background:var(--paper);
+  --surface-titlebar:var(--paper);--surface-sticky:var(--paper);--surface-tabbar:var(--paper);--surface-tab-active:transparent;--surface-button:transparent;--surface-input:transparent;
+  --surface-hover:color-mix(in srgb,var(--ink) 5%,transparent);--surface-selected:transparent;
+  --tab-indicator:inset 0 -2px;--rail-indicator:none;
+  --icon-stroke:1.35;--ui-transition:.15s;
+  --edit-off:transparent;--edit-on:var(--accent);--edit-ink:var(--ink);
+}
+:root[data-skin~=editorial] #sidebar-resize,:root[data-skin~=editorial] #split-resize{background:linear-gradient(to right,transparent 2px,var(--hairline) 2px 3px,transparent 3px)}
+:root[data-skin~=editorial] #sidebar-resize:hover,:root[data-skin~=editorial] #split-resize:hover{background:linear-gradient(to right,transparent 1px,var(--accent) 1px 4px,transparent 4px)}
+:root[data-skin~=editorial] .rail{border-right:0;padding-top:12px;color:var(--muted)}
+:root[data-skin~=editorial] .rail button:hover{color:var(--ink)}
+:root[data-skin~=editorial] .rail button[aria-pressed=true]{color:var(--accent)}
+:root[data-skin~=editorial] .panel-heading{padding-block:14px 10px}
+:root[data-skin~=editorial] .panel-heading h2{font-family:var(--display-font)}
+:root[data-skin~=editorial] .tree-row.selected{color:var(--accent);box-shadow:inset 2px 0 var(--accent);border-radius:0}
+:root[data-skin~=editorial] .tree-folder{font-weight:600}
+:root[data-skin~=editorial] .tree-workspace-heading{font:italic 400 13px var(--display-font);letter-spacing:0;text-transform:none}
+/* Tabs are titles with an underline, set in the display face. */
+:root[data-skin~=editorial] #tab-bar{padding-left:18px}
+:root[data-skin~=editorial] .file-tab{border-right:0;margin:0 6px 0 0}
+:root[data-skin~=editorial] .file-tab .tab-title{font:500 14px var(--display-font)}
+:root[data-skin~=editorial] .file-tab:not(.active) .tab-title{color:var(--muted)}
+:root[data-skin~=editorial] .file-tab.workspace-tab,:root[data-skin~=editorial] .file-tab.workspace-tab.active{background:transparent}
+:root[data-skin~=editorial] .file-tab.workspace-tab.active{box-shadow:inset 0 -2px var(--workspace-color)}
+:root[data-skin~=editorial] main.split .editor-group:not(.focused) .file-tab.active{box-shadow:inset 0 -2px color-mix(in srgb,var(--muted) 45%,transparent)}
+:root[data-skin~=editorial] #titlebar{padding-left:14px;gap:7px}
+:root[data-skin~=editorial] #titlebar .brand-mark{background:transparent;color:var(--ink);font:italic 22px var(--display-font);padding:0 6px 0 0}
+:root[data-skin~=editorial] #titlebar #nav-back,:root[data-skin~=editorial] #titlebar #nav-forward{border-color:transparent;background:transparent;border-radius:var(--radius-pill)}
+:root[data-skin~=editorial] #edit-mode{border-color:var(--control-border)}
+:root[data-skin~=editorial] #edit-mode[aria-pressed=true]{color:var(--paper)}
+:root[data-skin~=editorial] button[aria-pressed=true]{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+:root[data-skin~=editorial] footer{font-variant:all-small-caps;letter-spacing:.6px;font-size:12px;padding-inline:16px}
+:root[data-skin~=editorial] .okf-chip{border-radius:2px;border-color:var(--hairline);font-variant:all-small-caps;letter-spacing:.3px}
+:root[data-skin~=editorial] .okf-chip.okf-tag{font-variant:normal;letter-spacing:0}
+:root[data-skin~=editorial] #welcome h1{font-style:italic}
+:root[data-skin~=editorial] .settings-category>h2{font:400 24px var(--display-font);border-bottom-color:var(--hairline)}
+:root[data-skin~=editorial] .settings-nav{background:var(--paper)}
+:root[data-skin~=editorial] .settings-nav-item.active{background:transparent;color:var(--accent);box-shadow:inset 2px 0 var(--accent);border-radius:0}
+:root[data-skin~=editorial] dialog h2{font:400 22px var(--display-font)}
+:root[data-skin~=editorial] .kanban-board-title{font:400 26px var(--display-font)}
+:root[data-skin~=editorial] .kanban-lane{background:transparent;border-color:var(--hairline)}
+:root[data-skin~=editorial] .kanban-lane-title{font:italic 400 15px var(--display-font)}
+:root[data-skin~=editorial] :is(.index-card,.result,.workspace-card,.evidence-card){border-color:var(--hairline)}
+/* Picker preview */
+.skin-preview[data-preview~=editorial]{background:var(--paper);border-radius:3px}
+.skin-preview[data-preview~=editorial] .sp-title{background:var(--paper);border-bottom-color:color-mix(in srgb,var(--ink) 11%,var(--paper))}
+.skin-preview[data-preview~=editorial] .sp-title::before{content:"W";position:absolute;left:3px;top:-2px;font:italic 8px Georgia,serif;color:var(--ink)}
+.skin-preview[data-preview~=editorial] .sp-rail{border-right:0;background:transparent}
+.skin-preview[data-preview~=editorial] .sp-side{background:transparent;border-right:1px solid color-mix(in srgb,var(--ink) 11%,var(--paper))}
+.skin-preview[data-preview~=editorial] .sp-main{border-left:0;border-radius:0}
+.skin-preview[data-preview~=editorial] .sp-tab{background:transparent;box-shadow:inset 0 -1.5px var(--accent)}
+.skin-preview[data-preview~=editorial] .sp-lines{left:9px;right:12px}
+:root[data-skin~=editorial] #graph-resize:hover{background:color-mix(in srgb,var(--accent) 35%,transparent)}
+/* Scrollbars: a slim thumb on a clear track, widening under the pointer. */
+:root[data-skin~=editorial]{--scrollbar-size:10px;--scrollbar-thumb-size:3px;--scrollbar-thumb-hover-size:6px;--scrollbar-radius:999px;--scrollbar-track:transparent;--scrollbar-thumb:color-mix(in srgb,var(--ink) 20%,transparent);--scrollbar-thumb-hover:color-mix(in srgb,var(--accent) 70%,transparent);--native-scrollbar-width:thin;--native-scrollbar-color:var(--scrollbar-thumb) transparent}
+:root[data-skin~=editorial] ::-webkit-scrollbar{width:10px;height:10px;background:transparent}
+:root[data-skin~=editorial] ::-webkit-scrollbar-thumb{border:calc((10px - var(--scrollbar-thumb-size))/2) solid transparent;border-radius:var(--scrollbar-radius);background:var(--scrollbar-thumb) padding-box}
+:root[data-skin~=editorial] ::-webkit-scrollbar-thumb:hover{background:var(--scrollbar-thumb-hover) padding-box}
+:root[data-skin~=editorial] ::-webkit-scrollbar-corner{background:transparent}/* The bar between graph and article: a short grip instead of a band. */
+:root[data-skin~=editorial]{--pane-bar-height:10px;--pane-bar-background:linear-gradient(color-mix(in srgb,var(--ink) 20%,transparent),color-mix(in srgb,var(--ink) 20%,transparent)) center/38px 3px no-repeat;--pane-bar-border:transparent}

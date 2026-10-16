@@ -1,0 +1,42 @@
+/* Aurora Thin: Aurora's glass and gradient with the chrome pared back for the
+   editor. Slimmer title, status and tab bars, a narrower rail, tight panel
+   margins, tabs that give more width to their titles, and hairline glass
+   scrollbars. Extends Aurora; only the differences are here. */
+:root[data-skin~=aurora-thin]{
+  --radius-control:8px;--radius-row:8px;--radius-menu:12px;--radius-card:12px;--radius-dialog:16px;--radius-rail:9px;--radius-tab:8px;--radius-main:14px;
+  --titlebar-height:34px;--footer-height:20px;--rail-width:38px;--rail-button-size:32px;--rail-button-height:32px;--rail-gap:3px;
+  --tab-height:34px;--tab-max-width:300px;--tab-title-max-width:266px;
+  --tree-row-height:26px;--sidebar-padding:8px;--control-padding:4px 10px;
+  --scrollbar-size:9px;--scrollbar-thumb-size:3px;--scrollbar-thumb-hover-size:7px;
+  --scrollbar-thumb:color-mix(in srgb,var(--ink) 24%,transparent);--scrollbar-thumb-hover:color-mix(in srgb,var(--accent) 80%,transparent);
+}
+:root[data-skin~=aurora-thin] main{margin:0 6px 6px 0;box-shadow:0 18px 40px -26px #00000040,0 6px 18px -14px var(--glow)}
+:root[data-skin~=aurora-thin] #right-sidebar{margin:0 6px 6px 0}
+:root[data-skin~=aurora-thin] .rail{padding-top:4px}
+:root[data-skin~=aurora-thin] #titlebar{gap:4px;padding:0 6px 0 8px}
+:root[data-skin~=aurora-thin] #titlebar .brand-mark{font-size:14px;padding:1px 6px;border-radius:7px}
+:root[data-skin~=aurora-thin] #titlebar .titlebar-end>button{padding:2px 9px}
+:root[data-skin~=aurora-thin] #titlebar #nav-back,:root[data-skin~=aurora-thin] #titlebar #nav-forward{width:26px;height:24px}
+:root[data-skin~=aurora-thin] :is(#edit-mode,#view-graph,#source-toggle){padding-inline:12px}
+:root[data-skin~=aurora-thin] .panel-heading{padding-block:5px}
+:root[data-skin~=aurora-thin] footer{padding-inline:10px}
+/* Tabs: less padding around the title and a narrower close button, so more of the title shows. */
+:root[data-skin~=aurora-thin] #tab-bar{padding:0 4px;gap:2px}
+:root[data-skin~=aurora-thin] .file-tab{margin:4px 0}
+:root[data-skin~=aurora-thin] .file-tab [data-tab]{padding:3px 3px 3px 10px}
+:root[data-skin~=aurora-thin] .file-tab.named-tab [data-tab]{padding-top:1px;padding-bottom:8px}
+:root[data-skin~=aurora-thin] .file-tab .close-tab{min-width:20px;padding:2px 5px 2px 3px}
+:root[data-skin~=aurora-thin] #new-tab{padding:2px 9px}
+/* A little less air above the article; the reader's own indent is untouched. */
+:root[data-skin~=aurora-thin] #okf-bar{padding-top:6px}
+:root[data-skin~=aurora-thin] #article,:root[data-skin~=aurora-thin] #source-editor{padding-top:16px;padding-right:22px}
+/* The glass scrollbar floats over the card edge: a hairline that widens when used. */
+:root[data-skin~=aurora-thin] .article-scrollbar{margin-left:-3px}
+/* Picker preview */
+.skin-preview[data-preview~=aurora-thin] .sp-title{height:6px}
+.skin-preview[data-preview~=aurora-thin] .sp-rail{top:6px;width:9px}
+.skin-preview[data-preview~=aurora-thin] .sp-rail::after{left:1px;width:7px;height:6px}
+.skin-preview[data-preview~=aurora-thin] .sp-side{left:9px;top:6px}
+.skin-preview[data-preview~=aurora-thin] .sp-main{inset:7px 2px 2px 35px}
+.skin-preview[data-preview~=aurora-thin] .sp-tab{width:30px;height:6px}
+.skin-preview[data-preview~=aurora-thin] .sp-main::after{content:"";position:absolute;right:1px;top:12px;width:1.5px;height:16px;border-radius:2px;background:color-mix(in srgb,var(--accent) 70%,transparent)}

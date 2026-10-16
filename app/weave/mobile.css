@@ -1,0 +1,125 @@
+/* Phone layout (root data-layout=mobile, set by mobile.mjs on narrow
+   viewports). Layout, not a skin: loaded after the skins and title-bar tabs,
+   it applies to every skin and changes only geometry and touch sizes, never
+   colours. The article fills the window; the rail and left sidebar form one
+   drawer over it, the right sidebar another, and a scrim closes them. Selectors
+   start with :root[data-layout=mobile][data-skin] so they outrank the skins'
+   own :root[data-skin~=…] rules. */
+:root[data-layout=mobile][data-skin]{--titlebar-height:48px;--tab-height:40px;--footer-height:22px;--rail-width:52px;--rail-button-size:44px;--rail-button-height:44px;--rail-gap:4px;--tree-row-height:40px;--tree-font-size:15px;--drawer-width:min(330px,calc(100vw - var(--rail-width) - 44px));--mobile-touch:40px}
+
+/* Title bar: a drawer button, the menu, Back and Forward; Graph, the right
+   sidebar and Edit at the end. Every control is a comfortable touch target. */
+:root[data-layout=mobile][data-skin] #titlebar{gap:2px;padding:0 6px;padding-top:env(safe-area-inset-top);height:calc(var(--titlebar-height) + env(safe-area-inset-top))}
+:root[data-layout=mobile][data-skin] #titlebar :is(.titlebar-start,.titlebar-end){gap:2px}
+:root[data-layout=mobile][data-skin] #titlebar :is(.titlebar-start,.titlebar-end)>button{min-width:var(--mobile-touch);min-height:var(--mobile-touch);height:auto;width:auto;display:inline-flex;align-items:center;justify-content:center}
+:root[data-layout=mobile][data-skin] #titlebar .titlebar-end>button{padding-inline:10px}
+/* No room for the Source pill on a phone's title bar; Source mode stays in the W menu. */
+:root[data-layout=mobile][data-skin] #titlebar #source-toggle{display:none}
+:root[data-layout=mobile][data-skin] #mobile-drawer{border:0;background:transparent;padding:0}
+:root[data-layout=mobile][data-skin] #mobile-drawer[aria-expanded=true]{background:var(--surface-selected);color:var(--accent)}
+:root[data-layout=mobile] #mobile-drawer svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);stroke-linecap:round}
+:root[data-layout=mobile] #window-controls{display:none!important}
+
+/* The article column is the whole shell. */
+:root[data-layout=mobile][data-skin] .shell{display:block;position:relative;height:calc(100dvh - var(--titlebar-height) - env(safe-area-inset-top) - var(--footer-height) - env(safe-area-inset-bottom))}
+:root[data-layout=mobile][data-skin] .shell>main{height:100%;margin:0;border-radius:0;border-inline:0;border-bottom:0}
+:root[data-layout=mobile] :is(#sidebar-resize,#right-sidebar-resize,#split-resize){display:none!important}
+
+/* Left drawer: the rail and the sidebar side by side, sliding in together. */
+:root[data-layout=mobile][data-skin] .shell>:is(.rail,#sidebar,#right-sidebar){position:fixed;top:calc(var(--titlebar-height) + env(safe-area-inset-top));bottom:calc(var(--footer-height) + env(safe-area-inset-bottom));z-index:30;margin:0;transition:transform var(--ui-transition),visibility 0s}
+:root[data-layout=mobile][data-skin] .shell>.rail{left:0;width:var(--rail-width);overflow-y:auto;overflow-x:hidden;border-radius:0;background:var(--paper)}
+:root[data-layout=mobile][data-skin] .shell>#sidebar{left:var(--rail-width);width:var(--drawer-width);padding:0 12px;border-radius:0 var(--radius-main) var(--radius-main) 0;border-left:1px solid var(--divider);background:var(--paper);box-shadow:var(--shadow-dialog)}
+:root[data-layout=mobile][data-skin] body.sidebar-collapsed .shell>:is(.rail,#sidebar){transform:translateX(calc(-1 * (var(--rail-width) + var(--drawer-width) + 24px)));visibility:hidden;transition:transform var(--ui-transition),visibility 0s var(--ui-transition)}
+:root[data-layout=mobile][data-skin] body.sidebar-collapsed #sidebar{padding:0 12px}
+:root[data-layout=mobile] #collapse-panel{min-width:var(--mobile-touch);min-height:var(--mobile-touch)}
+
+/* Right drawer. */
+:root[data-layout=mobile][data-skin] .shell>#right-sidebar{right:0;left:auto;width:min(380px,calc(100vw - 44px));padding:0 12px;border:0;border-left:1px solid var(--divider);border-radius:var(--radius-main) 0 0 var(--radius-main);background:var(--paper);box-shadow:var(--shadow-dialog)}
+:root[data-layout=mobile][data-skin] .right-rail button{width:var(--mobile-touch);height:var(--mobile-touch);flex-basis:var(--mobile-touch)}
+
+#mobile-scrim{position:fixed;inset:calc(var(--titlebar-height) + env(safe-area-inset-top)) 0 0;z-index:29;background:color-mix(in srgb,#000 32%,transparent);-webkit-tap-highlight-color:transparent}
+
+/* Touch sizes in the drawers. */
+:root[data-layout=mobile][data-skin] :is(#sidebar,#right-sidebar) .panel-heading{min-height:52px}
+:root[data-layout=mobile][data-skin] :is(#sidebar,#right-sidebar) .panel-heading button{min-width:var(--mobile-touch);min-height:var(--mobile-touch)}
+:root[data-layout=mobile][data-skin] .file-actions{margin-bottom:0}
+:root[data-layout=mobile][data-skin] .file-actions button{min-width:var(--mobile-touch);min-height:var(--mobile-touch)}
+:root[data-layout=mobile][data-skin] #tree .tree-row{min-height:var(--tree-row-height);display:flex;align-items:center}
+:root[data-layout=mobile][data-skin] .result{padding:12px}
+:root[data-layout=mobile][data-skin] :is(#sidebar,#right-sidebar,dialog) :is(input,select,textarea){font-size:16px}
+
+/* Tabs: their own row, scrolled sideways by touch, with a close button on every tab. */
+:root[data-layout=mobile][data-skin] #tab-bar{min-height:var(--tab-height)}
+:root[data-layout=mobile][data-skin] #file-tabs{scrollbar-width:none;-webkit-overflow-scrolling:touch}
+:root[data-layout=mobile] #file-tabs::-webkit-scrollbar{display:none}
+:root[data-layout=mobile][data-skin] .file-tab{--tab-max-width:70vw}
+:root[data-layout=mobile][data-skin] .file-tab .close-tab{min-width:36px;opacity:1;visibility:visible}
+:root[data-layout=mobile][data-skin] :is(#new-tab,#close-tabs){min-width:var(--mobile-touch)}
+/* The tab bar slides away while the article is read downwards or typed in, and
+   returns on scrolling up (mobile.mjs sets data-tabs-hidden on its side). The
+   whole side moves up under the title bar, so every skin's card keeps its shape
+   beneath the strip. When the graph is shown the side scrolls as a whole and the
+   bar sticks over the article, so it paints the window background beneath any
+   translucent skin surface instead of letting the text show through. */
+:root[data-layout=mobile][data-skin] main>.editor-group{transition:margin-top max(.2s,var(--ui-transition)) ease}
+:root[data-layout=mobile][data-skin] main>.editor-group[data-tabs-hidden]{margin-top:calc(-1 * var(--tab-height))}
+:root[data-layout=mobile][data-skin] #tab-bar{transition:opacity max(.2s,var(--ui-transition)) ease,visibility 0s}
+:root[data-layout=mobile][data-skin] .editor-group[data-tabs-hidden]>#tab-bar{opacity:0;visibility:hidden;pointer-events:none;transition-delay:0s,max(.2s,var(--ui-transition))}
+:root[data-layout=mobile][data-skin] .editor-group.graph-with-article>#tab-bar{background:linear-gradient(var(--surface-tabbar),var(--surface-tabbar)),var(--app-background);background-attachment:fixed}
+
+/* Split view shows the focused side only; its tabs keep their sides. */
+:root[data-layout=mobile] main.split>.editor-group:not(.focused){display:none}
+:root[data-layout=mobile] main.split>.editor-group.focused{flex:1 1 0}
+:root[data-layout=mobile] :is(#context-split-tab,#context-move-tab,[data-file-action=open-side]){display:none!important}
+
+/* Reading: a narrow gutter and no wasted margins. */
+:root[data-layout=mobile][data-skin] :is(#article,#source-editor){--article-indent:22px;padding-right:16px}
+:root[data-layout=mobile][data-skin] #okf-bar{padding-inline:22px 16px}
+:root[data-layout=mobile][data-skin] #welcome{margin:6vh auto;padding:20px 18px}
+:root[data-layout=mobile][data-skin] #evidence-panel{padding:20px 16px}
+:root[data-layout=mobile][data-skin] #connections{margin-inline:16px}
+:root[data-layout=mobile][data-skin] #find-bar{left:8px;right:8px;top:calc(var(--tab-height) + 6px);flex-wrap:wrap}
+:root[data-layout=mobile][data-skin] #find-bar input{flex:1;min-width:0;font-size:16px}
+
+/* Graph: a shorter default, and its bars are big enough to drag with a finger. */
+:root[data-layout=mobile][data-skin] #graph-panel{max-height:60%}
+:root[data-layout=mobile][data-skin] #graph-resize{height:14px}
+:root[data-layout=mobile][data-skin] .graph-controls{left:8px;right:8px;max-width:none}
+
+/* Status bar: the workspace and messages; index counts live in Control panel. */
+:root[data-layout=mobile][data-skin] footer{padding-bottom:env(safe-area-inset-bottom);height:calc(var(--footer-height) + env(safe-area-inset-bottom))}
+:root[data-layout=mobile][data-skin] footer #index-status{display:none}
+:root[data-layout=mobile][data-skin] footer #current-path{max-width:45%}
+
+/* Menus fit the screen and their items are touch targets. */
+:root[data-layout=mobile][data-skin] :is(.article-context-menu,#file-menu,#tab-menu,#link-menu){max-width:calc(100vw - 16px);max-height:calc(100dvh - 16px);overflow-y:auto}
+:root[data-layout=mobile][data-skin] :is(.article-context-menu,#file-menu,#tab-menu,#link-menu) button{min-height:var(--mobile-touch)}
+:root[data-layout=mobile][data-skin] #suggestions{left:8px;right:8px;max-width:none}
+
+/* Dialogs become full-width sheets. */
+:root[data-layout=mobile][data-skin] dialog:not(.settings-dialog){width:calc(100vw - 16px);max-width:none;max-height:calc(100dvh - 16px);padding:20px 16px;overflow-y:auto}
+:root[data-layout=mobile][data-skin] .dialog-actions{flex-wrap:wrap}
+:root[data-layout=mobile][data-skin] .dialog-actions button{min-height:var(--mobile-touch);flex:1 1 auto}
+:root[data-layout=mobile][data-skin] .git-diff-dialog{width:100vw;height:100dvh;max-height:none;border-radius:0}
+
+/* Settings: categories, then one category, with a way back to the list. */
+:root[data-layout=mobile][data-skin] .settings-dialog{width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;border:0;border-radius:0}
+:root[data-layout=mobile][data-skin] .settings-shell{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+:root[data-layout=mobile][data-skin] .settings-dialog[data-view=list] .settings-content,:root[data-layout=mobile][data-skin] .settings-dialog[data-view=detail] .settings-nav{display:none}
+:root[data-layout=mobile][data-skin] .settings-nav{padding:56px 12px 16px;border-right:0}
+:root[data-layout=mobile][data-skin] .settings-nav-item{padding:12px;font-size:15px}
+:root[data-layout=mobile][data-skin] .settings-content{padding:56px 16px 32px;font-size:14px}
+:root[data-layout=mobile][data-skin] .settings-close{width:44px;height:44px}
+:root[data-layout=mobile][data-skin] .settings-dialog.settings-searching .settings-shell{grid-template-rows:auto minmax(0,1fr)}
+:root[data-layout=mobile][data-skin] .settings-dialog.settings-searching[data-view=detail] .settings-nav{display:block;padding-bottom:0}
+:root[data-layout=mobile][data-skin] .settings-dialog.settings-searching[data-view=detail] .settings-nav #settings-categories{display:none}
+:root[data-layout=mobile][data-skin] .settings-dialog.settings-searching .settings-content{padding-top:8px}
+.settings-back{display:none}
+:root[data-layout=mobile][data-skin] .settings-dialog[data-view=detail] .settings-back{display:inline-flex;align-items:center;gap:4px;position:absolute;top:6px;left:8px;z-index:2;min-height:44px;padding:0 12px;border:0;background:transparent;color:var(--accent);font-size:15px}
+:root[data-layout=mobile][data-skin] .settings-dialog.settings-searching .settings-back{display:none}
+
+/* No slide while the layout itself changes (mobile.mjs sets data-layout-settling), or for reduced motion. */
+:root[data-layout=mobile][data-layout-settling] .shell>:is(.rail,#sidebar,#right-sidebar){transition:none!important}
+@media (prefers-reduced-motion:reduce){
+  :root[data-layout=mobile] :is(.shell>:is(.rail,#sidebar,#right-sidebar),main>.editor-group,#tab-bar){transition:none!important}
+}

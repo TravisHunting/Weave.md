@@ -1,0 +1,37 @@
+name: weave
+# Start with: docker compose up -d, then open http://localhost:8765 (or this
+# computer's address) and create the administrator account. Put a reverse proxy
+# or tunnel in front for HTTPS. Accounts and settings persist in weave-data.
+# Optional (.env or shell):
+#   WEAVE_PORT                 host port (default 8765)
+#   WEAVE_ADMIN_USERNAME/_PASSWORD  create the account at first start instead
+#   WEAVE_ORIGIN               accept only this public https:// origin
+#   WEAVE_ALLOWED_HOSTS=local  accept only localhost and the container's own
+#                              addresses (default any host name)
+services:
+  weave:
+    image: ${WEAVE_IMAGE:-weave-server:local}
+    build: .
+    restart: unless-stopped
+    init: true
+    command: ["--host", "0.0.0.0", "--port", "8765", "--workspaces", "/workspaces", "--data", "/data"]
+    environment:
+      WEAVE_ORIGIN: ${WEAVE_ORIGIN:-}
+      WEAVE_ALLOWED_HOSTS: ${WEAVE_ALLOWED_HOSTS:-}
+      WEAVE_ADMIN_USERNAME: ${WEAVE_ADMIN_USERNAME:-}
+      WEAVE_ADMIN_PASSWORD: ${WEAVE_ADMIN_PASSWORD:-}
+    ports:
+      - "${WEAVE_PORT:-8765}:8765"
+    volumes:
+      - weave-workspaces:/workspaces
+      - weave-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 256
+    stop_grace_period: 60s
+volumes:
+  weave-workspaces:
+  weave-data:

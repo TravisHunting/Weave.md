@@ -1,0 +1,12 @@
+node_modules/
+test-results/
+*.tmp
+dist/
+src-tauri/target/
+src-tauri/gen/
+*.lnk
+/knowledge/
+.weave/
+.weave-server/
+/workspaces/
+.env

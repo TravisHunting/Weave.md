@@ -1,0 +1,12 @@
+*
+!Dockerfile
+!package.json
+!package-lock.json
+!app/
+!app/**
+!src-tauri/
+!src-tauri/Cargo.toml
+!src-tauri/Cargo.lock
+!src-tauri/build.rs
+!src-tauri/src/
+!src-tauri/src/**

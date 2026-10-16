@@ -1,0 +1,21 @@
+.shell{grid-template-columns:var(--rail-width) minmax(0,var(--sidebar)) 5px minmax(0,1fr) 0 0}
+.sidebar-collapsed .shell{grid-template-columns:var(--rail-width) 0 0 minmax(0,1fr) 0 0}
+.right-sidebar-open .shell{grid-template-columns:var(--rail-width) minmax(0,min(var(--sidebar),32vw)) 5px minmax(0,1fr) 5px minmax(0,min(var(--right-sidebar),38vw))}
+.right-sidebar-open.sidebar-collapsed .shell{grid-template-columns:var(--rail-width) 0 0 minmax(0,1fr) 5px minmax(0,min(var(--right-sidebar),60vw))}
+#right-sidebar{min-width:0;overflow:auto;background:var(--surface-sidebar);padding:0 var(--sidebar-padding);display:flex;flex-direction:column;border-left:1px solid var(--divider)}
+#right-sidebar[hidden],#right-sidebar-resize[hidden]{display:none}
+#right-sidebar-resize{cursor:col-resize;touch-action:none;background:transparent}
+#right-sidebar-resize:hover,#right-sidebar-resize:focus-visible{background:var(--accent)}
+.right-rail{display:flex;flex-wrap:wrap;gap:3px;padding:6px 0;border-bottom:1px solid var(--divider);flex-shrink:0}
+.right-rail button{height:29px;width:29px;flex:0 0 29px;padding:4px;border:0;background:transparent;color:var(--muted)}
+.right-rail button:hover,.right-rail button[aria-pressed=true]{background:var(--surface-selected);color:var(--ink)}
+.right-rail svg,#toggle-right-sidebar svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:calc(var(--icon-stroke) - .1);stroke-linecap:round;stroke-linejoin:round}
+#toggle-right-sidebar{padding:4px 7px;display:flex;align-items:center}
+#right-sidebar .panel-heading{position:static}
+.file-labels-right .tree-row .tree-secondary{margin-left:auto}
+#search-query:focus,#search-query:focus-visible{outline:none;box-shadow:none}
+.search-match{background:var(--search-match);color:var(--search-match-ink);border-radius:2px}
+#article .search-match,#source-editor .search-match{background:var(--search-match);color:var(--search-match-ink)}
+.tree-hidden-folder .tree-name{opacity:.6}
+/* While the left sidebar is dragged narrower than its minimum, clip rather than reflow its panels. */
+body.sidebar-resizing{cursor:col-resize;user-select:none}body.sidebar-resizing #sidebar{overflow:hidden}

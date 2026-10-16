@@ -1,0 +1,19 @@
+/* Mermaid diagrams (mermaid.mjs). The drawing is an <img>; this is its frame.
+   Settings › Visual styling › Diagrams sets data-mermaid-frame/-size/-align. */
+.mermaid-diagram{position:relative;box-sizing:border-box;margin:4px 0;padding:16px 18px;min-height:var(--mermaid-height,72px);display:flex;flex-direction:column;gap:8px;border:1px solid var(--diagram-frame-border);border-radius:var(--diagram-frame-radius);background:var(--surface-diagram);box-shadow:var(--diagram-frame-shadow);overflow-x:auto;overflow-y:hidden;cursor:default;white-space:normal;line-height:normal}
+.mermaid-figure{width:max-content;max-width:100%;margin-inline:auto}
+.mermaid-figure img{display:block;width:calc(var(--diagram-width,300px) * var(--article-zoom,1));max-width:100%;height:auto;user-select:none;-webkit-user-drag:none}
+.mermaid-diagram[data-state=pending]::before,.mermaid-diagram[data-state=pending]::after{content:'';position:absolute;inset:16px 18px auto;height:10px;border-radius:var(--radius-pill);background:color-mix(in srgb,var(--ink) 8%,transparent)}
+.mermaid-diagram[data-state=pending]::after{top:34px;right:45%}
+.mermaid-diagram[data-state=updating] .mermaid-figure{opacity:.55}
+.mermaid-diagram[data-state=error]{border-color:color-mix(in srgb,var(--danger) 45%,var(--diagram-frame-border))}
+.mermaid-error{margin:0;font:12px/1.5 var(--ui-mono-font);color:var(--danger);white-space:pre-wrap;overflow-wrap:anywhere}
+.live-editing .mermaid-diagram:not(.mermaid-preview){cursor:text}
+.mermaid-preview{margin-top:6px;border-style:dashed}
+:root[data-mermaid-frame=plain] .mermaid-diagram:not(.mermaid-preview){border-color:transparent;background:transparent;box-shadow:none;padding-inline:0}
+:root[data-mermaid-align=left] .mermaid-figure{margin-inline:0}
+:root[data-mermaid-size=natural] .mermaid-figure,:root[data-mermaid-size=natural] .mermaid-figure img{max-width:none}
+/* Where Mermaid lays diagrams out (off-screen, never seen); its background is the
+   colour diagrams are drawn on, which mermaid.mjs reads for edge labels */
+.mermaid-sandbox{position:fixed;left:-20000px;top:0;width:960px;visibility:hidden;pointer-events:none;background:var(--surface-diagram)}
+:root[data-mermaid-frame=plain] .mermaid-sandbox{background:transparent}

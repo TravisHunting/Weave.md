@@ -1,0 +1,24 @@
+# Use with compose.yaml. Access must protect the entire hostname before starting.
+# No origin port is published in this deployment.
+services:
+  weave:
+    ports: !reset []
+    command: ["--host", "0.0.0.0", "--port", "8765", "--workspaces", "/workspaces", "--data", "/data", "--origin", "${WEAVE_ORIGIN:?Set WEAVE_ORIGIN to the Access-protected https origin}"]
+    networks: [origin]
+  cloudflared:
+    image: ${CLOUDFLARED_IMAGE:-cloudflare/cloudflared:latest}
+    command: ["tunnel", "--no-autoupdate", "run", "--token-file", "/run/secrets/tunnel-token"]
+    secrets: [tunnel-token]
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [origin, gateway]
+    depends_on: [weave]
+networks:
+  origin:
+    internal: true
+  gateway:
+secrets:
+  tunnel-token:
+    file: ${CLOUDFLARE_TOKEN_FILE:?Set CLOUDFLARE_TOKEN_FILE to a private tunnel token file outside the repository}

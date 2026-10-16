@@ -1,0 +1,38 @@
+/* Aurora Flow: Aurora Thin with browser-style tabs. The tab strip sits on the
+   gradient and the article card starts beneath it; the active tab is cut from
+   the same glass as the card and curves into it (--tab-curve feet). Extends
+   Aurora Thin. */
+:root[data-skin~=aurora-flow]{
+  --tab-height:36px;--tab-curve:8px;--radius-tab:10px 10px 0 0;
+  --surface-tab-active:var(--glass-strong);
+  --card-top:var(--tab-height);
+}
+/* main draws nothing itself; each editor group paints its card below the strip
+   as one rounded shape. Separate background layers for the corners and body
+   left a faint seam where they met at fractional display scales. The card is
+   absolute normally and sticky while the group itself scrolls (graph with
+   article), so it stays put while content scrolls; isolation keeps it above
+   the gradient but beneath the group's content. */
+:root[data-skin~=aurora-flow] main{background:transparent;border:0;box-shadow:none}
+:root[data-skin~=aurora-flow] .editor-group{isolation:isolate}
+:root[data-skin~=aurora-flow] .editor-group::before{content:"";position:absolute;inset:var(--card-top) 0 0;z-index:-1;border-radius:var(--radius-main) var(--radius-main) 0 0;background:var(--glass-strong);pointer-events:none}
+:root[data-skin~=aurora-flow] .editor-group.graph-with-article::before{position:sticky;inset:auto;top:var(--card-top);flex:none;height:100vh;margin-bottom:-100vh}
+:root[data-skin~=aurora-flow] #tab-bar{align-items:stretch;padding:0 4px 0 2px;gap:0;border-bottom:0}
+/* The first tab's foot must land on the card's flat top, clear of its rounded corner. */
+:root[data-skin~=aurora-flow] #file-tabs{padding-inline:calc(var(--radius-main) + var(--tab-curve) - 3px) var(--tab-curve)}
+:root[data-skin~=aurora-flow] .file-tab{margin:5px 1px 0;border-right:0}
+:root[data-skin~=aurora-flow] .file-tab [data-tab]{padding-block:2px}
+:root[data-skin~=aurora-flow] .file-tab.active{background:var(--surface-tab-active);box-shadow:none}
+:root[data-skin~=aurora-flow] .file-tab:not(.active):hover{background:color-mix(in srgb,var(--paper) 38%,transparent)}
+:root[data-skin~=aurora-flow] .file-tab:not(.active)+.file-tab:not(.active)::before{content:"";position:absolute;left:-1.5px;top:30%;height:40%;width:1px;background:color-mix(in srgb,var(--ink) 20%,transparent)}
+:root[data-skin~=aurora-flow] .file-tab:not(.active):hover+.file-tab::before,:root[data-skin~=aurora-flow] .file-tab:not(.active):hover::before{opacity:0}
+/* Workspace colours mark the tab's top edge so the tab still matches its card. */
+:root[data-skin~=aurora-flow] .file-tab.workspace-tab{box-shadow:none}
+:root[data-skin~=aurora-flow] .file-tab.workspace-tab.active{background:var(--surface-tab-active);box-shadow:inset 0 2px var(--workspace-color)}
+:root[data-skin~=aurora-flow] main.split .editor-group:not(.focused) .file-tab.active{background:var(--surface-tab-active);box-shadow:none}
+:root[data-skin~=aurora-flow] main.split .editor-group:not(.focused) .file-tab.active .tab-title{opacity:.7}
+:root[data-skin~=aurora-flow] #tab-bar{height:var(--tab-height)}
+:root[data-skin~=aurora-flow] #new-tab,:root[data-skin~=aurora-flow] #close-tabs{align-self:center;height:24px;margin:3px 0 0;padding-block:0;line-height:1;border-radius:var(--radius-control)}
+/* Picker preview: the tab rises out of the card. */
+.skin-preview[data-preview~=aurora-flow] .sp-main{top:14px;overflow:visible}
+.skin-preview[data-preview~=aurora-flow] .sp-tab{top:-6px;left:9px;height:6px;border-radius:3px 3px 0 0;background:color-mix(in srgb,var(--paper) 80%,transparent);box-shadow:none}

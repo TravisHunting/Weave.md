@@ -1,0 +1,6 @@
+# Linux build scripts and package files must keep LF line endings on every checkout.
+*.sh text eol=lf
+scripts/linux/** text eol=lf
+packaging/linux/** text eol=lf
+Dockerfile text eol=lf
+compose*.yaml text eol=lf

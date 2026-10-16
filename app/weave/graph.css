@@ -1,0 +1,18 @@
+/* The graph owns a pan scrollbar; the outer page remains available for reading. */
+#graph-stage{position:relative;flex:1;min-height:0;isolation:isolate;overflow:hidden}
+#graph-scrollport{position:absolute;inset:0;overflow-x:hidden;overflow-y:scroll;overscroll-behavior:contain;scrollbar-width:auto;scrollbar-color:var(--line) var(--bg)}
+#graph-scroll-space{position:relative;min-width:100%;min-height:100%}
+#graph-panel #graph{position:sticky;touch-action:none;top:0;left:0;display:block;flex:none;min-height:0;max-width:none;overflow:hidden}
+#graph-stage .graph-controls{position:absolute;left:12px;bottom:12px;top:auto;z-index:2;display:flex;gap:5px 8px;align-items:center;max-width:calc(100% - 44px);padding:7px 9px;border:1px solid var(--line);border-radius:var(--radius-menu);background:var(--surface-menu);box-shadow:var(--shadow-float);-webkit-backdrop-filter:var(--overlay-filter);backdrop-filter:var(--overlay-filter);font-size:11px}
+#graph-stage .graph-controls label{display:flex;gap:5px;align-items:center}
+#graph-stage .graph-controls select,#graph-stage .graph-controls button{padding:3px 6px;font-size:11px}
+#graph-stage #graph-count{margin-left:4px;font-size:10px;color:var(--muted)}
+#graph-stage .graph-scroll-hint{color:var(--muted);font-size:10px}
+#graph-panel.graph-resizing{min-height:8px;overflow:hidden}
+#graph-panel.graph-resizing #graph{min-height:0}
+#graph-spacing{width:90px;padding:0;accent-color:var(--accent)}
+#graph-spacing-value{min-width:32px;font-variant-numeric:tabular-nums}
+.graph-arriving{animation:graph-arrival 240ms ease-out both}
+.graph-camera-arriving{transition:transform 180ms ease-out}
+@keyframes graph-arrival{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.graph-arriving{animation:none}.graph-camera-arriving{transition:none}}

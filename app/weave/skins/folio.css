@@ -1,0 +1,36 @@
+/* Folio: Editorial with folder tabs. Tabs stand on a lightly tinted strip; the
+   active tab is the page itself, outlined in hairlines and joined to the page
+   below. Bars and margins are slimmer than Editorial's. Extends Editorial. */
+:root[data-skin~=folio]{
+  --titlebar-height:34px;--footer-height:21px;--rail-width:38px;--rail-button-size:32px;--rail-button-height:32px;--rail-gap:5px;
+  --tab-height:36px;--tab-max-width:300px;--tab-title-max-width:264px;--tab-curve:6px;--radius-tab:7px 7px 0 0;
+  --tree-row-height:28px;--sidebar-padding:10px;--control-padding:3px 12px;
+  --surface-tabbar:color-mix(in srgb,var(--ink) 4%,var(--paper));--surface-tab-active:var(--paper);--tab-indicator:0 0 0 0;
+}
+:root[data-skin~=folio] .rail{padding-top:6px}
+:root[data-skin~=folio] .panel-heading{padding-block:9px 6px}
+:root[data-skin~=folio] #titlebar{padding-left:10px;gap:5px}
+:root[data-skin~=folio] #titlebar .brand-mark{font-size:19px}
+:root[data-skin~=folio] footer{padding-inline:12px}
+:root[data-skin~=folio] #okf-bar{padding-top:6px}
+:root[data-skin~=folio] #article,:root[data-skin~=folio] #source-editor{padding-top:16px}
+/* The strip's lower hairline runs under every tab except the active one, which covers it. */
+:root[data-skin~=folio] #tab-bar{align-items:stretch;padding-left:8px;border-bottom:0;background:linear-gradient(var(--hairline),var(--hairline)) left bottom/100% 1px no-repeat,var(--surface-tabbar)}
+:root[data-skin~=folio] #file-tabs{padding-inline:var(--tab-curve)}
+:root[data-skin~=folio] .file-tab{margin:6px 2px 0 0}
+:root[data-skin~=folio] .file-tab [data-tab]{padding:2px 3px 2px 12px}
+:root[data-skin~=folio] .file-tab.named-tab [data-tab]{padding-top:1px;padding-bottom:8px}
+:root[data-skin~=folio] .file-tab .close-tab{min-width:20px;padding:2px 7px 2px 3px}
+:root[data-skin~=folio] .file-tab.active{background:var(--surface-tab-active);box-shadow:inset 1px 0 var(--hairline),inset -1px 0 var(--hairline),inset 0 1px var(--hairline)}
+:root[data-skin~=folio] .file-tab:not(.active):hover{background:color-mix(in srgb,var(--ink) 4%,transparent)}
+:root[data-skin~=folio] .file-tab.workspace-tab,:root[data-skin~=folio] .file-tab.workspace-tab.active{background:transparent}
+:root[data-skin~=folio] .file-tab.workspace-tab.active{background:var(--surface-tab-active);box-shadow:inset 1px 0 var(--hairline),inset -1px 0 var(--hairline),inset 0 2px var(--workspace-color)}
+:root[data-skin~=folio] main.split .editor-group:not(.focused) .file-tab.active{box-shadow:inset 1px 0 var(--hairline),inset -1px 0 var(--hairline),inset 0 1px var(--hairline)}
+:root[data-skin~=folio] main.split .editor-group:not(.focused) .file-tab.active .tab-title{opacity:.7}
+:root[data-skin~=folio] #tab-bar{height:var(--tab-height)}
+:root[data-skin~=folio] #new-tab,:root[data-skin~=folio] #close-tabs{align-self:center;height:24px;margin:3px 0 0;padding-block:0;line-height:1;border-radius:var(--radius-control)}
+/* Picker preview */
+.skin-preview[data-preview~=folio] .sp-main{background:color-mix(in srgb,var(--ink) 4%,var(--paper))}
+.skin-preview[data-preview~=folio] .sp-main::before{content:"";position:absolute;inset:8px 0 0;background:var(--paper);border-top:1px solid color-mix(in srgb,var(--ink) 11%,var(--paper))}
+.skin-preview[data-preview~=folio] .sp-tab{top:2px;height:7px;z-index:1;border:1px solid color-mix(in srgb,var(--ink) 11%,var(--paper));border-bottom:0;border-radius:3px 3px 0 0;background:var(--paper);box-shadow:none}
+.skin-preview[data-preview~=folio] .sp-lines{z-index:1}

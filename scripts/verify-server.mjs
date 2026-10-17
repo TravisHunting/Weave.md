@@ -192,6 +192,31 @@ try {
   await page.getByRole('button',{name:'Create workspace',exact:true}).click();
   await page.locator('#server-workspace-picker').waitFor({state:'detached'});
   assert((await fs.stat(path.join(root,'Gamma'))).isDirectory());
+  // The start page offers the next steps, and Set up Git guides a workspace to GitHub with a deploy key.
+  await page.locator('#new-tab').click();
+  for (const action of ['new-article','random-article','setup-git','create-workspace','open-workspace']) await page.locator(`#welcome [data-welcome="${action}"]`).waitFor();
+  await page.locator('#welcome [data-welcome="setup-git"]').click();
+  const guide = page.locator('.git-setup-dialog');
+  await guide.getByRole('button',{name:'Create repository'}).click();
+  // A global Git author on this machine already completes the step; Change reopens it.
+  await guide.locator('.git-setup-step.done').first().waitFor();
+  if (!await guide.getByLabel('Name',{exact:true}).count()) await guide.locator('[data-expand="2"]').click();
+  await guide.getByLabel('Name',{exact:true}).fill('Server Tester'); await guide.getByLabel('Email',{exact:true}).fill('tester@example.org');
+  await guide.getByRole('button',{name:/author$/}).click();
+  await until(async()=>(await guide.locator('.git-setup-notice').innerText()).includes('Commit author saved'),'commit author saved');
+  await guide.getByLabel('Repository address').fill('https://github.com/you/notes');
+  await guide.getByRole('button',{name:'Connect repository'}).click();
+  await guide.getByRole('button',{name:'Create deploy key'}).click();
+  await guide.locator('.git-setup-key').waitFor();
+  assert.match(await guide.locator('.git-setup-key').inputValue(),/^ssh-ed25519 \S+ weave-/);
+  assert(await guide.getByRole('button',{name:'Open GitHub deploy keys ↗'}).isVisible());
+  await page.screenshot({path:path.join(output,'server-git-setup.png')});
+  const repository = (await Promise.all(['Alpha','Beta','Gamma'].map(async name=>(await fs.stat(path.join(root,name,'.git')).catch(()=>null)) ? name : null))).find(Boolean);
+  const gitConfig = await fs.readFile(path.join(root,repository,'.git','config'),'utf8');
+  assert(gitConfig.includes('git@github.com:you/notes.git') && gitConfig.includes('Server Tester'),'the guide stores the SSH remote and commit author');
+  assert(!JSON.stringify(await fs.readdir(path.join(root,repository))).includes('id_ed25519'),'deploy keys stay in private server data');
+  await guide.getByRole('button',{name:'Close',exact:true}).click();
+  await until(async()=>await page.locator('#welcome [data-welcome="setup-git"]').count()===0,'Set up Git leaves the start page once connected');
   assert(await page.locator('#window-controls').isHidden());
   assert.deepEqual(await page.evaluate(()=>window.__blockedStyles),[]);
   await page.screenshot({path:path.join(output,'server-workspaces.png')});
@@ -250,7 +275,7 @@ try {
   let throttled=false;
   for(let i=0;i<11;i++) {const result=await raw('login',{username:'admin',password:'incorrect'}, {},'/api/auth');if(result.status===429){throttled=true;break;}assert.equal(result.status,401);}
   assert(throttled,'login attempts are throttled');
-  console.log('Weave Server HTTP security, CRUD, search, graph, Kanban, watcher, export, browser editing, independent tabs and restart persistence passed.');
+  console.log('Weave Server HTTP security, CRUD, search, graph, Kanban, watcher, export, browser editing, start page, Git setup guide with deploy key, independent tabs and restart persistence passed.');
 } finally {
   await browser?.close(); await stop();
   // Windows junction fixtures must be unlinked before recursive fixture cleanup.

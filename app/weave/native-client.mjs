@@ -16,6 +16,8 @@ export async function createNativeClient({invoke, listen, Channel}) {
     capabilities: features, writable: features.write,
     get workspace() {return workspace;},
     async choose() {return adopt(await invoke('choose_workspace'));},
+    // A new, empty workspace folder: the desktop asks where to put it; the server creates it in its workspace directory.
+    async createWorkspace(name) {return adopt(await invoke('create_workspace', {name}));},
     chooseDirectory() {if (!features.storage) throw new Error('This host does not provide storage locations.'); return invoke('choose_storage_directory');},
     async call(op, args = {}) {
       assertCapability(features, op);

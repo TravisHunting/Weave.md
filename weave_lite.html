@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><title>Weave</title><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-wuayep04GCs1xy2WDFsNjZ6/VqqOGuWUvexQNwWBRgQ=' 'sha256-DpYHA9WyOM4/SQdA6cbrf9w018NOPsJ4rft7wiZwV10=' 'sha256-smgTRSyBQv9YBTKMlG6Q/APpDxfduzoD8NUsWWR6mFM='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'"><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2262%22%20height%3D%2262%22%20rx%3D%2213%22%20fill%3D%22%2325382f%22%2F%3E%3Cpath%20d%3D%22M13%2018%2022%2047%2032%2028%2042%2047%2051%2018%22%20fill%3D%22none%22%20stroke%3D%22%23eaf1e7%22%20stroke-width%3D%225.4%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E%0D%0A"><style>/* The skin contract: every visual decision a skin may change, with the Classic
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><title>Weave</title><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-wuayep04GCs1xy2WDFsNjZ6/VqqOGuWUvexQNwWBRgQ=' 'sha256-f3daS1YJ9Pcxabj/1H4sZ607Bt5FVEngYLzszbIPdf8=' 'sha256-smgTRSyBQv9YBTKMlG6Q/APpDxfduzoD8NUsWWR6mFM='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'"><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2262%22%20height%3D%2262%22%20rx%3D%2213%22%20fill%3D%22%2325382f%22%2F%3E%3Cpath%20d%3D%22M13%2018%2022%2047%2032%2028%2042%2047%2051%2018%22%20fill%3D%22none%22%20stroke%3D%22%23eaf1e7%22%20stroke-width%3D%225.4%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E%0D%0A"><style>/* The skin contract: every visual decision a skin may change, with the Classic
    skin's values. Colour schemes own the palette (--bg, --paper, --ink, --muted,
    --line, --accent, --wash, --code, …, written on the root by appearance.mjs);
    skins (skins/*.css) own shape, type, density, surfaces and depth, and derive
@@ -533,6 +533,7 @@ footer #save-status{flex-shrink:0;font-size:inherit}footer #save-status:empty{di
 .server-workspace-info{flex:1}.server-workspace-info small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .server-workspace-title{display:flex;align-items:center;gap:6px;min-width:0}.server-workspace-title strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .server-badge{flex:none;padding:0 6px;border-radius:var(--radius-pill);background:var(--surface-selected);color:var(--muted);font-size:10.5px;line-height:16px}
+.welcome-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:24px auto 0;max-width:520px;text-align:left}.welcome-action{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-radius:var(--radius-card);min-height:64px}.welcome-action strong{font-size:14px;font-weight:600}.welcome-action small{font-size:11px;line-height:1.4;color:var(--muted)}.welcome-action.primary{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}.welcome-action.primary strong{color:var(--accent)}.welcome-action.secondary{min-height:0;padding:9px 12px}.welcome-action.secondary strong{font-size:12px}.welcome-note{margin-top:26px}
 
 /* Source control shares the reader palette; diffs receive a full-width review surface. */
 #git-panel{min-width:0}.git-toolbar{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:2px;margin:0 0 12px}
@@ -554,6 +555,10 @@ footer #save-status{flex-shrink:0;font-size:inherit}footer #save-status:empty{di
 #git-ignore-dialog{height:auto;max-height:90vh}#git-ignore-dialog .git-diff-heading [data-ignore-close]{margin-left:auto}
 
 .rail [data-panel="git"]{position:relative;overflow:visible}.git-pending-badge{position:absolute;right:2px;bottom:-3px;min-width:12px;height:12px;padding:0 2px;border-radius:6px;background:var(--accent);color:var(--paper);font:700 8px/12px system-ui;text-align:center;box-shadow:0 0 0 1px var(--bg);pointer-events:none}
+#git-panel .git-connect{background:var(--wash);border-radius:var(--radius-control);padding:8px 10px;margin-bottom:10px}#git-panel .git-connect p{margin:0 0 6px}#git-setup p{margin:0 0 8px}#git-setup [data-git-action=setup],#git-panel .git-connect button{border-color:var(--accent);background:var(--accent);color:var(--paper)}#git-remote-management [data-git-action=setup]{margin:8px 0;width:100%}
+.git-setup-dialog{max-width:640px;width:calc(100vw - 32px);max-height:calc(100dvh - 40px);overflow:auto;box-shadow:var(--shadow-dialog)}.git-setup-heading{display:flex;align-items:flex-start;gap:12px}.git-setup-heading>div{flex:1;min-width:0}.git-setup-heading .eyebrow{margin:0 0 6px}.git-setup-heading h2{margin:0;overflow-wrap:anywhere}.git-setup-heading>button{border:0;background:transparent;font-size:24px;padding:0 8px}.git-setup-steps{display:flex;flex-direction:column;gap:6px;margin:18px 0 8px}.git-setup-step{border:1px solid var(--line);border-radius:var(--radius-card);padding:10px 14px}.git-setup-step.current{border-color:var(--accent)}.git-setup-step h3{display:flex;align-items:center;gap:10px;margin:0;font-size:14px;font-weight:600}.git-setup-step:not(.current):not(.done) h3{color:var(--muted)}.git-setup-index{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;border:1px solid var(--line);font-size:12px;flex-shrink:0}.git-setup-step.current .git-setup-index{border-color:var(--accent);color:var(--accent)}.git-setup-step.done .git-setup-index{background:var(--accent);border-color:var(--accent);color:var(--paper)}.git-setup-body{font-size:13px;line-height:1.6;padding:6px 0 4px 34px}.git-setup-body p{margin:6px 0}.git-setup-body code{overflow-wrap:anywhere}.git-setup-body button{margin:4px 6px 4px 0}.git-setup-body button.primary,.git-setup-dialog .dialog-actions .primary{border-color:var(--accent);background:var(--accent);color:var(--paper)}.git-setup-step.done .git-setup-body{color:var(--muted)}.git-setup-list{padding-left:20px;margin:6px 0}.git-setup-list li{margin:6px 0}.git-setup-form{display:flex;flex-direction:column;gap:4px}.git-setup-form label{display:flex;flex-direction:column;gap:2px;font-size:12px}.git-setup-form input{width:100%;margin:2px 0 6px}.git-setup-form .hint{margin:0 0 6px}.git-setup-form button{align-self:flex-start}.git-setup-key{display:block;width:100%;font:12px/1.5 var(--ui-mono-font);resize:none;margin:6px 0;overflow-wrap:anywhere;word-break:break-all}.git-setup-fingerprint{display:block;color:var(--muted);font-size:11px;overflow-wrap:anywhere}.git-setup-link{border:0;background:transparent;color:var(--accent);padding:0;text-decoration:underline}.git-setup-copy{white-space:nowrap}.git-setup-notice{font-size:12px;min-height:1.6em;margin:8px 0;white-space:pre-wrap;overflow-wrap:anywhere}.git-setup-notice.git-error,.git-setup-body .git-error{color:var(--danger)}.git-setup-notice:empty{display:none}
+:root[data-theme=dark] .git-setup-body button.primary,:root[data-theme=dark] .git-setup-dialog .dialog-actions .primary,:root[data-theme=dark] #git-setup [data-git-action=setup],:root[data-theme=dark] #git-panel .git-connect button{color:#182b20}
+.git-setup-summary{display:flex;align-items:baseline;gap:8px;margin:4px 0 0 34px;font-size:12px;color:var(--muted)}.git-setup-summary span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* Local appearance preferences are shared by reading and live editing. */
 :root{--reading-font-size:15px;--reading-line-height:1.7;--code-line-height:1.7;--reading-font-weight:400;--reading-paragraph-spacing:0em;--reading-font-family:'Segoe UI',system-ui,Arial,sans-serif;--code-font-family:'Cascadia Mono',Consolas,monospace;--code-font-size:15px;--reading-width:none;--article-indent:40px;--article-zoom:1;--line-number-color:var(--muted);--line-number-opacity:.5;--table-cell-padding:9px;--table-border-width:2px;--table-header-tint:100%;--tableBorder:var(--line)}
@@ -1402,10 +1407,12 @@ body.kanban-dragging,body.kanban-dragging *{cursor:grabbing!important}
 @media (prefers-reduced-motion:reduce){
   :root[data-layout=mobile] :is(.shell>:is(.rail,#sidebar,#right-sidebar),main>.editor-group,:is(#tab-bar,#tab-bar-2)){transition:none!important}
 }
+:root[data-layout=mobile][data-skin] .welcome-actions{grid-template-columns:1fr;gap:8px}:root[data-layout=mobile][data-skin] .welcome-action{min-height:48px}:root[data-layout=mobile][data-skin] .git-setup-dialog{width:100vw;max-width:none;max-height:100dvh;height:100dvh;margin:0;border-radius:0;padding:16px}:root[data-layout=mobile][data-skin] .git-setup-dialog button{min-height:40px}:root[data-layout=mobile][data-skin] .git-setup-body{padding-left:0}
+:root[data-layout=mobile][data-skin] .git-setup-summary{margin-left:0}
 </style><script>(()=>{var l={classic:{name:"Classic",description:"The original Weave look: bordered controls, tabbed panes and compact chrome."},studio:{name:"Studio",description:"Floating rounded panels, borderless controls and soft depth."},"studio-flow":{name:"Studio Flow",extends:"studio",description:"Studio pared back for space, with tabs that curve into the article like a browser."},compact:{name:"Compact",description:"A dense, square-cornered workbench with an activity bar and coloured status bar."},slate:{name:"Slate",extends:"compact",description:"Compact density with softened corners and tabs that merge into the editor."},editorial:{name:"Editorial",description:"Quiet paper chrome, serif headings, hairline rules and generous spacing."},folio:{name:"Folio",extends:"editorial",description:"Editorial with folder tabs that join the page and slimmer margins."},aurora:{name:"Aurora",description:"Translucent glass panels over a soft gradient drawn from the accent colour."},"aurora-thin":{name:"Aurora Thin",extends:"aurora",description:"Aurora with slim bars, tight margins, roomier tabs and hairline glass scrollbars."},"aurora-flow":{name:"Aurora Flow",extends:"aurora-thin",description:"Aurora Thin with glass tabs that flow into the article from the gradient."}},w="aurora-flow",A=Object.keys(l).filter(a=>a!=="classic").map(a=>`skins/${a}.css`),d=a=>typeof a=="string"&&Object.hasOwn(l,a)?a:w;function g(a){let e=[];for(let n=d(a);n&&!e.includes(n);n=l[n].extends)e.unshift(n);return e}var h={scheme:"Match colour scheme",pastel:"Soft pastels",vivid:"Vivid",mono:"Monochrome",mermaid:"Mermaid default"};var p={grey:{name:"Light grey",mode:"light",colors:["#eeeeee","#fafafa","#292929","#666666","#d4d4d4","#505968","#e3e5e8","#e9e9e9","#b9cce8","#a0a0a0","#fafafa"]},graphite:{name:"Graphite",mode:"dark",colors:["#202124","#292a2d","#e8eaed","#b0b3bb","#474950","#abc4ef","#383e49","#34363c","#4e6385","#777a83","#292a2d"]},paper:{name:"Warm paper",mode:"light",colors:["#eee8dc","#fffaf0","#3c342b","#736657","#d9cfbd","#80613b","#eee2cd","#f2e9da","#e6cfa7","#ad9d84","#fffaf0"]},sage:{name:"Sage",mode:"light",colors:["#edf1eb","#fafcf8","#293b30","#5c7163","#cdd9ce","#34664d","#dfeadc","#e8efe3","#b5d7bd","#91a493","#fafcf8"]},ocean:{name:"Ocean",mode:"dark",colors:["#182731","#20333f","#e4eff4","#a5bdcb","#405764","#99cfe6","#304b5b","#29414e","#446d86","#668799","#20333f"]},lavender:{name:"Lavender",mode:"light",colors:["#eeebf2","#fcfaff","#36303f","#70667f","#d9d0e5","#735494","#e8e0f0","#eee8f4","#d2bce9","#ad9ebf","#fcfaff"]}},b="grey",S={bg:"Sidebar & background",paper:"Article & panels",ink:"Text",muted:"Secondary text",line:"Borders",accent:"Links & accents",wash:"Selected & hover",code:"Code background",selection:"Text selection",tableBorder:"Table borders",titleBar:"Top bar"},s={system:'"Segoe UI", system-ui, Arial, sans-serif',serif:'Georgia, "Times New Roman", serif',sans:"Arial, Helvetica, sans-serif",mono:'Consolas, "Courier New", monospace',calibri:'Calibri, "Segoe UI", sans-serif',cambria:"Cambria, Georgia, serif",verdana:"Verdana, Geneva, sans-serif",tahoma:'Tahoma, "Segoe UI", sans-serif',trebuchet:'"Trebuchet MS", Arial, sans-serif',palatino:'"Palatino Linotype", Palatino, Georgia, serif',times:'"Times New Roman", Times, serif',cascadia:'"Cascadia Code", "Cascadia Mono", Consolas, monospace'},$={system:typeof navigator<"u"&&!/Windows/.test(navigator.userAgent)?"System":"System (Segoe UI)",serif:"Georgia",sans:"Arial",mono:"Consolas",calibri:"Calibri",cambria:"Cambria",verdana:"Verdana",tahoma:"Tahoma",trebuchet:"Trebuchet MS",palatino:"Palatino",times:"Times New Roman",cascadia:"Cascadia Code"},f={consolas:s.mono,cascadia:s.cascadia,cascadiaMono:'"Cascadia Mono", Consolas, monospace',courier:'"Courier New", Courier, monospace',lucida:'"Lucida Console", Consolas, monospace',jetbrains:'"JetBrains Mono", Consolas, monospace',fira:'"Fira Code", Consolas, monospace',source:'"Source Code Pro", Consolas, monospace'};var C={fontSize:15,fontWeight:400,lineHeight:1.7,codeLineSpacing:0,paragraphSpacing:0,font:"system",codeFont:"cascadiaMono",codeFontSize:15,articleZoom:100,articleIndent:40,readableWidth:!1,width:880,lineNumbers:"both",lineNumberColor:null,lineNumberOpacity:50,lineNumberSize:9,titlebarTabs:!0,tabTint:!0,tabTintOpacity:10,graphCounts:!1,graphSpacing:!1,graphColours:!1,spellColor:"#e5484d",highlightColor:"#ffd43b",spellOpacity:55,spellThickness:1.5,spellStyle:"wavy",tablePadding:9,tableBorders:"grid",tableBorderWidth:2,tableHeaderTint:100,tableStriped:!0,tableEditing:"visual",tableAutoFormat:!0,tableHoverControls:!0,mermaid:!0,mermaidPreview:!0,mermaidPalette:"scheme",mermaidAccent:null,mermaidLook:"classic",mermaidCurve:"smooth",mermaidFrame:"card",mermaidSize:"fit",mermaidAlign:"centre"},y={mermaidPalette:Object.keys(h),mermaidLook:["classic","handDrawn"],mermaidCurve:["smooth","rounded","straight","stepped"],mermaidFrame:["card","plain"],mermaidSize:["fit","natural"],mermaidAlign:["centre","left"]};var x={fontSize:[12,28],fontWeight:[100,900],codeLineSpacing:[-.8,1.2],codeFontSize:[10,28],articleZoom:[50,200],articleIndent:[32,160],lineHeight:[1.2,2.4],paragraphSpacing:[0,1.5],width:[560,1400],lineNumberOpacity:[0,100],lineNumberSize:[7,20],spellOpacity:[10,100],spellThickness:[1,4],tabTintOpacity:[5,100],tablePadding:[2,18],tableBorderWidth:[0,3],tableHeaderTint:[0,100]};function z(a){let e=a&&typeof a=="object"?a:{},n=Object.hasOwn(p,e.preset)?e.preset:b,r=Object.fromEntries(Object.keys(S).map((i,o)=>[i,/^#[0-9a-f]{6}$/i.test(e.colors?.[i])?e.colors[i]:p[n].colors[o]]));e.colors?.tableBorder===void 0&&/^#[0-9a-f]{6}$/i.test(e.colors?.line)&&(r.tableBorder=e.colors.line);let t={...C};for(let[i,[o,k]]of Object.entries(x)){let c=e.reading?.[i];typeof c=="number"&&Number.isFinite(c)&&(t[i]=Math.max(o,Math.min(k,c)))}e.reading&&e.reading.fontWeight===void 0&&e.reading.paragraphSpacing===.45&&(t.paragraphSpacing=0),Object.hasOwn(s,e.reading?.font)&&(t.font=e.reading.font),Object.hasOwn(f,e.reading?.codeFont)&&(t.codeFont=e.reading.codeFont),["off","read","edit","both"].includes(e.reading?.lineNumbers)&&(t.lineNumbers=e.reading.lineNumbers),/^#[0-9a-f]{6}$/i.test(e.reading?.lineNumberColor)&&(t.lineNumberColor=e.reading.lineNumberColor),/^#[0-9a-f]{6}$/i.test(e.reading?.spellColor)&&(t.spellColor=e.reading.spellColor),/^#[0-9a-f]{6}$/i.test(e.reading?.highlightColor)&&(t.highlightColor=e.reading.highlightColor.toLowerCase()),["wavy","dotted","dashed","solid"].includes(e.reading?.spellStyle)&&(t.spellStyle=e.reading.spellStyle),["grid","rows","none"].includes(e.reading?.tableBorders)&&(t.tableBorders=e.reading.tableBorders),["visual","source"].includes(e.reading?.tableEditing)&&(t.tableEditing=e.reading.tableEditing);for(let[i,o]of Object.entries(y))o.includes(e.reading?.[i])&&(t[i]=e.reading[i]);/^#[0-9a-f]{6}$/i.test(e.reading?.mermaidAccent)&&(t.mermaidAccent=e.reading.mermaidAccent.toLowerCase());for(let i of["tableStriped","tableAutoFormat","tableHoverControls","titlebarTabs","tabTint","graphCounts","graphSpacing","graphColours","mermaid","mermaidPreview"])typeof e.reading?.[i]=="boolean"&&(t[i]=e.reading[i]);return t.readableWidth=e.reading?.readableWidth===!0,{preset:n,colors:r,reading:t,skin:d(e.skin)}}function u(a){let e;try{e=JSON.parse(a.get("appearance"))}catch{}return z(e||{preset:a.get("theme")==="dark"?"graphite":a.get("theme")==="light"?"grey":b})}function m(a,e=document.documentElement){let n=p[a.preset].mode;e.dataset.theme=n,e.dataset.scheme=a.preset,e.dataset.skin=g(a.skin).join(" "),e.dataset.lineNumbers=a.reading.lineNumbers,e.dataset.tableBorders=a.reading.tableBorders,e.dataset.tableStriped=String(a.reading.tableStriped),e.dataset.tableEditing=a.reading.tableEditing,e.dataset.tableAutoFormat=String(a.reading.tableAutoFormat),e.dataset.tableHoverControls=String(a.reading.tableHoverControls),e.dataset.tabTint=String(a.reading.tabTint),e.dataset.mermaid=String(a.reading.mermaid),e.dataset.mermaidPreview=String(a.reading.mermaidPreview);for(let t of Object.keys(y))e.dataset[t]=a.reading[t];e.dataset.mermaidAccent=a.reading.mermaidAccent||"",e.dataset.titlebarTabs=String(a.reading.titlebarTabs),e.style.setProperty("--highlight-color",a.reading.highlightColor),e.style.setProperty("--spell-color",a.reading.spellColor),e.style.setProperty("--spell-opacity",a.reading.spellOpacity+"%"),e.style.setProperty("--spell-thickness",a.reading.spellThickness+"px"),e.style.setProperty("--spell-style",a.reading.spellStyle),e.dataset.graphCounts=String(a.reading.graphCounts),e.dataset.graphSpacing=String(a.reading.graphSpacing),e.dataset.graphColours=String(a.reading.graphColours),e.style.setProperty("--tab-tint",a.reading.tabTintOpacity+"%"),e.style.setProperty("--tab-tint-active",Math.min(100,Math.round(a.reading.tabTintOpacity*1.5))+"%");for(let[t,i]of Object.entries(a.colors))e.style.setProperty("--"+t,i);let r=a.reading.articleZoom/100;return e.style.setProperty("--reading-font-size",Number((a.reading.fontSize*r).toFixed(2))+"px"),e.style.setProperty("--reading-line-height",a.reading.lineHeight),e.style.setProperty("--reading-font-weight",a.reading.fontWeight),e.style.setProperty("--code-line-height",Math.max(1,a.reading.lineHeight+a.reading.codeLineSpacing)),e.style.setProperty("--reading-paragraph-spacing",a.reading.paragraphSpacing+"em"),e.style.setProperty("--reading-font-family",s[a.reading.font]),e.style.setProperty("--code-font-family",f[a.reading.codeFont]),e.style.setProperty("--code-font-size",Number((a.reading.codeFontSize*r).toFixed(2))+"px"),e.style.setProperty("--article-indent",a.reading.articleIndent+"px"),e.style.setProperty("--article-zoom",r),e.style.setProperty("--line-number-color",a.reading.lineNumberColor||a.colors.muted),e.style.setProperty("--line-number-opacity",a.reading.lineNumberOpacity/100),e.style.setProperty("--line-number-size",Number((a.reading.lineNumberSize*r).toFixed(2))+"px"),e.style.setProperty("--table-cell-padding",a.reading.tablePadding+"px"),e.style.setProperty("--table-border-width",a.reading.tableBorderWidth+"px"),e.style.setProperty("--table-header-tint",a.reading.tableHeaderTint+"%"),e.style.setProperty("--reading-width",a.reading.readableWidth?a.reading.width+"px":"none"),n}var v="(max-width: 760px), (pointer: coarse) and (max-height: 500px)";try{m(u({get:e=>localStorage.getItem("weave:"+e)}))}catch{try{m(u({get:()=>null}))}catch{}}matchMedia(v).matches&&(document.documentElement.dataset.layout="mobile");})();</script></head>
 <body>
 <header id="titlebar"><div class="titlebar-start"><button id="app-menu-button" aria-haspopup="menu" aria-expanded="false" aria-controls="app-menu" title="Menu" aria-label="Menu"><span class="brand-mark" aria-hidden="true">W</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg></button><button id="nav-back" title="Back (Alt+Left)" aria-label="Back" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><button id="nav-forward" title="Forward (Alt+Right)" aria-label="Forward" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button></div><div class="titlebar-spacer"></div><div class="titlebar-end"><button id="view-graph" aria-pressed="false" title="Show or hide the graph">Graph</button><button id="toggle-right-sidebar" aria-label="Toggle right sidebar" title="Toggle right sidebar" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg></button><button id="edit-mode" aria-pressed="false" title="Enable editing">Edit</button><button id="source-toggle" aria-pressed="false" title="Show the Markdown source" disabled>Source</button><div id="window-controls" hidden><button id="window-minimize" aria-label="Minimise window" title="Minimise" data-ui>−</button><button id="window-maximize" aria-label="Maximise window" title="Maximise" data-ui>□</button><button id="window-close" aria-label="Close window" title="Close">×</button></div></div></header>
-<div id="app-menu" class="article-context-menu app-menu" role="menu" aria-label="Menu" hidden><button id="choose-workspace" role="menuitem" title="Open a workspace folder beside those already open">Open workspace folder…</button><div class="context-separator" role="separator"></div><button id="save" role="menuitem" data-mutation title="Save (Ctrl+S). Ctrl+Shift+S saves all. Autosave is set in Control panel › Editing.">Save <kbd>Ctrl+S</kbd></button><button id="reload-note" role="menuitem" title="Read the article again from disk" disabled>Reload from disk</button><div class="context-separator" role="separator"></div><button id="source-mode" role="menuitemcheckbox" aria-pressed="false" aria-checked="false" title="Show the article's Markdown source" disabled>Source mode</button><button id="view-article" role="menuitemcheckbox" aria-pressed="true" aria-checked="true" title="With the graph showing, turn this off to give the graph the whole pane">Show article</button><div class="context-separator" role="separator"></div><button id="menu-settings" role="menuitem">Settings… <kbd>Ctrl+,</kbd></button></div>
+<div id="app-menu" class="article-context-menu app-menu" role="menu" aria-label="Menu" hidden><button id="create-workspace" role="menuitem" title="Create an empty workspace folder for new articles">Create workspace…</button><button id="choose-workspace" role="menuitem" title="Open a workspace folder beside those already open">Open workspace folder…</button><button id="menu-git-setup" role="menuitem" title="Connect the current workspace to GitHub with a deploy key">Set up Git…</button><div class="context-separator" role="separator"></div><button id="save" role="menuitem" data-mutation title="Save (Ctrl+S). Ctrl+Shift+S saves all. Autosave is set in Control panel › Editing.">Save <kbd>Ctrl+S</kbd></button><button id="reload-note" role="menuitem" title="Read the article again from disk" disabled>Reload from disk</button><div class="context-separator" role="separator"></div><button id="source-mode" role="menuitemcheckbox" aria-pressed="false" aria-checked="false" title="Show the article's Markdown source" disabled>Source mode</button><button id="view-article" role="menuitemcheckbox" aria-pressed="true" aria-checked="true" title="With the graph showing, turn this off to give the graph the whole pane">Show article</button><div class="context-separator" role="separator"></div><button id="menu-settings" role="menuitem">Settings… <kbd>Ctrl+,</kbd></button></div>
 <div class="shell">
 <nav class="rail" aria-label="Workspace actions">
 <button data-panel="files" title="Files" aria-label="Files" aria-pressed="true">▤</button><button data-panel="search" title="Search and evidence" aria-label="Search">⌕</button><button data-panel="kanban" title="Kanban boards" aria-label="Kanban boards" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="9.5" y="4" width="5" height="10" rx="1"/><rect x="16" y="4" width="5" height="13" rx="1"/></svg><span id="kanban-attention-badge" class="git-pending-badge kanban-badge" hidden aria-hidden="true"></span></button><button data-panel="card" title="Card preview" aria-label="Card preview" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></button><hr>
@@ -1457,7 +1464,7 @@ body.kanban-dragging,body.kanban-dragging *{cursor:grabbing!important}
 <main>
 <div class="editor-group focused" id="editor-left" data-pane="0">
 <div id="tab-bar" class="tab-bar"><div id="file-tabs" role="tablist" aria-label="Open articles"></div><button id="new-tab" title="New tab (Ctrl+T)" aria-label="New tab">+</button><span class="tab-bar-divider" aria-hidden="true"></span><button id="close-tabs" title="Close all tabs" aria-label="Close all tabs">× All</button></div>
-<div id="find-bar" role="search" aria-label="Find in article" hidden><input id="find-query" type="search" placeholder="Find in article" aria-label="Find in article" autocomplete="off" spellcheck="false"><span id="find-count" aria-live="polite"></span><button id="find-previous" title="Previous match (Shift+Enter)" aria-label="Previous match">↑</button><button id="find-next" title="Next match (Enter)" aria-label="Next match">↓</button><button id="find-close" title="Close (Escape)" aria-label="Close find">×</button></div><section id="welcome"><div class="welcome-mark">W</div><h1>Your notes, connected.</h1><p>Open a folder of Markdown files to begin.</p><p class="hint">Weave keeps knowledge in your files. Search and graph indexes can always be rebuilt.</p><button id="welcome-open">Open</button><div id="welcome-recent" hidden><h2>Inactive workspaces</h2><ul id="welcome-recent-list" aria-label="Inactive workspaces"></ul></div></section>
+<div id="find-bar" role="search" aria-label="Find in article" hidden><input id="find-query" type="search" placeholder="Find in article" aria-label="Find in article" autocomplete="off" spellcheck="false"><span id="find-count" aria-live="polite"></span><button id="find-previous" title="Previous match (Shift+Enter)" aria-label="Previous match">↑</button><button id="find-next" title="Next match (Enter)" aria-label="Next match">↓</button><button id="find-close" title="Close (Escape)" aria-label="Close find">×</button></div><section id="welcome"><div class="welcome-mark">W</div><h1>Your notes, connected.</h1><p>Open a folder of Markdown files to begin.</p><div class="welcome-actions" role="group" aria-label="Get started"></div><div id="welcome-recent" hidden><h2>Activate a deactivated workspace</h2><ul id="welcome-recent-list" aria-label="Deactivated workspaces"></ul></div><p class="hint welcome-note">Weave keeps knowledge in your files. Search and graph indexes can always be rebuilt.</p></section>
 <section id="note-panel" hidden><div id="note-warning" role="status"></div><div id="kanban-view" hidden></div><div id="okf-bar" role="toolbar" aria-label="Article properties" hidden></div><article id="article"></article><div id="source-editor" hidden></div><details id="connections"><summary>Connections</summary><div id="relationships"></div></details></section>
 <section id="evidence-panel" hidden><div class="evidence-heading"><div><span class="eyebrow">DEEP SEARCH</span><h1 id="evidence-question"></h1></div><button id="close-evidence">Back to article</button></div><p id="evidence-notices" class="hint"></p><div id="evidence"></div></section>
 <section id="graph-panel" hidden><div class="graph-bar"><details><summary>Graph controls</summary><div class="graph-controls"><label>Depth <select id="graph-depth"><option>1</option><option>2</option><option>3</option></select></label><label>Direction <select id="graph-direction"><option value="both">Both</option><option value="upstream">Incoming</option><option value="downstream">Outgoing</option></select></label><button id="graph-fit">Fit</button><button id="graph-reset">Reset layout</button><label class="graph-spacing-control">Node spacing <input id="graph-spacing" type="range" min="100" max="250" step="10" value="100" aria-label="Node spacing"><output id="graph-spacing-value">100%</output></label><button id="graph-shuffle">Shuffle nodes</button><button id="graph-palette" data-ui>Colours</button><button id="zoom-out" aria-label="Zoom out">−</button><span id="zoom-label">100%</span><button id="zoom-in" aria-label="Zoom in">+</button></div></details><span id="graph-count"></span></div><svg id="graph" aria-label="Interactive relationship graph"><defs><marker id="arrow-dependency" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#6389aa"/></marker></defs><g id="graph-viewport"><g id="graph-edges-svg"></g><g id="graph-nodes"></g></g></svg></section>
@@ -5388,31 +5395,31 @@ slice(8,12)}-${hex2.slice(12,16)}-${hex2.slice(16,20)}-${hex2.slice(20)}`}async 
 equest",{op:"health",args:{}});const features=capabilities(health.capabilities||{...desktopCapabilities,resources:false});
 function adopt(result){if(result?.scope!=null)scope=result.scope;if(result?.workspace)workspace=result.workspace;return result}
 const client2={capabilities:features,writable:features.write,get workspace(){return workspace},async choose(){return adopt(
-await invoke("choose_workspace"))},chooseDirectory(){if(!features.storage)throw new Error("This host does not provide st\
-orage locations.");return invoke("choose_storage_directory")},async call(op,args={}){assertCapability(features,op);const requestedScope=scope;
-const request=features.resources&&workspace?encodeResourceArgs(op,args,workspace.id):{...args};if(op==="graph"&&features.
-graphStream&&Channel)request.summaryOnly=true;const result=await invoke("weave_request",{op,args:{scope:requestedScope,...request}});
-if(!["restore","configureMonitoring","configureStorage"].includes(op)&&scope!==requestedScope)throw new Error("The works\
-pace changed while this request was running.");return adopt(result)},file(path){return resource(workspace?.id,path,"file")},
-directory(path="/"){return resource(workspace?.id,path,"directory")},dirty(value){if(features.write)return invoke("edito\
-r_state",{dirty:value})},windowAction(action){if(!features.nativeWindow)throw new Error("Window controls are unavailable\
- on this host.");return invoke("window_action",{action})},openResource(url){return invoke("open_resource",{url})},exportWorkspace(scope2,{
-name:name2,graph:graph2=true,otherFiles=true,folder=null,diagrams=true}={}){if(!features.export)throw new Error("This ho\
-st cannot export workspaces.");return invoke("export_workspace",{scope:scope2,name:name2,graph:graph2,otherFiles,folder,
-diagrams})},revealExport(){return invoke("reveal_export")},events:!!listen,async onChanged(callback){return listen?listen(
-"weave-changed",event=>callback(event.payload)):()=>{}},chooseMarkdownFile(directory=null){return invoke("choose_markdow\
-n_file",{directory})},readExternal(path){return invoke("read_external",{path})},saveExternal(path,text,hash2){return invoke(
-"save_external",{path,text,hash:hash2})},async onOpenExternal(callback){return listen?listen("weave-open-external",event=>callback(
-event.payload)):()=>{}}};if(health.serverControl===true)client2.serverControl=(action,settings)=>invoke("server_control",
-{action,settings:settings??null});if(features.graphStream&&Channel)client2.graphNeighborhood=async(query,onChunk)=>{const channel=new Channel;
-channel.onmessage=onChunk;return invoke("weave_graph_neighborhood",{args:{...query,scope},onChunk:channel})};client2.bind=
-catalog=>{const bound=catalog.scope,id2=catalog.workspace?.id;const view={capabilities:features,writable:features.write,
-scope:bound,workspaceId:id2,call(op,args={}){assertCapability(features,op);const request=features.resources&&id2?encodeResourceArgs(
-op,args,id2):{...args};if(op==="graph"&&features.graphStream&&Channel)request.summaryOnly=true;return invoke("weave_requ\
-est",{op,args:{...request,scope:bound}})},file(path){return resource(id2,path,"file")},directory(path="/"){return resource(
-id2,path,"directory")}};if(client2.graphNeighborhood)view.graphNeighborhood=async(query,onChunk)=>{const channel=new Channel;
-channel.onmessage=onChunk;return invoke("weave_graph_neighborhood",{args:{...query,scope:bound},onChunk:channel})};return view};
-return client2}var logicalPath2=value=>String(value).replaceAll("\\","/").replace(/^\.\//,"");function normalizeRelationship(value="lin\
+await invoke("choose_workspace"))},async createWorkspace(name2){return adopt(await invoke("create_workspace",{name:name2}))},
+chooseDirectory(){if(!features.storage)throw new Error("This host does not provide storage locations.");return invoke("c\
+hoose_storage_directory")},async call(op,args={}){assertCapability(features,op);const requestedScope=scope;const request=features.
+resources&&workspace?encodeResourceArgs(op,args,workspace.id):{...args};if(op==="graph"&&features.graphStream&&Channel)request.
+summaryOnly=true;const result=await invoke("weave_request",{op,args:{scope:requestedScope,...request}});if(!["restore","\
+configureMonitoring","configureStorage"].includes(op)&&scope!==requestedScope)throw new Error("The workspace changed whi\
+le this request was running.");return adopt(result)},file(path){return resource(workspace?.id,path,"file")},directory(path="\
+/"){return resource(workspace?.id,path,"directory")},dirty(value){if(features.write)return invoke("editor_state",{dirty:value})},
+windowAction(action){if(!features.nativeWindow)throw new Error("Window controls are unavailable on this host.");return invoke(
+"window_action",{action})},openResource(url){return invoke("open_resource",{url})},exportWorkspace(scope2,{name:name2,graph:graph2=true,
+otherFiles=true,folder=null,diagrams=true}={}){if(!features.export)throw new Error("This host cannot export workspaces.");
+return invoke("export_workspace",{scope:scope2,name:name2,graph:graph2,otherFiles,folder,diagrams})},revealExport(){return invoke(
+"reveal_export")},events:!!listen,async onChanged(callback){return listen?listen("weave-changed",event=>callback(event.payload)):
+()=>{}},chooseMarkdownFile(directory=null){return invoke("choose_markdown_file",{directory})},readExternal(path){return invoke(
+"read_external",{path})},saveExternal(path,text,hash2){return invoke("save_external",{path,text,hash:hash2})},async onOpenExternal(callback){
+return listen?listen("weave-open-external",event=>callback(event.payload)):()=>{}}};if(health.serverControl===true)client2.
+serverControl=(action,settings)=>invoke("server_control",{action,settings:settings??null});if(features.graphStream&&Channel)
+client2.graphNeighborhood=async(query,onChunk)=>{const channel=new Channel;channel.onmessage=onChunk;return invoke("weav\
+e_graph_neighborhood",{args:{...query,scope},onChunk:channel})};client2.bind=catalog=>{const bound=catalog.scope,id2=catalog.
+workspace?.id;const view={capabilities:features,writable:features.write,scope:bound,workspaceId:id2,call(op,args={}){assertCapability(
+features,op);const request=features.resources&&id2?encodeResourceArgs(op,args,id2):{...args};if(op==="graph"&&features.graphStream&&
+Channel)request.summaryOnly=true;return invoke("weave_request",{op,args:{...request,scope:bound}})},file(path){return resource(
+id2,path,"file")},directory(path="/"){return resource(id2,path,"directory")}};if(client2.graphNeighborhood)view.graphNeighborhood=
+async(query,onChunk)=>{const channel=new Channel;channel.onmessage=onChunk;return invoke("weave_graph_neighborhood",{args:{
+...query,scope:bound},onChunk:channel})};return view};return client2}var logicalPath2=value=>String(value).replaceAll("\\","/").replace(/^\.\//,"");function normalizeRelationship(value="lin\
 ks-to"){return value.trim().normalize("NFC").toLowerCase().replace(/[\s_]+/gu,"-").replace(/-+/g,"-")}var relationshipName=/^[\p{L}\p{N}][\p{L}\p{N}_-]*$/u;
 var plainText=value=>String(value).replace(/\\([\\_*~`\[\]<>#()!|])|`+([^`]+)`+|\*\*([^*]+)\*\*|\[([^\]]+)\]\([^)]+\)/g,
 (_match,escaped3,code2,strong,link)=>escaped3??code2??strong??link);var escapeLabel=value=>String(value).replace(/([\\`*\[\]<>|])/g,
@@ -6789,21 +6796,22 @@ op,args);panel.workspaces=panel.workspaces.map(w=>({...w,open:(state.open||[]).i
 const result=await post(op,args);if(op==="reopen")return adopt(result);if(result?.workspace)result.session=state.sessions[result.
 workspace.id]||{};return result}class Channel{onmessage(){}}const client2=await createNativeClient({Channel,invoke:async(command2,input={})=>{
 if(command2==="weave_request")return call(input.op,input.args||{});if(command2==="choose_workspace")return adopt(await choose2(
-post));if(command2==="weave_graph_neighborhood"){const result=await post("graphNeighborhood",input.args);for(const chunk of result.
-chunks)input.onChunk.onmessage(chunk);return result.summary}if(command2==="editor_state")return;if(command2==="open_reso\
-urce"){const url=new URL(input.url);if(!["http:","https:"].includes(url.protocol)||url.username||url.password)throw new Error(
-"Only HTTP(S) resources without credentials can be opened.");window.open(url.href,"_blank","noopener,noreferrer");return}
-throw new Error("This desktop operation is unavailable in a browser.")}});delete client2.chooseDirectory;delete client2.
-chooseMarkdownFile;delete client2.readExternal;delete client2.saveExternal;client2.serverAccount=()=>window.open("/accou\
-nt","_blank","noopener,noreferrer");client2.exportWorkspace=async(scope,{name:name2="workspace",...options}={})=>{const{
-blob,documents,relationships,diagrams}=await post("export",{scope,...options},"/api/export");const filename2=name2.replace(
-/[<>:"/\\|?*\x00-\x1f]/g,"-").replace(/\s+/g,"_")+".html";const url=URL.createObjectURL(blob),anchor=document.createElement(
-"a");anchor.href=url;anchor.download=filename2;anchor.click();setTimeout(()=>URL.revokeObjectURL(url),3e4);return{path:filename2,
-bytes:blob.size,documents,relationships,diagrams}};return client2}async function chooseServerWorkspace(post){const[{folders,
-managed},panel]=await Promise.all([post("serverFolders"),post("controlPanel")]);const dialog=document.createElement("dia\
-log");dialog.id="server-workspace-picker";dialog.setAttribute("aria-labelledby","server-workspace-title");dialog.innerHTML=
-`<h2 id="server-workspace-title">Server workspaces</h2><p>${managed?"Open a workspace selected by the desktop server con\
-troller.":"Open a folder on this server, or create a new workspace."}</p>
+post));if(command2==="create_workspace")return adopt(await post("serverOpen",{name:input.name,create:true}));if(command2===
+"weave_graph_neighborhood"){const result=await post("graphNeighborhood",input.args);for(const chunk of result.chunks)input.
+onChunk.onmessage(chunk);return result.summary}if(command2==="editor_state")return;if(command2==="open_resource"){const url=new URL(
+input.url);if(!["http:","https:"].includes(url.protocol)||url.username||url.password)throw new Error("Only HTTP(S) resou\
+rces without credentials can be opened.");window.open(url.href,"_blank","noopener,noreferrer");return}throw new Error("T\
+his desktop operation is unavailable in a browser.")}});delete client2.chooseDirectory;delete client2.chooseMarkdownFile;
+delete client2.readExternal;delete client2.saveExternal;client2.serverAccount=()=>window.open("/account","_blank","noope\
+ner,noreferrer");client2.exportWorkspace=async(scope,{name:name2="workspace",...options}={})=>{const{blob,documents,relationships,
+diagrams}=await post("export",{scope,...options},"/api/export");const filename2=name2.replace(/[<>:"/\\|?*\x00-\x1f]/g,"\
+-").replace(/\s+/g,"_")+".html";const url=URL.createObjectURL(blob),anchor=document.createElement("a");anchor.href=url;anchor.
+download=filename2;anchor.click();setTimeout(()=>URL.revokeObjectURL(url),3e4);return{path:filename2,bytes:blob.size,documents,
+relationships,diagrams}};return client2}async function chooseServerWorkspace(post){const[{folders,managed},panel]=await Promise.
+all([post("serverFolders"),post("controlPanel")]);const dialog=document.createElement("dialog");dialog.id="server-worksp\
+ace-picker";dialog.setAttribute("aria-labelledby","server-workspace-title");dialog.innerHTML=`<h2 id="server-workspace-t\
+itle">Server workspaces</h2><p>${managed?"Open a workspace selected by the desktop server controller.":"Open a folder on\
+ this server, or create a new workspace."}</p>
     <div class="server-folders"></div><form><label>New workspace folder<input name="name" aria-label="New workspace fold\
 er" maxlength="120" required autocomplete="off"></label>
     <p class="hint" role="status"></p><div class="dialog-actions"><button type="button" data-cancel>Cancel</button><butt\
@@ -13499,33 +13507,36 @@ if(row.kind==="context"){html2+=`<div class="git-diff-pair">${half(row,"context"
 </div>`;continue}const removed=[],added=[];while(rows[i2]?.kind==="remove")removed.push(rows[i2++]);while(rows[i2]?.kind===
 "add")added.push(rows[i2++]);i2--;for(let j=0;j<Math.max(removed.length,added.length);j++)html2+=`<div class="git-diff-p\
 air">${half(removed[j])}${half(added[j])}</div>`}return html2}function createGitPanel({client:client2,container,beforeAction=async()=>{},
-afterMutation=async()=>{},openFile=async()=>{},idSuffix="",onPendingCount,onBusy}){let state=null,busy=false,generation=0,
-refreshing=false,refreshedAt=0,refreshCost=0,selectedRemote="",pushRemotes=[],defaultMessage="",historyLoaded=false,diff=null,
-split2=true,conflict=null,conflictChoice="manual";const dialog=document.createElement("dialog");dialog.id="git-diff-dial\
-og"+idSuffix;dialog.className="git-diff-dialog";dialog.setAttribute("aria-labelledby","git-diff-title");document.body.append(
-dialog);const conflictDialog=document.createElement("dialog");conflictDialog.id="git-conflict-dialog"+idSuffix;conflictDialog.
-className="git-diff-dialog git-conflict-dialog";conflictDialog.setAttribute("aria-labelledby","git-conflict-title");document.
-body.append(conflictDialog);container.innerHTML=`<div class="git-toolbar" role="toolbar" aria-label="Source control acti\
-ons">${iconButton("sync","Commit all & sync",'id="git-commit-sync"')}${iconButton("commit","Commit staged changes",'id="\
-git-commit"')}${iconButton("stageAll","Stage all changes")}${iconButton("unstageAll","Unstage all changes")}${iconButton(
-"push","Push branch to selected remotes")}${iconButton("pull","Pull (fast-forward only)")}${iconButton("fetch","Fetch re\
-mote updates")}${iconButton("refresh","Refresh source control")}</div>
+afterMutation=async()=>{},openFile=async()=>{},idSuffix="",onPendingCount,onBusy,onStatus,onSetup}){let state=null,busy=false,
+generation=0,refreshing=false,refreshedAt=0,refreshCost=0,selectedRemote="",pushRemotes=[],defaultMessage="",historyLoaded=false,
+diff=null,split2=true,conflict=null,conflictChoice="manual";const dialog=document.createElement("dialog");dialog.id="git\
+-diff-dialog"+idSuffix;dialog.className="git-diff-dialog";dialog.setAttribute("aria-labelledby","git-diff-title");document.
+body.append(dialog);const conflictDialog=document.createElement("dialog");conflictDialog.id="git-conflict-dialog"+idSuffix;
+conflictDialog.className="git-diff-dialog git-conflict-dialog";conflictDialog.setAttribute("aria-labelledby","git-confli\
+ct-title");document.body.append(conflictDialog);container.innerHTML=`<div class="git-toolbar" role="toolbar" aria-label=\
+"Source control actions">${iconButton("sync","Commit all & sync",'id="git-commit-sync"')}${iconButton("commit","Commit s\
+taged changes",'id="git-commit"')}${iconButton("stageAll","Stage all changes")}${iconButton("unstageAll","Unstage all ch\
+anges")}${iconButton("push","Push branch to selected remotes")}${iconButton("pull","Pull (fast-forward only)")}${iconButton(
+"fetch","Fetch remote updates")}${iconButton("refresh","Refresh source control")}</div>
     <div class="git-summary"><strong id="git-branch">Source control</strong></div><p id="git-repository-note" class="hin\
-t"></p><div id="git-notice" class="git-notice" role="status" aria-live="polite"></div><div id="git-setup" hidden></div>
+t"></p><div id="git-notice" class="git-notice" role="status" aria-live="polite"></div><div id="git-setup" hidden></div><\
+div id="git-connect" class="git-connect" hidden><p>This repository is not connected to GitHub or another remote yet.</p>${button(
+"setup","Set up Git\u2026","Connect this workspace to GitHub with a deploy key")}</div>
     <div id="git-repository" hidden><form id="git-commit-form"><label for="git-commit-message" class="git-visually-hidde\
 n">Commit message</label><input id="git-commit-message" type="text" maxlength="10000" placeholder="Commit message (Ctrl+\
 Enter)" aria-label="Commit message" title="Current UTC timestamp by default. Enter your own message to replace it." auto\
 complete="off"></form><p id="git-sync-status" class="hint"></p><div id="git-changes"></div>
     <div class="git-repository-controls"><div class="git-branch-control"><label for="git-branches">Branch</label><select\
  id="git-branches" aria-label="Current Git branch"></select>${button("newBranch","+","Create branch")}</div></div>
-    ${button("editIgnore","Edit .gitignore")}<details id="git-remote-management"><summary>Remote management</summary><di\
-v class="git-remote-control"><label for="git-remotes">Fetch / pull</label><select id="git-remotes" aria-label="Git fetch\
- and pull remote"></select></div><p class="hint">Sync fetches and merges from this remote, then pushes to every checked \
-remote. Only this remote can set the branch upstream.</p><fieldset class="git-push-remotes"><legend>Push to</legend><div\
- id="git-push-remotes"></div></fieldset><form id="git-add-remote-form"><label for="git-remote-name">Remote name</label><\
-input id="git-remote-name" maxlength="100" placeholder="origin" required autocomplete="off"><label for="git-remote-url">\
-Clone URL (HTTPS or SSH)</label><input id="git-remote-url" maxlength="2000" placeholder="https://host/repository.git" re\
-quired autocomplete="off"><button type="submit">Add remote</button></form></details>
+    ${button("editIgnore","Edit .gitignore")}<details id="git-remote-management"><summary>Remote management</summary>${button(
+"setup","Git setup & deploy key\u2026","Open the Git setup guide: commit author, remote and deploy key")}<div class="git\
+-remote-control"><label for="git-remotes">Fetch / pull</label><select id="git-remotes" aria-label="Git fetch and pull re\
+mote"></select></div><p class="hint">Sync fetches and merges from this remote, then pushes to every checked remote. Only\
+ this remote can set the branch upstream.</p><fieldset class="git-push-remotes"><legend>Push to</legend><div id="git-pus\
+h-remotes"></div></fieldset><form id="git-add-remote-form"><label for="git-remote-name">Remote name</label><input id="gi\
+t-remote-name" maxlength="100" placeholder="origin" required autocomplete="off"><label for="git-remote-url">Clone URL (H\
+TTPS or SSH)</label><input id="git-remote-url" maxlength="2000" placeholder="https://host/repository.git" required autoc\
+omplete="off"><button type="submit">Add remote</button></form></details>
     <details id="git-recent-pulls"><summary>Recently pulled files</summary><div id="git-recent-pull-list"></div></detail\
 s><details id="git-more"><summary>Branches &amp; stashes</summary><p class="hint">Save tracked changes in a stash before\
  switching branches. Stage new files to include them.</p>${button("stash","Stash tracked changes")}<div id="git-stashes"\
@@ -13591,54 +13602,57 @@ h").textContent=state?.repository?state.detached?"Detached HEAD \xB7 "+state.oid
 ce control";if(!state?.repository){find2("git-repository-note").textContent=!client2.capabilities.git?"Source control is\
  available in the desktop application.":state?.parentRepository?"Open the repository root to manage every change togethe\
 r: "+state.parentRepository:state?.error||"This workspace is not a Git repository.";find2("git-setup").innerHTML=client2.
-capabilities.git&&state?.available&&!state.parentRepository?button("init",ui("Initialise repository")):"";updateControls();
-return}find2("git-repository-note").textContent=state.root;find2("git-repository-note").title=state.root;const branches=state.
-branches||[];find2("git-branches").innerHTML=(state.unborn||state.detached?`<option value="">${esc2(state.branch)}</opti\
-on>`:"")+branches.map(branch=>`<option ${branch.current?"selected":""} value="${esc2(branch.name)}">${esc2(branch.name)}\
-</option>`).join("");selectedRemote=state.syncRemote||state.remotes.find(remote=>remote.name==="origin")?.name||state.remotes[0]?.
-name||"";pushRemotes=state.pushRemotes||(selectedRemote?[selectedRemote]:[]);find2("git-remotes").innerHTML=state.remotes.
-length?state.remotes.map(remote=>`<option value="${esc2(remote.name)}" ${remote.name===selectedRemote?"selected":""}>${esc2(
-remote.name)}</option>`).join(""):'<option value="">No remote</option>';find2("git-remotes").title=state.remotes.find(remote=>remote.
-name===selectedRemote)?.fetch||"";find2("git-push-remotes").innerHTML=state.remotes.map(remote=>`<label class="git-push-\
-remote"><input type="checkbox" data-push-remote="${esc2(remote.name)}" aria-label="Push to ${esc2(remote.name)}" ${pushRemotes.
-includes(remote.name)?"checked":""}><span><strong>${esc2(remote.name)}</strong><small title="${esc2(remote.push||remote.
-fetch||"")}">${esc2(remote.push||remote.fetch||"")}</small>${remote.fetch!==remote.push?`<small>Fetch: ${esc2(remote.fetch||
-"")}</small>`:""}</span></label>`).join("")||'<p class="hint">Add a remote to publish this workspace.</p>';timestampMessage();
-find2("git-sync-status").textContent=state.upstream?`${state.ahead} outgoing \u2191 \xB7 ${state.behind} incoming \u2193 \xB7 ${state.
-upstream}`:selectedRemote?`No upstream branch. Pushing to ${selectedRemote} sets this branch's upstream.`:"No upstream b\
-ranch. Add a remote to publish this branch.";find2("git-recent-pull-list").innerHTML=(state.recentPulls||[]).map(pull=>`\
-<section class="git-pull"><p class="hint">${esc2(new Date(pull.at).toLocaleString())}<br>${esc2(pull.remote+"/"+pull.branch)}\
- \xB7 ${pull.totalFiles} ${pull.totalFiles===1?"file":"files"}</p>${pull.files.map(file=>`<button type="button" class="g\
-it-pulled-file" data-pull-id="${esc2(pull.to)}" data-pull-path="${esc2(file.path)}" title="${esc2(file.previousPath?file.
-previousPath+" \u2192 "+file.path:file.path)}"><span>${esc2(file.path)}</span><strong>${esc2(file.status)}</strong></but\
-ton>`).join("")}${pull.totalFiles>pull.files.length?'<p class="hint">Showing the first 200 files.</p>':""}</section>`).join(
-"")||'<p class="hint">Files received by Pull or Sync will appear here, including modified, added, renamed and deleted fi\
-les.</p>';const conflicts=state.files.filter(file=>file.conflict),staged=state.files.filter(file=>!file.untracked&&!file.
-conflict&&file.index!=="."),unstaged=state.files.filter(file=>!file.conflict&&(file.untracked||file.worktree!=="."));find2(
-"git-changes").innerHTML=fileGroup("Merge changes",conflicts,false)+fileGroup("Staged changes",staged,true)+fileGroup("C\
-hanges",unstaged,false)+(!state.files.length?`<div class="git-clean"><span aria-hidden="true">\u2713</span><strong>${state.
-merging?"Conflicts resolved":"Working tree clean"}</strong><p>${state.merging?"Commit to complete the merge.":"All chang\
-es are committed."}</p></div>`:"");find2("git-stashes").innerHTML=state.stashes.map(stash=>`<div class="git-stash"><span\
->${esc2(stash.message)}</span>${button("applyStash","Apply","Apply "+stash.ref+" (keep stash)",`data-ref="${esc2(stash.ref)}\
-"`)}</div>`).join("")||'<p class="hint">No saved stashes.</p>';if(state.privateStaged)announce("Private Weave data is st\
-aged. Unstage it in an external Git client before committing.",true);updateControls()}async function refresh({quiet=false}={}){
-if(refreshing||busy||!client2.capabilities.git){if(!client2.capabilities.git)render2();return}if(quiet&&Date.now()-refreshedAt<
-Math.max(1e3,refreshCost*5))return;refreshing=true;refreshedAt=Date.now();const serial=generation;try{const next=await client2.
-call("gitStatus");if(serial!==generation)return;const changed=JSON.stringify(next)!==JSON.stringify(state);state=next;if(changed)
-render2();if(!quiet&&state.error)announce(state.error,true)}catch(error){if(serial===generation&&!quiet)announce(error.message,
-true)}finally{refreshing=false;refreshCost=Date.now()-refreshedAt}}async function ask(title,description,{input,confirm="\
-Continue"}={}){const prompt=document.createElement("dialog");prompt.className="git-prompt";prompt.innerHTML=`<form metho\
-d="dialog"><h2>${esc2(title)}</h2><p>${esc2(description)}</p>${input!==void 0?`<label>${esc2(title)}<input name="value" \
-value="${esc2(input)}" autocomplete="off" required></label>`:""}<div class="dialog-actions"><button value="cancel" formn\
-ovalidate>Cancel</button><button value="ok">${esc2(confirm)}</button></div></form>`;document.body.append(prompt);prompt.
-showModal();prompt.querySelector("input")?.select();return new Promise(resolve=>{prompt.onclose=()=>{const value=prompt.
-returnValue==="ok"?prompt.querySelector("input")?.value.trim()??true:null;prompt.remove();resolve(value)}})}async function action(name2,args={}){
-if(busy)return;const serial=generation;lock(true);announce({fetch:"Fetching remote updates\u2026",pull:"Pulling changes\u2026",
-push:"Pushing branch\u2026",sync:"Committing all changes and syncing\u2026",commit:"Committing staged changes\u2026"}[name2]||
-"Updating repository\u2026");try{if(name2!=="configureRemotes")await beforeAction(name2);if(serial!==generation)return;const result=await client2.
-call("gitAction",{action:name2,remote:selectedRemote,...["push","sync"].includes(name2)?{pushRemotes}:{},...args});if(serial!==
-generation)return;state=result.status;if(name2==="commit"||name2==="sync"&&result.committed)timestampMessage(true);if(name2===
-"addRemote"){find2("git-remote-name").value="";find2("git-remote-url").value=""}historyLoaded=false;render2();announce(result.
+capabilities.git&&state?.available&&!state.parentRepository?(onSetup?`<p>Keep a history of this workspace and share it t\
+hrough GitHub.</p>${button("setup","Set up Git\u2026","Set up Git for this workspace")} `:"")+button("init",ui("Initiali\
+se repository")):"";find2("git-connect").hidden=true;updateControls();onStatus?.(state);return}find2("git-repository-not\
+e").textContent=state.root;find2("git-repository-note").title=state.root;const branches=state.branches||[];find2("git-br\
+anches").innerHTML=(state.unborn||state.detached?`<option value="">${esc2(state.branch)}</option>`:"")+branches.map(branch=>`\
+<option ${branch.current?"selected":""} value="${esc2(branch.name)}">${esc2(branch.name)}</option>`).join("");selectedRemote=
+state.syncRemote||state.remotes.find(remote=>remote.name==="origin")?.name||state.remotes[0]?.name||"";pushRemotes=state.
+pushRemotes||(selectedRemote?[selectedRemote]:[]);find2("git-remotes").innerHTML=state.remotes.length?state.remotes.map(
+remote=>`<option value="${esc2(remote.name)}" ${remote.name===selectedRemote?"selected":""}>${esc2(remote.name)}</option\
+>`).join(""):'<option value="">No remote</option>';find2("git-remotes").title=state.remotes.find(remote=>remote.name===selectedRemote)?.
+fetch||"";find2("git-push-remotes").innerHTML=state.remotes.map(remote=>`<label class="git-push-remote"><input type="che\
+ckbox" data-push-remote="${esc2(remote.name)}" aria-label="Push to ${esc2(remote.name)}" ${pushRemotes.includes(remote.name)?
+"checked":""}><span><strong>${esc2(remote.name)}</strong><small title="${esc2(remote.push||remote.fetch||"")}">${esc2(remote.
+push||remote.fetch||"")}</small>${remote.fetch!==remote.push?`<small>Fetch: ${esc2(remote.fetch||"")}</small>`:""}</span\
+></label>`).join("")||'<p class="hint">Add a remote to publish this workspace.</p>';timestampMessage();find2("git-sync-s\
+tatus").textContent=state.upstream?`${state.ahead} outgoing \u2191 \xB7 ${state.behind} incoming \u2193 \xB7 ${state.upstream}`:
+selectedRemote?`No upstream branch. Pushing to ${selectedRemote} sets this branch's upstream.`:"No upstream branch. Add \
+a remote to publish this branch.";find2("git-recent-pull-list").innerHTML=(state.recentPulls||[]).map(pull=>`<section cl\
+ass="git-pull"><p class="hint">${esc2(new Date(pull.at).toLocaleString())}<br>${esc2(pull.remote+"/"+pull.branch)} \xB7 ${pull.
+totalFiles} ${pull.totalFiles===1?"file":"files"}</p>${pull.files.map(file=>`<button type="button" class="git-pulled-fil\
+e" data-pull-id="${esc2(pull.to)}" data-pull-path="${esc2(file.path)}" title="${esc2(file.previousPath?file.previousPath+
+" \u2192 "+file.path:file.path)}"><span>${esc2(file.path)}</span><strong>${esc2(file.status)}</strong></button>`).join("")}${pull.
+totalFiles>pull.files.length?'<p class="hint">Showing the first 200 files.</p>':""}</section>`).join("")||'<p class="hin\
+t">Files received by Pull or Sync will appear here, including modified, added, renamed and deleted files.</p>';const conflicts=state.
+files.filter(file=>file.conflict),staged=state.files.filter(file=>!file.untracked&&!file.conflict&&file.index!=="."),unstaged=state.
+files.filter(file=>!file.conflict&&(file.untracked||file.worktree!=="."));find2("git-changes").innerHTML=fileGroup("Merg\
+e changes",conflicts,false)+fileGroup("Staged changes",staged,true)+fileGroup("Changes",unstaged,false)+(!state.files.length?
+`<div class="git-clean"><span aria-hidden="true">\u2713</span><strong>${state.merging?"Conflicts resolved":"Working tree\
+ clean"}</strong><p>${state.merging?"Commit to complete the merge.":"All changes are committed."}</p></div>`:"");find2("\
+git-stashes").innerHTML=state.stashes.map(stash=>`<div class="git-stash"><span>${esc2(stash.message)}</span>${button("ap\
+plyStash","Apply","Apply "+stash.ref+" (keep stash)",`data-ref="${esc2(stash.ref)}"`)}</div>`).join("")||'<p class="hint\
+">No saved stashes.</p>';if(state.privateStaged)announce("Private Weave data is staged. Unstage it in an external Git cl\
+ient before committing.",true);find2("git-connect").hidden=!onSetup||state.remotes.length>0;updateControls();onStatus?.(
+state)}async function refresh({quiet=false}={}){if(refreshing||busy||!client2.capabilities.git){if(!client2.capabilities.
+git)render2();return}if(quiet&&Date.now()-refreshedAt<Math.max(1e3,refreshCost*5))return;refreshing=true;refreshedAt=Date.
+now();const serial=generation;try{const next=await client2.call("gitStatus");if(serial!==generation)return;const changed=JSON.
+stringify(next)!==JSON.stringify(state);state=next;if(changed)render2();if(!quiet&&state.error)announce(state.error,true)}catch(error){
+if(serial===generation&&!quiet)announce(error.message,true)}finally{refreshing=false;refreshCost=Date.now()-refreshedAt}}
+async function ask(title,description,{input,confirm="Continue"}={}){const prompt=document.createElement("dialog");prompt.
+className="git-prompt";prompt.innerHTML=`<form method="dialog"><h2>${esc2(title)}</h2><p>${esc2(description)}</p>${input!==
+void 0?`<label>${esc2(title)}<input name="value" value="${esc2(input)}" autocomplete="off" required></label>`:""}<div cl\
+ass="dialog-actions"><button value="cancel" formnovalidate>Cancel</button><button value="ok">${esc2(confirm)}</button></\
+div></form>`;document.body.append(prompt);prompt.showModal();prompt.querySelector("input")?.select();return new Promise(
+resolve=>{prompt.onclose=()=>{const value=prompt.returnValue==="ok"?prompt.querySelector("input")?.value.trim()??true:null;
+prompt.remove();resolve(value)}})}async function action(name2,args={}){if(busy)return;const serial=generation;lock(true);
+announce({fetch:"Fetching remote updates\u2026",pull:"Pulling changes\u2026",push:"Pushing branch\u2026",sync:"Committin\
+g all changes and syncing\u2026",commit:"Committing staged changes\u2026"}[name2]||"Updating repository\u2026");try{if(name2!==
+"configureRemotes")await beforeAction(name2);if(serial!==generation)return;const result=await client2.call("gitAction",{
+action:name2,remote:selectedRemote,...["push","sync"].includes(name2)?{pushRemotes}:{},...args});if(serial!==generation)
+return;state=result.status;if(name2==="commit"||name2==="sync"&&result.committed)timestampMessage(true);if(name2==="addR\
+emote"){find2("git-remote-name").value="";find2("git-remote-url").value=""}historyLoaded=false;render2();announce(result.
 message||"Done.");if(name2!=="configureRemotes")await afterMutation(name2);if(find2("git-history").open)await loadHistory()}catch(error){
 if(serial===generation){announce(error.message,true);try{state=await client2.call("gitStatus");render2();if(name2!=="con\
 figureRemotes")await afterMutation(name2)}catch{}}}finally{lock(false)}}function renderDiffDialog(){const rows=diffRows(
@@ -13735,24 +13749,153 @@ dataset.untracked==="true";if(await ask(untracked?"Delete untracked file?":"Disc
 ete "+file+" from this workspace? Git has no staged version to restore. Its current contents will be lost.":"Restore "+file+
 " to its staged version. Unstaged edits will be lost.",{confirm:untracked?"Delete file":"Discard changes"})){if(serial===
 generation)await action(name2,{path:file,confirmed:true,untracked})}return}if(name2==="editIgnore")return editIgnore();if(name2===
-"init"&&!await ask(ui("Initialise repository?"),"Create Git history for this workspace. Stage and commit selected files \
-to record your first version.",{confirm:ui("Initialise")}))return;if(serial!==generation)return;await action(name2,{path:target.
-closest(".git-file")?.dataset.path,ref:target.dataset.ref})});find2("git-branches").onchange=()=>action("switch",{branch:find2(
-"git-branches").value});find2("git-remotes").onchange=()=>action("configureRemotes",{remote:find2("git-remotes").value,pushRemotes});
-find2("git-push-remotes").onchange=()=>action("configureRemotes",{pushRemotes:[...container.querySelectorAll("[data-push\
--remote]:checked")].map(input=>input.dataset.pushRemote)});find2("git-add-remote-form").onsubmit=event=>{event.preventDefault();
-action("addRemote",{name:find2("git-remote-name").value.trim(),url:find2("git-remote-url").value.trim()})};find2("git-co\
-mmit-form").onsubmit=event=>{event.preventDefault();if(!find2("git-commit").disabled)action("commit",{message:commitMessage()})};
-find2("git-commit-message").onkeydown=event=>{if((event.ctrlKey||event.metaKey)&&event.key==="Enter"){event.preventDefault();
-if(!find2("git-commit").disabled)action("commit",{message:commitMessage()})}};find2("git-history").ontoggle=()=>{if(find2(
-"git-history").open)loadHistory()};dialog.addEventListener("click",event=>{if(event.target===dialog){const rect=dialog.getBoundingClientRect();
-if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)dialog.close()}});
-const timer=setInterval(()=>{if(!document.hidden){if(!busy)timestampMessage();refresh({quiet:true})}},6e3);render2();return{
-refresh,reset(){generation++;state=null;historyLoaded=false;selectedRemote="";pushRemotes=[];timestampMessage(true);find2(
-"git-remote-name").value="";find2("git-remote-url").value="";find2("git-history-list").innerHTML="";announce("");dialog.
+"setup")return onSetup?.();if(name2==="init"&&!await ask(ui("Initialise repository?"),"Create Git history for this works\
+pace. Stage and commit selected files to record your first version.",{confirm:ui("Initialise")}))return;if(serial!==generation)
+return;await action(name2,{path:target.closest(".git-file")?.dataset.path,ref:target.dataset.ref})});find2("git-branches").
+onchange=()=>action("switch",{branch:find2("git-branches").value});find2("git-remotes").onchange=()=>action("configureRe\
+motes",{remote:find2("git-remotes").value,pushRemotes});find2("git-push-remotes").onchange=()=>action("configureRemotes",
+{pushRemotes:[...container.querySelectorAll("[data-push-remote]:checked")].map(input=>input.dataset.pushRemote)});find2(
+"git-add-remote-form").onsubmit=event=>{event.preventDefault();action("addRemote",{name:find2("git-remote-name").value.trim(),
+url:find2("git-remote-url").value.trim()})};find2("git-commit-form").onsubmit=event=>{event.preventDefault();if(!find2("\
+git-commit").disabled)action("commit",{message:commitMessage()})};find2("git-commit-message").onkeydown=event=>{if((event.
+ctrlKey||event.metaKey)&&event.key==="Enter"){event.preventDefault();if(!find2("git-commit").disabled)action("commit",{message:commitMessage()})}};
+find2("git-history").ontoggle=()=>{if(find2("git-history").open)loadHistory()};dialog.addEventListener("click",event=>{if(event.
+target===dialog){const rect=dialog.getBoundingClientRect();if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<
+rect.top||event.clientY>rect.bottom)dialog.close()}});const timer=setInterval(()=>{if(!document.hidden){if(!busy)timestampMessage();
+refresh({quiet:true})}},6e3);async function perform(name2,args={}){if(busy)throw new Error("Source control is busy. Try \
+again in a moment.");const serial=generation;lock(true);try{await beforeAction(name2);const result=await client2.call("g\
+itAction",{action:name2,...args});if(serial===generation){state=result.status;historyLoaded=false;render2();announce(result.
+message||"Done.")}await afterMutation(name2);return result}finally{lock(false)}}render2();return{refresh,perform,get status(){
+return state},reset(){generation++;state=null;historyLoaded=false;selectedRemote="";pushRemotes=[];timestampMessage(true);
+find2("git-remote-name").value="";find2("git-remote-url").value="";find2("git-history-list").innerHTML="";announce("");dialog.
 close();conflictDialog.close();ignoreDialog.close();fileMenu.hidden=true;render2()},destroy(){clearInterval(timer);dialog.
 remove();conflictDialog.remove();ignoreDialog.remove();fileMenu.remove();document.removeEventListener("click",closeMenu);
-document.removeEventListener("keydown",closeMenu)}}}var skins={classic:{name:"Classic",description:"The original Weave look: bordered controls, tabbed panes and compact chr\
+document.removeEventListener("keydown",closeMenu)}}}function sshRemote(input){const text=String(input||"").trim().replace(/\/+$/,"");if(!text)return null;const short=text.match(
+/^([\w.-]+)\/([\w.-]+?)(?:\.git)?$/);if(short)return{url:`git@github.com:${short[1]}/${short[2]}.git`,host:"github.com",
+path:`${short[1]}/${short[2]}`};const scp=text.match(/^([\w.-]+)@([\w.-]+):([\w./-]+?)(?:\.git)?$/);if(scp)return{url:`${scp[1]}\
+@${scp[2]}:${scp[3]}.git`,host:scp[2].toLowerCase(),path:scp[3]};let url;try{url=new URL(text)}catch{return null}if(!["h\
+ttps:","http:","ssh:"].includes(url.protocol)||!url.hostname||url.password||url.search||url.hash)return null;const path=url.
+pathname.replace(/^\/+/,"").replace(/\.git$/,"").replace(/\/(?:tree|blob)\/.*$/,"");if(!/^[\w.-]+(?:\/[\w.-]+)+$/.test(path))
+return null;const host=url.hostname.toLowerCase();if(url.protocol==="ssh:")return{url:text.endsWith(".git")?text:text+".\
+git",host,path};return{url:`git@${host}:${path}.git`,host,path}}function deployKeyPage(remote){if(!remote)return null;if(remote.
+host==="github.com")return{url:`https://github.com/${remote.path}/settings/keys/new`,site:"GitHub"};if(remote.host==="gi\
+tlab.com")return{url:`https://gitlab.com/${remote.path}/-/settings/repository#js-deploy-keys-settings`,site:"GitLab"};return null}
+var isSsh=url=>/^ssh:\/\//.test(url||"")||/^[\w.-]+@[\w.-]+:/.test(url||"");function openGitSetup({git,name:name2,server,
+openResource,showSourceControl,ask}){const dialog=document.createElement("dialog");dialog.className="git-setup-dialog";dialog.
+setAttribute("aria-labelledby","git-setup-title");document.body.append(dialog);let tested=null,busy=false,notice="",failed=false,
+skipKey=false,remoteDraft="",lastAt=null;const expanded=new Set;const status=()=>git.status||{};const origin=()=>{const s=status();
+return s.remotes?.find(r=>r.name===(s.syncRemote||"origin"))||s.remotes?.find(r=>r.name==="origin")||s.remotes?.[0]||null};
+const step=(index2,title,done,current2,body,summary="")=>{const open=current2||done&&expanded.has(index2);return`<sectio\
+n class="git-setup-step${done?" done":""}${current2?" current":""}" aria-current="${current2?"step":"false"}"><h3><span \
+class="git-setup-index" aria-hidden="true">${done?"\u2713":index2}</span>${esc2(title)}${done?'<span class="git-visually\
+-hidden"> (done)</span>':""}</h3>${done&&!open?`<p class="git-setup-summary"><span>${esc2(summary)}</span> <button type=\
+"button" class="git-setup-link" data-expand="${index2}">Change</button></p>`:""}${open?`<div class="git-setup-body">${body}\
+</div>`:""}</section>`};function render2(){const s=status(),remote=origin(),parsed=remote?sshRemote(remote.fetch||""):null,
+page=deployKeyPage(parsed);const repo=!!s.repository,identity=!!(s.identity?.name&&s.identity?.email),key=s.deployKey,sshUrl=remote&&
+isSsh(remote.fetch);const keyNeeded=server||!skipKey&&!(remote&&!sshUrl);const synced=!!s.upstream,connected=!!tested?.connected||
+synced;const steps=[repo,identity,!!remote&&(sshUrl||!server),!keyNeeded||!!key&&connected,synced];const at=steps.findIndex(
+done=>!done);const parts=[];parts.push(step(1,"Create a Git repository",repo,at===0,s.parentRepository?`<p class="git-er\
+ror">This folder is inside another Git repository (${esc2(s.parentRepository)}). Open that repository's folder as the wo\
+rkspace instead.</p>`:repo?`<p>History is kept in this workspace's <code>.git</code> folder.</p>`:`<p>Git records versio\
+ns of your articles so you can review, undo and share changes. This creates an empty history in <strong>${esc2(name2)}</\
+strong>; your files are not changed.</p><button type="button" class="primary" data-setup="init">Create repository</butto\
+n>`,"History is kept in this workspace's .git folder."));parts.push(step(2,"Name your commits",identity,at===1,`<p>Each \
+saved version (commit) records who made it. This is shown on GitHub next to your changes and stays with this repository.\
+</p>
+      <form data-setup-form="identity" class="git-setup-form"><label>Name<input name="name" maxlength="200" autocomplete\
+="name" required value="${esc2(s.identity?.name||"")}"></label><label>Email<input name="email" type="email" maxlength="2\
+00" autocomplete="email" required value="${esc2(s.identity?.email||"")}"></label><p class="hint">GitHub can keep your ad\
+dress private: use the <code>\u2026@users.noreply.github.com</code> address from GitHub \u203A Settings \u203A Emails.</p><button type=\
+"submit" class="primary">${identity?"Update author":"Save author"}</button></form>`,`${s.identity?.name||""} \xB7 ${s.identity?.
+email||""}`));const remoteBody=remote&&!sshUrl&&server?`<p>The remote <strong>${esc2(remote.name)}</strong> uses <code>${esc2(
+remote.fetch)}</code>. Deploy keys work over SSH, so this server needs the SSH address.</p>${sshRemote(remote.fetch)?`<b\
+utton type="button" class="primary" data-setup="ssh">Switch to <code>${esc2(sshRemote(remote.fetch).url)}</code></button\
+>`:""}`:remote?`<p>Connected to <strong>${esc2(remote.name)}</strong>: <code>${esc2(remote.fetch)}</code></p><details><s\
+ummary>Use a different repository</summary>${remoteForm(remote.fetch)}</details>`:`<ol class="git-setup-list"><li>On <a \
+href="#" data-open="https://github.com/new">GitHub, create a new repository</a> (or choose an existing one). For a new r\
+epository leave the README, .gitignore and licence options off, so it starts empty.</li><li>Copy its address from the re\
+pository page, for example <code>https://github.com/you/notes</code>, and paste it here.</li></ol>${remoteForm("")}`;parts.
+push(step(3,"Choose the GitHub repository",steps[2],at===2,remoteBody,remote?`${remote.name}: ${remote.fetch}`:""));const title=`\
+Weave \u2013 ${name2}`;const keyBody=!keyNeeded?`<p>Pushing uses your own Git credentials on this computer.</p>${remote&&
+sshUrl?'<button type="button" data-setup="use-key">Use a deploy key instead</button>':""}`:!key?`<p>A <strong>deploy key\
+</strong> lets ${server?"this server":"Weave"} push to this one repository and nothing else. Weave creates the key and k\
+eeps its private half in its own data folder; you only copy the public half to GitHub.</p><button type="button" class="p\
+rimary" data-setup="key">Create deploy key</button>${!server?' <button type="button" data-setup="skip-key">Use my own Gi\
+t credentials</button>':""}`:`<ol class="git-setup-list">
+        <li>${page?`<button type="button" data-open="${esc2(page.url)}">Open ${esc2(page.site)} deploy keys \u2197</button>`:
+"On your Git host, open the repository's <strong>Settings \u203A Deploy keys</strong>."}${page?.site==="GitHub"?" (repos\
+itory \u203A <strong>Settings</strong> \u203A <strong>Deploy keys</strong> \u203A <strong>Add deploy key</strong>). You need to be the \
+repository's owner or an admin.":""}</li>
+        <li>Title: <code>${esc2(title)}</code> <button type="button" class="git-setup-copy" data-copy-text="${esc2(title)}\
+">Copy</button></li>
+        <li>Key: paste this public key.<textarea class="git-setup-key" readonly rows="3" spellcheck="false" aria-label="\
+Public deploy key">${esc2(key.publicKey)}</textarea><button type="button" class="primary git-setup-copy" data-copy-key>C\
+opy public key</button>${key.fingerprint?`<small class="git-setup-fingerprint">Fingerprint ${esc2(key.fingerprint)}</sma\
+ll>`:""}</li>
+        <li>Tick <strong>Allow write access</strong>, so Weave can push your changes.</li>
+        <li>Select <strong>Add key</strong>, then test the connection.</li></ol>
+        ${connected?`<p>\u2713 ${server?"The server":"Weave"} can reach the repository with this key.</p>`:'<button type\
+="button" class="primary" data-setup="test">Test connection</button>'}
+        <p class="hint">GitHub accepts a deploy key in one repository only; each workspace has its own. <button type="bu\
+tton" class="git-setup-link" data-setup="replace-key">Create a new key</button> \xB7 <button type="button" class="git-setup\
+-link" data-setup="remove-key">Remove key</button></p>`;parts.push(step(4,"Give Weave access with a deploy key",steps[3],
+at===3,keyBody,key?`Deploy key ${key.fingerprint||""} added and working`:"Uses your own Git credentials"));const unborn=s.
+unborn,branch=tested?.defaultBranch;const syncBody=synced?`<p>This workspace follows <code>${esc2(s.upstream)}</code>. U\
+se <strong>Commit all &amp; sync</strong> in Source control to save and share changes.</p>`:!tested?.connected?`<p>Check\
+ that Weave can reach the repository, then send or receive the first version.</p><button type="button" class="primary" d\
+ata-setup="test">Test connection</button>`:`${unborn&&branch?`<p>The remote already has articles on <code>${esc2(branch)}\
+</code>. Download them into this workspace; files here that the remote lacks are kept.</p><button type="button" class="p\
+rimary" data-setup="download" data-branch="${esc2(branch)}">Download from ${esc2(remote?.name||"origin")}</button>`:unborn&&
+!s.files?.length?"<p>This workspace is empty, so there is nothing to upload yet. Close this guide, add an article with <\
+strong>New article</strong>, then reopen <strong>Set up Git</strong> to upload it.</p>":`<p>${tested.remoteBranches?.length?
+"Combine this workspace with the remote and upload its changes.":"The remote is empty. Upload this workspace as its firs\
+t version."}</p><button type="button" class="primary" data-setup="sync">${tested.remoteBranches?.length?"Sync now":"Uplo\
+ad and sync"}</button>`}`;parts.push(step(5,"Connect and sync",synced,at===4,syncBody,`Following ${s.upstream||""}. Use \
+Commit all & sync in Source control.`));dialog.innerHTML=`<div class="git-setup-heading"><div><p class="eyebrow">SOURCE \
+CONTROL</p><h2 id="git-setup-title">Set up Git for ${esc2(name2)}</h2></div><button type="button" data-setup-close aria-\
+label="Close Git setup" title="Close (Esc)">\xD7</button></div>
+      <div class="git-setup-steps">${parts.join("")}</div>
+      <p class="git-setup-notice${failed?" git-error":""}" role="status" aria-live="polite">${esc2(notice)}</p>
+      <div class="dialog-actions">${at<0?'<button type="button" data-setup="source">Open Source control</button>':""}<bu\
+tton type="button" data-setup-close${at<0?' class="primary"':""}>${at<0?"Done":"Close"}</button></div>`;for(const node of dialog.
+querySelectorAll("button,input"))if(busy&&!node.matches("[data-setup-close]"))node.disabled=true;const field=dialog.querySelector(
+'[data-setup-form="remote"] input');if(field&&remoteDraft)field.value=remoteDraft;if(at!==lastAt){lastAt=at;dialog.querySelector(
+".git-setup-step.current")?.scrollIntoView({block:"nearest"})}}const remoteForm=value=>`<form data-setup-form="remote" c\
+lass="git-setup-form"><label>Repository address<input name="remote" maxlength="2000" required autocomplete="off" spellch\
+eck="false" placeholder="https://github.com/you/notes" value="${esc2(value)}"></label><p class="hint">An HTTPS page addr\
+ess, an SSH address (<code>git@github.com:you/notes.git</code>) or just <code>you/notes</code>.</p><button type="submit"\
+ class="primary">Connect repository</button></form>`;async function act(work,message2){if(busy)return;busy=true;failed=false;
+notice="Working\u2026";render2();try{const result=await work();notice=message2||result?.message||"Done."}catch(error){failed=
+true;notice=String(error?.message||error)}finally{busy=false;render2()}}async function copy(text,label){let copied=false;
+if(window.isSecureContext&&navigator.clipboard?.writeText){try{await navigator.clipboard.writeText(text);copied=true}catch{}}
+if(!copied){const area=document.createElement("textarea");area.value=text;area.className="git-visually-hidden";dialog.append(
+area);area.select();try{copied=document.execCommand("copy")}catch{}area.remove()}failed=!copied;notice=copied?label+" co\
+pied.":"Select the text and copy it.";render2();if(!copied)dialog.querySelector(".git-setup-key")?.select()}dialog.addEventListener(
+"input",event=>{if(event.target.name==="remote")remoteDraft=event.target.value});dialog.addEventListener("submit",event=>{
+event.preventDefault();const form=event.target,data2=new FormData(form);if(form.dataset.setupForm==="identity")void act(
+()=>git.perform("configureIdentity",{name:data2.get("name"),email:data2.get("email")}));if(form.dataset.setupForm==="rem\
+ote"){const typed=String(data2.get("remote")||""),parsed=sshRemote(typed);if(!parsed){failed=true;notice="Enter a reposi\
+tory address such as https://github.com/you/notes.";render2();return}const url=!server&&skipKey&&/^https:\/\//i.test(typed.
+trim())?typed.trim():parsed.url;tested=null;void act(async()=>{const result=await git.perform("addRemote",{name:origin()?.
+name||"origin",url,replace:true});remoteDraft="";return result})}});dialog.addEventListener("click",event=>{const target=event.
+target.closest("button,a");if(!target)return;if(target.matches("[data-open]")){event.preventDefault();void Promise.resolve(
+openResource(target.dataset.open)).catch(error=>{failed=true;notice=error?.message||String(error);render2()});return}if(target.
+matches("[data-setup-close]")){dialog.close();return}if(target.matches("[data-copy-key]"))return void copy(status().deployKey?.
+publicKey||"","Public key");if(target.matches("[data-copy-text]"))return void copy(target.dataset.copyText,"Title");if(target.
+matches("[data-expand]")){expanded.add(Number(target.dataset.expand));render2();return}const action=target.dataset.setup;
+if(!action)return;const remote=origin();if(action==="init")void act(()=>git.perform("init"));if(action==="ssh")void act(
+()=>git.perform("addRemote",{name:remote.name,url:sshRemote(remote.fetch).url,replace:true}));if(action==="key")void act(
+()=>git.perform("createDeployKey"));if(action==="replace-key")void ask("Create a new deploy key?","The current key stops\
+ working here. Add the new key to the repository on GitHub and delete the old one there.","Create new key").then(ok=>{if(ok){
+tested=null;void act(()=>git.perform("createDeployKey",{replace:true}))}});if(action==="remove-key")void ask("Remove dep\
+loy key?","Weave can no longer push with it. Also delete it from the repository's deploy keys on GitHub.","Remove key").
+then(ok=>{if(ok){tested=null;void act(()=>git.perform("removeDeployKey",{confirmed:true}))}});if(action==="skip-key"){skipKey=
+true;render2()}if(action==="use-key"){skipKey=false;render2()}if(action==="test")void act(async()=>{tested=null;const result=await git.
+perform("testRemote",{remote:remote.name});tested=result;return result});if(action==="download")void act(()=>git.perform(
+"useRemoteBranch",{remote:remote.name,branch:target.dataset.branch}));if(action==="sync")void act(async()=>{const s=status();
+return git.perform("sync",{remote:remote.name,pushRemotes:s.pushRemotes?.length?s.pushRemotes:[remote.name],message:s.unborn?
+"First version from Weave":new Date().toISOString()})});if(action==="source"){dialog.close();showSourceControl()}});dialog.
+addEventListener("close",()=>dialog.remove());render2();dialog.showModal();return dialog}var skins={classic:{name:"Classic",description:"The original Weave look: bordered controls, tabbed panes and compact chr\
 ome."},studio:{name:"Studio",description:"Floating rounded panels, borderless controls and soft depth."},"studio-flow":{
 name:"Studio Flow",extends:"studio",description:"Studio pared back for space, with tabs that curve into the article like\
  a browser."},compact:{name:"Compact",description:"A dense, square-cornered workbench with an activity bar and coloured \
@@ -14778,34 +14921,35 @@ append(copy)}const divider=document.createElement("div");divider.id="split-resiz
 0;divider.setAttribute("role","separator");divider.setAttribute("aria-orientation","vertical");divider.setAttribute("ari\
 a-label","Resize split view");$("editor-left").after(divider,group)}for(const element of document.querySelectorAll("[dat\
 a-capability]"))element.hidden=!client.capabilities[element.dataset.capability];document.querySelector('[data-panel="git\
-"]').hidden=!client.capabilities.git;if(pageData.mode==="server")for(const id2 of["choose-workspace","welcome-open"])$(id2).
-textContent="Open server workspace\u2026";if(portable)for(const id2 of["choose-workspace","welcome-open"])$(id2).hidden=
-true;if(!graphFeature){for(const id2 of["toggle-graph","view-graph"])$(id2).hidden=true;for(const index2 of[0,1])$(paneId(
-"connections",index2)).hidden=true}if(portable&&pageData.root)document.title=pageData.root+" \xB7 Weave";if(portable)document.
-documentElement.style.setProperty("--sidebar","180px");var showExtensions=()=>(prefs.get("show-extensions")??String(portable))===
-"true";var prefs={get(key){try{return localStorage.getItem("weave:"+key)}catch{return null}},set(key,value){try{localStorage.
-setItem("weave:"+key,value)}catch{}}};var active=null;var selected2="";var selectedWs=null;var focusKey=null;var dirty=false;
-var saving=null;var saveTimer;var pollBusy=false;var edit=client.writable&&prefs.get("edit")==="true";var sidebars;var showGraph=portable&&
-graphFeature;var openSerial=0;var searchSerial=0;var evidenceSerial=0;var tabs=[];var activeTab=null;var source2=false;var showArticle=true;
-var sessionWrite=Promise.resolve();var layoutPersisted="";var kanban=null;var workspaces=[];var panes=[$("editor-left"),
-$("editor-right")].map((group,index2)=>({index:index2,group,el:Object.fromEntries(PANE_IDS.map(id2=>[id2,$(paneId(id2,index2))])),
-tabs:[],activeTab:null,active:null,source:false}));var P=panes[0];var split=false;var sides=[panes[0],panes[1]];var graphPane=P;
-var evidencePane=P;var $p=id2=>P.el[id2];var paneTabs=pane=>pane===P?tabs:pane.tabs;var paneTabId=pane=>pane===P?activeTab:
-pane.activeTab;var paneActive=pane=>pane===P?active:pane.active;var paneSource=pane=>pane===P?source2:pane.source;var paneWs=pane=>{
-const doc2=paneActive(pane);return doc2&&!doc2.external?wsByKey(doc2.ws):null};var paneOfTab=id2=>panes.find(pane=>paneTabs(
-pane).some(tab=>tab.id===id2))||null;var paneAt=node=>panes[Number(node?.closest?.(".editor-group")?.dataset.pane)]||null;
-var otherPane=()=>split?panes.find(pane=>pane!==P):null;var shownPanes=()=>split?sides:[P];var allTabs=()=>panes.flatMap(
-paneTabs);var docKey=doc2=>doc2?draftKey(doc2.external?null:doc2.ws,doc2.path):null;var currentTab=()=>tabs.find(tab=>tab.
-id===activeTab);var workspaceKey=value=>client.capabilities.resources?value.workspace?.id||value.root:value.root;var wsByKey=key=>key?
-workspaces.find(ws=>ws.key===key)||null:null;var multi=()=>workspaces.length>1;var activeWs=()=>active&&!active.external?
-wsByKey(active.ws):null;var current=()=>wsByKey(currentTab()?.ws)||wsByKey(focusKey)||workspaces[0]||null;var workspaceName=ws=>ws?.
-catalog.workspace?.label||ws?.catalog.workspace?.name||ws?.catalog.root.split(/[\\/]/).filter(Boolean).at(-1)||"Workspac\
-e";var workspaceColor=ws=>/^#[0-9a-f]{6}$/i.test(ws?.catalog.workspace?.color||"")?ws.catalog.workspace.color:"#7c8594";
-var withWs=(doc2,ws)=>({...doc2,ws:ws.key});var drafts=new Map;var draftKey=(wsKey,path)=>(wsKey||"")+"\n"+path;var activeKey=()=>active?
-draftKey(active.external?null:active.ws,active.path):null;var autosaveMode=()=>["off","delay","leave"].includes(prefs.get(
-"autosave"))?prefs.get("autosave"):"delay";var autosaveDelay=()=>Math.max(100,Math.min(6e4,Math.round(Number(prefs.get("\
-autosave-delay-ms")))||650));var tabKey=tab=>draftKey(isExternal(tab.path)?null:tab.ws,tab.path);var tabUnsaved=tab=>!!tab.
-path&&(dirty&&tabKey(tab)===activeKey()||drafts.has(tabKey(tab)));var DOT_DELAY=1e3;var dirtySince=0;var dotTimer;var draftShowsDot=draft=>!!draft&&
+"]').hidden=!client.capabilities.git;if(pageData.mode==="server")$("choose-workspace").textContent="Open server workspac\
+e\u2026";if(portable)$("choose-workspace").hidden=true;$("create-workspace").hidden=portable||!client.writable||!client.
+createWorkspace;$("menu-git-setup").hidden=portable||!client.writable||!client.capabilities.git;if(!graphFeature){for(const id2 of[
+"toggle-graph","view-graph"])$(id2).hidden=true;for(const index2 of[0,1])$(paneId("connections",index2)).hidden=true}if(portable&&
+pageData.root)document.title=pageData.root+" \xB7 Weave";if(portable)document.documentElement.style.setProperty("--sideb\
+ar","180px");var showExtensions=()=>(prefs.get("show-extensions")??String(portable))==="true";var prefs={get(key){try{return localStorage.
+getItem("weave:"+key)}catch{return null}},set(key,value){try{localStorage.setItem("weave:"+key,value)}catch{}}};var active=null;
+var selected2="";var selectedWs=null;var focusKey=null;var dirty=false;var saving=null;var saveTimer;var pollBusy=false;
+var edit=client.writable&&prefs.get("edit")==="true";var sidebars;var showGraph=portable&&graphFeature;var openSerial=0;
+var searchSerial=0;var evidenceSerial=0;var tabs=[];var activeTab=null;var source2=false;var showArticle=true;var sessionWrite=Promise.
+resolve();var layoutPersisted="";var kanban=null;var workspaces=[];var panes=[$("editor-left"),$("editor-right")].map((group,index2)=>({
+index:index2,group,el:Object.fromEntries(PANE_IDS.map(id2=>[id2,$(paneId(id2,index2))])),tabs:[],activeTab:null,active:null,
+source:false}));var P=panes[0];var split=false;var sides=[panes[0],panes[1]];var graphPane=P;var evidencePane=P;var $p=id2=>P.
+el[id2];var paneTabs=pane=>pane===P?tabs:pane.tabs;var paneTabId=pane=>pane===P?activeTab:pane.activeTab;var paneActive=pane=>pane===
+P?active:pane.active;var paneSource=pane=>pane===P?source2:pane.source;var paneWs=pane=>{const doc2=paneActive(pane);return doc2&&
+!doc2.external?wsByKey(doc2.ws):null};var paneOfTab=id2=>panes.find(pane=>paneTabs(pane).some(tab=>tab.id===id2))||null;
+var paneAt=node=>panes[Number(node?.closest?.(".editor-group")?.dataset.pane)]||null;var otherPane=()=>split?panes.find(
+pane=>pane!==P):null;var shownPanes=()=>split?sides:[P];var allTabs=()=>panes.flatMap(paneTabs);var docKey=doc2=>doc2?draftKey(
+doc2.external?null:doc2.ws,doc2.path):null;var currentTab=()=>tabs.find(tab=>tab.id===activeTab);var workspaceKey=value=>client.
+capabilities.resources?value.workspace?.id||value.root:value.root;var wsByKey=key=>key?workspaces.find(ws=>ws.key===key)||
+null:null;var multi=()=>workspaces.length>1;var activeWs=()=>active&&!active.external?wsByKey(active.ws):null;var current=()=>wsByKey(
+currentTab()?.ws)||wsByKey(focusKey)||workspaces[0]||null;var workspaceName=ws=>ws?.catalog.workspace?.label||ws?.catalog.
+workspace?.name||ws?.catalog.root.split(/[\\/]/).filter(Boolean).at(-1)||"Workspace";var workspaceColor=ws=>/^#[0-9a-f]{6}$/i.
+test(ws?.catalog.workspace?.color||"")?ws.catalog.workspace.color:"#7c8594";var withWs=(doc2,ws)=>({...doc2,ws:ws.key});
+var drafts=new Map;var draftKey=(wsKey,path)=>(wsKey||"")+"\n"+path;var activeKey=()=>active?draftKey(active.external?null:
+active.ws,active.path):null;var autosaveMode=()=>["off","delay","leave"].includes(prefs.get("autosave"))?prefs.get("auto\
+save"):"delay";var autosaveDelay=()=>Math.max(100,Math.min(6e4,Math.round(Number(prefs.get("autosave-delay-ms")))||650));
+var tabKey=tab=>draftKey(isExternal(tab.path)?null:tab.ws,tab.path);var tabUnsaved=tab=>!!tab.path&&(dirty&&tabKey(tab)===
+activeKey()||drafts.has(tabKey(tab)));var DOT_DELAY=1e3;var dirtySince=0;var dotTimer;var draftShowsDot=draft=>!!draft&&
 (autosaveMode()==="off"||Date.now()-(draft.since||0)>=DOT_DELAY);var tabShowsDot=tab=>!!tab.path&&(dirty&&tabKey(tab)===
 activeKey()&&Date.now()-dirtySince>=DOT_DELAY||draftShowsDot(drafts.get(tabKey(tab))));function scheduleSave(){clearTimeout(
 saveTimer);if(autosaveMode()==="delay")saveTimer=setTimeout(run(save),autosaveDelay())}var makeTab=(file=null,ws=null)=>({
@@ -14849,107 +14993,108 @@ innerHTML='<summary><span class="workspace-dot" aria-hidden="true"></span><span 
 class="git-workspace-count" hidden></span></summary><div class="git-workspace-body"></div>';ws.gitSection=section2;ws.gitCount=
 0;ws.gitBusy=false;ws.git=createGitPanel({client:ws.api,container:section2.querySelector(".git-workspace-body"),idSuffix:gitPanelCount++?
 "-"+gitPanelCount:"",openFile:file=>openNote(file,null,{ws}),onPendingCount:count3=>{ws.gitCount=count3;renderGitSections()},
-onBusy:busy=>{ws.gitBusy=busy;$("git-panel").setAttribute("aria-busy",String(workspaces.some(w=>w.gitBusy)))},beforeAction:async()=>{
-if(!workspaces.includes(ws))throw new Error("This workspace is inactive.");if(!await ensureDraftsSaved(key=>key.startsWith(
-ws.key+"\n"),"using Git"))throw new Error("Save or discard unsaved articles before using Git.");if(dirty||saving)throw new Error(
-"Finish saving the current article before continuing.")},afterMutation:async name2=>{await applyCatalog(ws,await ws.api.
-call("catalog"));if(active?.ws===ws.key&&["pull","sync","switch","createBranch","stash","applyStash","discard","resolveC\
-onflict"].includes(name2)){if(dirty||saving){$p("note-warning").textContent="Git changed this workspace. Your draft is r\
-etained; save or reload after reviewing the changes.";return}if(ws.index.has(active.path))await openNote(active.path,void 0,
-{record:false,ws});else $p("note-warning").textContent="This article is absent from the current Git version. Its open te\
-xt is retained."}await reloadChangedPanes(ws)}});section2.addEventListener("toggle",()=>{if(section2.open)void ws.git.refresh(
-{quiet:true})})}function renderGitSections(){let total=0;for(const ws of workspaces){gitList.append(ws.gitSection);total+=
-ws.gitCount;ws.gitSection.style.setProperty("--workspace-color",workspaceColor(ws));ws.gitSection.querySelector(".git-wo\
-rkspace-name").textContent=workspaceName(ws);ws.gitSection.querySelector("summary").title=ws.catalog.root;const count3=ws.
-gitSection.querySelector(".git-workspace-count");count3.hidden=!ws.gitCount;count3.textContent=String(ws.gitCount);count3.
-title=ws.gitCount+" pending "+(ws.gitCount===1?"file":"files")}if(workspaces.length===1&&gitSectionsShown!==1)workspaces[0].
-gitSection.open=true;gitSectionsShown=workspaces.length;let hint=gitList.querySelector(":scope > .hint");if(!workspaces.
-length&&!hint){hint=document.createElement("p");hint.className="hint";hint.textContent=client.capabilities.git?"Open a w\
-orkspace to manage its Git repository.":"Source control is available in the desktop application.";gitList.append(hint)}if(workspaces.
-length)hint?.remove();const badge=$("git-pending-badge");if(badge){badge.textContent=String(total);badge.hidden=!total;badge.
-parentElement.title=total?"Source control \xB7 "+total+" pending "+(total===1?"file":"files"):"Source control"}}function focusGitSection(ws){
-if(!ws||!multi())return;for(const other of workspaces)other.gitSection.open=other===ws}function addWorkspace(next){const key=workspaceKey(
-next);let ws=wsByKey(key);if(!ws){ws={key,catalog:next,status:next.status,api:client.bind?client.bind(next):client,graphData:{
-entities:[],relationships:[]},expanded:new Set,treeLimit:1e3,persisted:"",lastTab:null};workspaces.push(ws);createWorkspaceGit(
-ws);if(portable){const paths=next.tree.files.map(f=>f.path.split("/").slice(0,-1));for(let i2=1;paths.length&&paths.every(
-parts=>parts.length>=i2&&parts[i2-1]===paths[0][i2-1]);i2++)ws.expanded.add(paths[0].slice(0,i2).join("/"))}}setCatalog(
-ws,next);return ws}function setCatalog(ws,next){if(next.tree?.partial&&ws.index&&!ws.partial)ws.stale=true;else if(ws.catalog!==
-next||!ws.index){ws.index=new CatalogIndex(next.tree,{caseSensitive:next.caseSensitive});ws.partial=next.tree?.partial===
-true}ws.catalog=next;ws.revision=next.revision;ws.status=next.status||ws.status}var loadingTrees=null;function loadPartialTrees(){
-return loadingTrees||=(async()=>{try{for(const ws of[...workspaces])if(ws.partial||ws.stale)await loadTree(ws)}finally{loadingTrees=
-null}})()}async function loadTree(ws){const index2=new CatalogIndex({},{caseSensitive:ws.catalog.caseSensitive});let after="",
-revision=null;for(;;){const page=await ws.api.call("catalogPage",{after,limit:2e4});if(!workspaces.includes(ws))return;revision??=
-page.revision;index2.apply(page.tree);if(!page.next)break;after=page.next;await new Promise(resolve=>setTimeout(resolve))}
-Object.assign(ws,{index:index2,partial:false,stale:false,revision});renderTree();renderTabs();updatePath();refreshLinks(
-ws);void kanban?.workspaceChanged(ws)}function refreshLinks(ws){for(const pane of shownPanes())if(paneWs(pane)===ws){pane.
-live.refreshLinks();pane.raw.refreshLinks()}}function promptUser(title,description,{value,ok="Continue",secondary,confirmKeys=false,
-choices=[]}={}){return new Promise(resolve=>{const dialog=$("prompt-dialog");$("prompt-title").textContent=title;$("prom\
-pt-description").textContent=description;const selects=["prompt-choice","prompt-choice-2"].map((id2,index2)=>{const choice=choices[index2],
-select=$(id2);$(id2+"-label").hidden=!choice;const fill=(options,chosen)=>{select.innerHTML=options.map(option=>`<option\
- value="${esc2(option.value)}">${esc2(option.label)}</option>`).join("");if(chosen!==void 0)select.value=chosen};if(choice){
-$(id2+"-text").textContent=choice.label;fill(choice.options,choice.value)}return{select,choice,fill}});selects[0].select.
-onchange=()=>{const next=selects[1];if(next.choice?.optionsFor)next.fill(next.choice.optionsFor(selects[0].select.value))};
-const confirm=event=>{if((event.key==="Enter"||event.key===" ")&&!event.isComposing&&dialog.open){event.preventDefault();
-event.stopPropagation();dialog.close("ok")}};if(confirmKeys)document.addEventListener("keydown",confirm,true);$("prompt-\
-value").hidden=value===void 0;$("prompt-value").value=value||"";$("prompt-ok").textContent=ok;$("prompt-secondary").hidden=
-!secondary;$("prompt-secondary").textContent=secondary||"";$("prompt-value").onkeydown=event=>{if(event.key==="Enter"&&!event.
-isComposing){event.preventDefault();dialog.close("ok")}};dialog.returnValue="cancel";dialog.onclose=()=>{document.removeEventListener(
-"keydown",confirm,true);resolve({action:dialog.returnValue,value:$("prompt-value").value.trim(),choices:selects.filter(item=>item.
-choice).map(item=>item.select.value)})};dialog.showModal();if(value!==void 0){$("prompt-value").focus();$("prompt-value").
-select()}else if(choices.length)selects[0].select.focus();else $("prompt-ok").focus()})}var count2=(value,noun)=>(value||
-0)+" "+noun+((value||0)===1?"":"s");function setDirty(value){if(value&&!dirty){dirtySince=Date.now();clearTimeout(dotTimer);
-dotTimer=setTimeout(updateTabDots,DOT_DELAY+20)}if(!value)clearTimeout(dotTimer);dirty=value;client.dirty(dirty||drafts.
-size>0)?.catch?.(()=>{});$("save-status").textContent=value?"Unsaved":drafts.size?count2(drafts.size,"other unsaved arti\
-cle"):"Saved";updateTabDots()}function updateTabDots(){for(const node of panes.flatMap(pane=>[...pane.el["file-tabs"].querySelectorAll(
-"[data-tab-id]")])){const tab=allTabs().find(t2=>t2.id===node.dataset.tabId),unsaved=!!tab&&tabShowsDot(tab),close=node.
-querySelector(".close-tab");node.classList.toggle("unsaved",unsaved);if(close)close.title=unsaved?"Unsaved changes. Clos\
-e":"Close"}}function updateMode(){$("edit-mode").textContent="Edit";$("edit-mode").setAttribute("aria-pressed",String(edit));
-$("edit-mode").title=edit?"Editing enabled":"Editing disabled";$("edit-mode").setAttribute("aria-label",edit?"Edit \u2014 ena\
-bled":"Edit \u2014 disabled");$("edit-mode").disabled=!client.writable;for(const control of document.querySelectorAll("[\
-data-mutation]"))control.disabled=!edit||!workspaces.length;$("save").disabled=!canEdit()||!active;$("source-mode").disabled=
-$("reload-note").disabled=!active;$("source-mode").setAttribute("aria-pressed",String(source2));$("source-mode").setAttribute(
-"aria-checked",String(source2));$("source-toggle").disabled=!active;$("source-toggle").setAttribute("aria-pressed",String(
-source2));$("source-toggle").title=source2?"Show the formatted article":"Show the Markdown source";for(const pane of panes){
-const editable3=canEditDoc(paneActive(pane)),inSource=paneSource(pane);pane.live.setEnabled(editable3);pane.raw.setEnabled(
-editable3);pane.el["source-editor"].hidden=!inSource;pane.el.article.hidden=inSource;pane.okfBar.render()}(source2?raw:live).
-requestMeasure();document.body.classList.toggle("editing",edit);$("format-underline").hidden=!underlineEnabled()}function updateStatus(status){
-const progress=status.progress?.total?` \xB7 Indexing ${Math.min(100,Math.floor(100*status.progress.indexed/status.progress.
-total))}%`:"";$("index-status").textContent=`${count2(status.documents,"article")} \xB7 ${count2(status.relationships,"l\
-ink")} \xB7 ${status.unresolved||0} broken`+(client.capabilities.fts?` \xB7 Search: ${status.search||"indexing"}`:" \xB7 Lo\
-cal text search")+progress;$("diagnostics").textContent=JSON.stringify(status,null,2);if(status.lastError)message(status.
-lastError);renderOperation(status)}function collapseSidebar(){sidebars.collapse()}function setPanel(next,{toggle=false}={}){
-sidebars.select("left",next,{toggle})}function folderPreferences(ws){let hiddenFolders=[];try{hiddenFolders=hiddenFolderPaths(
-JSON.parse(prefs.get("hidden-folders:"+ws.key)))}catch{}return{hiddenFolders,hideDotFolders:prefs.get("hide-dot-folders")!==
-"false",showHiddenFolders:prefs.get("show-hidden-folders:"+ws.key)==="true"}}function storeHiddenFolders(ws,folders){prefs.
-set("hidden-folders:"+ws.key,JSON.stringify(hiddenFolderPaths(folders)))}function treeRows(ws){const catalog=ws.catalog,
-visibility2=folderPreferences(ws),titleMap=titles(ws),allFiles=prefs.get("show-all-files")==="true";let html2="",count3=0,
-total=0;const walk=(parent="",depth=0)=>{for(const item of ws.index.childrenOf(parent)){if(item.other&&!allFiles)continue;
-const hiddenFolder=item.folder&&folderIsHidden(item.path,visibility2,catalog.caseSensitive);if(hiddenFolder&&!visibility2.
-showHiddenFolders)continue;const filename2=item.path.split("/").at(-1),name2=item.folder||showExtensions()?filename2:filename2.
-replace(/\.[^.]+$/,"");const title=titleMap.get(item.path)||item.title||name2,mode2=prefs.get("file-labels")||"title-fir\
-st";const labels2=item.folder||mode2==="filename"?[name2]:mode2==="title-first"?[title,name2]:mode2==="filename-first"?[
-name2,title]:[title];const board=!item.folder&&!!kanban?.isBoard(ws,item.path);total++;if(count3++<ws.treeLimit)html2+=`\
-<button class="tree-row ${item.folder?"tree-folder":""} ${board?"tree-board":""} ${hiddenFolder?"tree-hidden-folder":""}\
- ${selected2===item.path&&selectedWs===ws.key?"selected":""}" data-ws="${esc2(ws.key)}" data-tree-path="${esc2(item.path)}\
-" data-folder="${item.folder}" title="${esc2(labels2.join(" \xB7 ")+"\n"+item.path+(hiddenFolder?"\nHidden folder":"")+(board?
-"\nKanban board":""))}" ${item.folder?'aria-expanded="'+ws.expanded.has(item.path)+'"':""}>${'<span class="tree-indent" \
-aria-hidden="true"></span>'.repeat(depth)}<span class="tree-icon" aria-hidden="true">${item.folder?'<svg viewBox="0 0 20\
- 20" aria-hidden="true"><path d="M7 4l6 6-6 6"/></svg>':board?'<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y\
-="4" width="4" height="12" rx="1"/><rect x="8.5" y="4" width="4" height="8" rx="1"/><rect x="14" y="4" width="3.5" heigh\
-t="10" rx="1"/></svg>':"\u25A7"}</span><span class="tree-labels"><span class="tree-name">${esc2(labels2[0])}</span>${labels2.
-length>1?`<span class="tree-secondary">${esc2(labels2[1])}</span>`:""}</span></button>`;if(item.folder&&ws.expanded.has(
-item.path))walk(item.path,depth+1)}};walk();if(ws.partial)return'<p class="hint">Loading files\u2026</p>';return(html2||
-'<p class="hint">No visible files. Right-click here to show hidden folders, or turn on Edit to create an article.</p>')+
-(total>ws.treeLimit?`<button class="tree-more" data-tree-more="${esc2(ws.key)}">Show more files</button>`:"")}function renderTree(){
-if(!workspaces.length){$("tree").innerHTML='<p class="hint">Choose a Markdown workspace.</p>';return}$("tree").innerHTML=
-workspaces.map((ws,index2)=>`${index2?'<hr class="tree-workspace-divider" aria-hidden="true">':""}<div class="tree-works\
-pace" data-ws="${esc2(ws.key)}" role="group" aria-label="${esc2(workspaceName(ws))}" data-workspace-color="${workspaceColor(
-ws)}">${multi()?`<div class="tree-workspace-title"><button class="tree-workspace-heading ${selectedWs===ws.key&&!selected2?
-"selected":""}" data-workspace-root="${esc2(ws.key)}" title="${esc2(workspaceName(ws)+"\n"+ws.catalog.root+"\nSelect this\
- workspace root")}"><span class="workspace-dot" aria-hidden="true"></span><span>${esc2(workspaceName(ws))}</span></butto\
-n><button class="tree-workspace-collapse" data-collapse-workspace="${esc2(ws.key)}" title="${esc2("Collapse all folders \
-in "+workspaceName(ws))}" aria-label="${esc2("Collapse all folders in "+workspaceName(ws))}"><svg viewBox="0 0 24 24" ar\
-ia-hidden="true"><path d="M7 4l5 5 5-5M7 20l5-5 5 5"/></svg></button></div>`:""}${treeRows(ws)}</div>`).join("")}async function refreshGraph(ws=activeWs()){
+onBusy:busy=>{ws.gitBusy=busy;$("git-panel").setAttribute("aria-busy",String(workspaces.some(w=>w.gitBusy)))},onStatus:()=>renderWelcome(),
+onSetup:()=>run(setupGit)(ws),beforeAction:async()=>{if(!workspaces.includes(ws))throw new Error("This workspace is inac\
+tive.");if(!await ensureDraftsSaved(key=>key.startsWith(ws.key+"\n"),"using Git"))throw new Error("Save or discard unsav\
+ed articles before using Git.");if(dirty||saving)throw new Error("Finish saving the current article before continuing.")},
+afterMutation:async name2=>{await applyCatalog(ws,await ws.api.call("catalog"));if(active?.ws===ws.key&&["pull","sync","\
+switch","createBranch","stash","applyStash","discard","resolveConflict"].includes(name2)){if(dirty||saving){$p("note-war\
+ning").textContent="Git changed this workspace. Your draft is retained; save or reload after reviewing the changes.";return}
+if(ws.index.has(active.path))await openNote(active.path,void 0,{record:false,ws});else $p("note-warning").textContent="T\
+his article is absent from the current Git version. Its open text is retained."}await reloadChangedPanes(ws)}});section2.
+addEventListener("toggle",()=>{if(section2.open)void ws.git.refresh({quiet:true})})}function renderGitSections(){let total=0;
+for(const ws of workspaces){gitList.append(ws.gitSection);total+=ws.gitCount;ws.gitSection.style.setProperty("--workspac\
+e-color",workspaceColor(ws));ws.gitSection.querySelector(".git-workspace-name").textContent=workspaceName(ws);ws.gitSection.
+querySelector("summary").title=ws.catalog.root;const count3=ws.gitSection.querySelector(".git-workspace-count");count3.hidden=
+!ws.gitCount;count3.textContent=String(ws.gitCount);count3.title=ws.gitCount+" pending "+(ws.gitCount===1?"file":"files")}
+if(workspaces.length===1&&gitSectionsShown!==1)workspaces[0].gitSection.open=true;gitSectionsShown=workspaces.length;let hint=gitList.
+querySelector(":scope > .hint");if(!workspaces.length&&!hint){hint=document.createElement("p");hint.className="hint";hint.
+textContent=client.capabilities.git?"Open a workspace to manage its Git repository.":"Source control is available in the\
+ desktop application.";gitList.append(hint)}if(workspaces.length)hint?.remove();const badge=$("git-pending-badge");if(badge){
+badge.textContent=String(total);badge.hidden=!total;badge.parentElement.title=total?"Source control \xB7 "+total+" pendi\
+ng "+(total===1?"file":"files"):"Source control"}}function focusGitSection(ws){if(!ws||!multi())return;for(const other of workspaces)
+other.gitSection.open=other===ws}function addWorkspace(next){const key=workspaceKey(next);let ws=wsByKey(key);if(!ws){ws=
+{key,catalog:next,status:next.status,api:client.bind?client.bind(next):client,graphData:{entities:[],relationships:[]},expanded:new Set,
+treeLimit:1e3,persisted:"",lastTab:null};workspaces.push(ws);createWorkspaceGit(ws);if(portable){const paths=next.tree.files.
+map(f=>f.path.split("/").slice(0,-1));for(let i2=1;paths.length&&paths.every(parts=>parts.length>=i2&&parts[i2-1]===paths[0][i2-
+1]);i2++)ws.expanded.add(paths[0].slice(0,i2).join("/"))}}setCatalog(ws,next);return ws}function setCatalog(ws,next){if(next.
+tree?.partial&&ws.index&&!ws.partial)ws.stale=true;else if(ws.catalog!==next||!ws.index){ws.index=new CatalogIndex(next.
+tree,{caseSensitive:next.caseSensitive});ws.partial=next.tree?.partial===true}ws.catalog=next;ws.revision=next.revision;
+ws.status=next.status||ws.status}var loadingTrees=null;function loadPartialTrees(){return loadingTrees||=(async()=>{try{
+for(const ws of[...workspaces])if(ws.partial||ws.stale)await loadTree(ws)}finally{loadingTrees=null}})()}async function loadTree(ws){
+const index2=new CatalogIndex({},{caseSensitive:ws.catalog.caseSensitive});let after="",revision=null;for(;;){const page=await ws.
+api.call("catalogPage",{after,limit:2e4});if(!workspaces.includes(ws))return;revision??=page.revision;index2.apply(page.
+tree);if(!page.next)break;after=page.next;await new Promise(resolve=>setTimeout(resolve))}Object.assign(ws,{index:index2,
+partial:false,stale:false,revision});renderTree();renderTabs();updatePath();refreshLinks(ws);void kanban?.workspaceChanged(
+ws)}function refreshLinks(ws){for(const pane of shownPanes())if(paneWs(pane)===ws){pane.live.refreshLinks();pane.raw.refreshLinks()}}
+function promptUser(title,description,{value,ok="Continue",secondary,confirmKeys=false,choices=[]}={}){return new Promise(
+resolve=>{const dialog=$("prompt-dialog");$("prompt-title").textContent=title;$("prompt-description").textContent=description;
+const selects=["prompt-choice","prompt-choice-2"].map((id2,index2)=>{const choice=choices[index2],select=$(id2);$(id2+"-\
+label").hidden=!choice;const fill=(options,chosen)=>{select.innerHTML=options.map(option=>`<option value="${esc2(option.
+value)}">${esc2(option.label)}</option>`).join("");if(chosen!==void 0)select.value=chosen};if(choice){$(id2+"-text").textContent=
+choice.label;fill(choice.options,choice.value)}return{select,choice,fill}});selects[0].select.onchange=()=>{const next=selects[1];
+if(next.choice?.optionsFor)next.fill(next.choice.optionsFor(selects[0].select.value))};const confirm=event=>{if((event.key===
+"Enter"||event.key===" ")&&!event.isComposing&&dialog.open){event.preventDefault();event.stopPropagation();dialog.close(
+"ok")}};if(confirmKeys)document.addEventListener("keydown",confirm,true);$("prompt-value").hidden=value===void 0;$("prom\
+pt-value").value=value||"";$("prompt-ok").textContent=ok;$("prompt-secondary").hidden=!secondary;$("prompt-secondary").textContent=
+secondary||"";$("prompt-value").onkeydown=event=>{if(event.key==="Enter"&&!event.isComposing){event.preventDefault();dialog.
+close("ok")}};dialog.returnValue="cancel";dialog.onclose=()=>{document.removeEventListener("keydown",confirm,true);resolve(
+{action:dialog.returnValue,value:$("prompt-value").value.trim(),choices:selects.filter(item=>item.choice).map(item=>item.
+select.value)})};dialog.showModal();if(value!==void 0){$("prompt-value").focus();$("prompt-value").select()}else if(choices.
+length)selects[0].select.focus();else $("prompt-ok").focus()})}var count2=(value,noun)=>(value||0)+" "+noun+((value||0)===
+1?"":"s");function setDirty(value){if(value&&!dirty){dirtySince=Date.now();clearTimeout(dotTimer);dotTimer=setTimeout(updateTabDots,
+DOT_DELAY+20)}if(!value)clearTimeout(dotTimer);dirty=value;client.dirty(dirty||drafts.size>0)?.catch?.(()=>{});$("save-s\
+tatus").textContent=value?"Unsaved":drafts.size?count2(drafts.size,"other unsaved article"):"Saved";updateTabDots()}function updateTabDots(){
+for(const node of panes.flatMap(pane=>[...pane.el["file-tabs"].querySelectorAll("[data-tab-id]")])){const tab=allTabs().
+find(t2=>t2.id===node.dataset.tabId),unsaved=!!tab&&tabShowsDot(tab),close=node.querySelector(".close-tab");node.classList.
+toggle("unsaved",unsaved);if(close)close.title=unsaved?"Unsaved changes. Close":"Close"}}function updateMode(){$("edit-m\
+ode").textContent="Edit";$("edit-mode").setAttribute("aria-pressed",String(edit));$("edit-mode").title=edit?"Editing ena\
+bled":"Editing disabled";$("edit-mode").setAttribute("aria-label",edit?"Edit \u2014 enabled":"Edit \u2014 disabled");$("\
+edit-mode").disabled=!client.writable;for(const control of document.querySelectorAll("[data-mutation]"))control.disabled=
+!edit||!workspaces.length;$("save").disabled=!canEdit()||!active;$("source-mode").disabled=$("reload-note").disabled=!active;
+$("source-mode").setAttribute("aria-pressed",String(source2));$("source-mode").setAttribute("aria-checked",String(source2));
+$("source-toggle").disabled=!active;$("source-toggle").setAttribute("aria-pressed",String(source2));$("source-toggle").title=
+source2?"Show the formatted article":"Show the Markdown source";for(const pane of panes){const editable3=canEditDoc(paneActive(
+pane)),inSource=paneSource(pane);pane.live.setEnabled(editable3);pane.raw.setEnabled(editable3);pane.el["source-editor"].
+hidden=!inSource;pane.el.article.hidden=inSource;pane.okfBar.render()}(source2?raw:live).requestMeasure();document.body.
+classList.toggle("editing",edit);$("format-underline").hidden=!underlineEnabled()}function updateStatus(status){const progress=status.
+progress?.total?` \xB7 Indexing ${Math.min(100,Math.floor(100*status.progress.indexed/status.progress.total))}%`:"";$("i\
+ndex-status").textContent=`${count2(status.documents,"article")} \xB7 ${count2(status.relationships,"link")} \xB7 ${status.
+unresolved||0} broken`+(client.capabilities.fts?` \xB7 Search: ${status.search||"indexing"}`:" \xB7 Local text search")+
+progress;$("diagnostics").textContent=JSON.stringify(status,null,2);if(status.lastError)message(status.lastError);renderOperation(
+status)}function collapseSidebar(){sidebars.collapse()}function setPanel(next,{toggle=false}={}){sidebars.select("left",
+next,{toggle})}function folderPreferences(ws){let hiddenFolders=[];try{hiddenFolders=hiddenFolderPaths(JSON.parse(prefs.
+get("hidden-folders:"+ws.key)))}catch{}return{hiddenFolders,hideDotFolders:prefs.get("hide-dot-folders")!=="false",showHiddenFolders:prefs.
+get("show-hidden-folders:"+ws.key)==="true"}}function storeHiddenFolders(ws,folders){prefs.set("hidden-folders:"+ws.key,
+JSON.stringify(hiddenFolderPaths(folders)))}function treeRows(ws){const catalog=ws.catalog,visibility2=folderPreferences(
+ws),titleMap=titles(ws),allFiles=prefs.get("show-all-files")==="true";let html2="",count3=0,total=0;const walk=(parent="",depth=0)=>{
+for(const item of ws.index.childrenOf(parent)){if(item.other&&!allFiles)continue;const hiddenFolder=item.folder&&folderIsHidden(
+item.path,visibility2,catalog.caseSensitive);if(hiddenFolder&&!visibility2.showHiddenFolders)continue;const filename2=item.
+path.split("/").at(-1),name2=item.folder||showExtensions()?filename2:filename2.replace(/\.[^.]+$/,"");const title=titleMap.
+get(item.path)||item.title||name2,mode2=prefs.get("file-labels")||"title-first";const labels2=item.folder||mode2==="file\
+name"?[name2]:mode2==="title-first"?[title,name2]:mode2==="filename-first"?[name2,title]:[title];const board=!item.folder&&
+!!kanban?.isBoard(ws,item.path);total++;if(count3++<ws.treeLimit)html2+=`<button class="tree-row ${item.folder?"tree-fol\
+der":""} ${board?"tree-board":""} ${hiddenFolder?"tree-hidden-folder":""} ${selected2===item.path&&selectedWs===ws.key?"\
+selected":""}" data-ws="${esc2(ws.key)}" data-tree-path="${esc2(item.path)}" data-folder="${item.folder}" title="${esc2(
+labels2.join(" \xB7 ")+"\n"+item.path+(hiddenFolder?"\nHidden folder":"")+(board?"\nKanban board":""))}" ${item.folder?'\
+aria-expanded="'+ws.expanded.has(item.path)+'"':""}>${'<span class="tree-indent" aria-hidden="true"></span>'.repeat(depth)}\
+<span class="tree-icon" aria-hidden="true">${item.folder?'<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7 4l6 6-\
+6 6"/></svg>':board?'<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="4" width="4" height="12" rx="1"/><rect x\
+="8.5" y="4" width="4" height="8" rx="1"/><rect x="14" y="4" width="3.5" height="10" rx="1"/></svg>':"\u25A7"}</span><sp\
+an class="tree-labels"><span class="tree-name">${esc2(labels2[0])}</span>${labels2.length>1?`<span class="tree-secondary\
+">${esc2(labels2[1])}</span>`:""}</span></button>`;if(item.folder&&ws.expanded.has(item.path))walk(item.path,depth+1)}};
+walk();if(ws.partial)return'<p class="hint">Loading files\u2026</p>';return(html2||'<p class="hint">No visible files. Ri\
+ght-click here to show hidden folders, or turn on Edit to create an article.</p>')+(total>ws.treeLimit?`<button class="t\
+ree-more" data-tree-more="${esc2(ws.key)}">Show more files</button>`:"")}function renderTree(){if(!workspaces.length){$(
+"tree").innerHTML='<p class="hint">Choose a Markdown workspace.</p>';return}$("tree").innerHTML=workspaces.map((ws,index2)=>`${index2?
+'<hr class="tree-workspace-divider" aria-hidden="true">':""}<div class="tree-workspace" data-ws="${esc2(ws.key)}" role="\
+group" aria-label="${esc2(workspaceName(ws))}" data-workspace-color="${workspaceColor(ws)}">${multi()?`<div class="tree-\
+workspace-title"><button class="tree-workspace-heading ${selectedWs===ws.key&&!selected2?"selected":""}" data-workspace-\
+root="${esc2(ws.key)}" title="${esc2(workspaceName(ws)+"\n"+ws.catalog.root+"\nSelect this workspace root")}"><span clas\
+s="workspace-dot" aria-hidden="true"></span><span>${esc2(workspaceName(ws))}</span></button><button class="tree-workspac\
+e-collapse" data-collapse-workspace="${esc2(ws.key)}" title="${esc2("Collapse all folders in "+workspaceName(ws))}" aria\
+-label="${esc2("Collapse all folders in "+workspaceName(ws))}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4\
+l5 5 5-5M7 20l5-5 5 5"/></svg></button></div>`:""}${treeRows(ws)}</div>`).join("")}async function refreshGraph(ws=activeWs()){
 if(!ws)return;ws.graphData=await ws.api.call("graph");if(showGraph&&paneWs(graphPane)===ws)graph.update(ws.graphData,paneActive(
 graphPane).path)}async function applyCatalog(ws,next){setCatalog(ws,next);updatePath();void ws.git.refresh({quiet:true});
 if(ws===current())updateStatus(ws.status);renderTree();renderTabs();renderGitSections();updateMode();await refreshGraph(
@@ -15026,18 +15171,17 @@ find(t2=>t2.id===activeTab)?.ws)?.catalog.session||fallback?.saved)?.source===tr
 activeTab);if(split){panes[1].source=source2;focusPane(panes[1]);await selectTab(panes[1].activeTab);if(initial.layout.focus!==
 "right")focusPane(panes[0])}void run(loadPartialTrees)()}function showEmptyTab(){openSerial++;active=null;selected2="";live.
 setText("");raw.setText("");updatePath();updateMode();if(evidencePane===P){evidenceSerial++;$("evidence-panel").hidden=true}
-$p("note-panel").hidden=true;$p("welcome").hidden=false;kanban?.update(P);$p("welcome").querySelector("p").textContent=workspaces.
-length?"Select an article from Files or Search to open it in this tab.":"Open a folder of Markdown files to begin.";history.
-replaceState(null,"",location.pathname+location.search);updatePanes()}async function selectTab(id2){const owner=paneOfTab(
-id2);if(owner&&owner!==P)focusPane(owner);if(!await leaveArticle())return;const tab=tabs.find(t2=>t2.id===id2);if(!tab)return;
-if(tab.path)await openNote(tab.path,null,{record:false,tabId:id2,ws:wsByKey(tab.ws)});else{activeTab=id2;const ws=wsByKey(
-tab.ws);if(ws){focusKey=ws.key;ws.lastTab=id2;focusGitSection(ws);updateStatus(ws.status)}showEmptyTab();renderTabs();renderTree();
-renderWorkspaceManager();await persistSession()}}async function newTab(){if(!await leaveArticle())return;const tab=makeTab(
-null,current()?.key||null);tabs.push(tab);activeTab=tab.id;showEmptyTab();renderTabs();renderTree();await persistSession()}
-async function closeTab(id2,all=false){if(!all){const owner=paneOfTab(id2);if(owner&&owner!==P)focusPane(owner)}const shownTabs=visibleTabs(),
-closing2=all?shownTabs:tabs.filter(t2=>t2.id===id2),remaining=tabs.filter(t2=>!closing2.includes(t2));if(closing2.some(t2=>t2.
-id===activeTab)&&autosaveMode()!=="off"&&!await canLeave())return;const keyOf=tabKey;const shown=new Set([...remaining,...otherPane()?.
-tabs||[]].filter(t2=>t2.path).map(keyOf));const pending=closing2.filter(t2=>tabUnsaved(t2)&&!shown.has(keyOf(t2)));if(pending.
+$p("note-panel").hidden=true;$p("welcome").hidden=false;kanban?.update(P);renderWelcome();history.replaceState(null,"",location.
+pathname+location.search);updatePanes()}async function selectTab(id2){const owner=paneOfTab(id2);if(owner&&owner!==P)focusPane(
+owner);if(!await leaveArticle())return;const tab=tabs.find(t2=>t2.id===id2);if(!tab)return;if(tab.path)await openNote(tab.
+path,null,{record:false,tabId:id2,ws:wsByKey(tab.ws)});else{activeTab=id2;const ws=wsByKey(tab.ws);if(ws){focusKey=ws.key;
+ws.lastTab=id2;focusGitSection(ws);updateStatus(ws.status)}showEmptyTab();renderTabs();renderTree();renderWorkspaceManager();
+await persistSession()}}async function newTab(){if(!await leaveArticle())return;const tab=makeTab(null,current()?.key||null);
+tabs.push(tab);activeTab=tab.id;showEmptyTab();renderTabs();renderTree();await persistSession()}async function closeTab(id2,all=false){
+if(!all){const owner=paneOfTab(id2);if(owner&&owner!==P)focusPane(owner)}const shownTabs=visibleTabs(),closing2=all?shownTabs:
+tabs.filter(t2=>t2.id===id2),remaining=tabs.filter(t2=>!closing2.includes(t2));if(closing2.some(t2=>t2.id===activeTab)&&
+autosaveMode()!=="off"&&!await canLeave())return;const keyOf=tabKey;const shown=new Set([...remaining,...otherPane()?.tabs||
+[]].filter(t2=>t2.path).map(keyOf));const pending=closing2.filter(t2=>tabUnsaved(t2)&&!shown.has(keyOf(t2)));if(pending.
 length){const name2=pending.length===1?'"'+pending[0].path.split(/[\\/]/).at(-1).replace(/\.(md|markdown)$/i,"")+'"':count2(
 pending.length,"article");const answer=await promptUser("Save changes?",name2+(pending.length===1?" has":" have")+" unsa\
 ved changes. Save before closing?",{ok:"Save",secondary:"Don't save"});if(answer.action==="cancel")return;for(const tab of pending){
@@ -15150,15 +15294,48 @@ return false;const pending=[...drafts.keys()].filter(filter);if(!pending.length)
 em before "+action+"?",{ok:"Save all and continue"});if(answer.action!=="ok")return false;for(const key of pending)await saveDraft(
 key);renderTabs();return true}async function choose(){await persistSession();const next=await client.choose();if(!next)return;
 if(!client.capabilities.workspaces)resetWorkspaces();await adoptWorkspace(next);message(client.writable?multi()?workspaceName(
-wsByKey(workspaceKey(next)))+" is open.":"Workspace open.":"Read-only browser view.")}async function adoptWorkspace(next){
+wsByKey(workspaceKey(next)))+" is open.":"Workspace open.":"Read-only browser view.")}async function createWorkspace(){if(!client.
+createWorkspace||!client.writable)throw new Error("This host cannot create workspaces.");if(panelInfo?.managedWorkspaces)
+throw new Error("This server shows workspaces chosen in the desktop app. Create workspaces there.");const server=pageData.
+mode==="server";const answer=await promptUser("Create workspace",server?"Name the new workspace. Weave creates an empty \
+folder with this name on the server.":"Name the new workspace. Next, choose the folder to create it in.",{value:"Notes",
+ok:server?"Create workspace":"Choose location\u2026"});if(answer.action!=="ok")return;if(!answer.value)throw new Error("\
+Enter a workspace name.");await persistSession();const next=await client.createWorkspace(answer.value);if(!next)return;if(!client.
+capabilities.workspaces)resetWorkspaces();const ws=await adoptWorkspace(next);message(workspaceName(ws)+" created. Add y\
+our first article.")}async function randomArticle(ws){const paths=ws.index.paths;if(!paths.length)throw new Error(workspaceName(
+ws)+" has no articles yet.");const others=paths.length>1?paths.filter(path=>path!==paneActive(P)?.path):paths;await openNote(
+others[Math.floor(Math.random()*others.length)],null,{ws})}async function setupGit(ws){if(!ws)throw new Error("Open a wo\
+rkspace to set up Git.");if(!client.capabilities.git)throw new Error("Git is unavailable on this host.");if(!ws.git.status)
+await ws.git.refresh();if(ws.git.status&&ws.git.status.available===false)throw new Error(ws.git.status.error||"Git is un\
+available. Install Git and reopen Weave.");openGitSetup({git:ws.git,name:workspaceName(ws),server:pageData.mode==="serve\
+r",openResource:url=>client.openResource(url),showSourceControl:()=>{sidebars.select("right","git");focusGitSection(ws);
+ws.gitSection.open=true},ask:async(title,text,ok)=>(await promptUser(title,text,{ok})).action==="ok"})}var needsGitSetup=ws=>{
+const s=ws?.git?.status;return!!(client.capabilities.git&&client.writable&&s&&s.available!==false&&!s.parentRepository&&
+(!s.repository||!s.remotes?.length))};var welcomeRendered=["",""];function renderWelcome(){for(const pane of panes){const box=pane.
+el.welcome.querySelector(".welcome-actions"),lead=pane.el.welcome.querySelector("p");if(!box)continue;const ws=portable?
+null:wsByKey(paneTabs(pane).find(tab=>tab.id===paneTabId(pane))?.ws)||current();const server=pageData.mode==="server",managed=!!panelInfo?.
+managedWorkspaces,writable=client.writable&&!portable;const items=[];if(ws){if(writable)items.push({action:"new-article",
+title:"New article",text:"Start writing in "+workspaceName(ws),primary:true});items.push({action:"random-article",title:"\
+Random article",text:ws.index?.size?"Rediscover one of "+count2(ws.index.size,"article"):"No articles yet",disabled:!ws.
+index?.size});if(needsGitSetup(ws))items.push({action:"setup-git",title:"Set up Git",text:"Keep history and sync with Gi\
+tHub"});if(document.documentElement.dataset.layout==="mobile")items.push({action:"browse",title:"Browse files",text:"Sho\
+w the articles of "+workspaceName(ws)})}if(writable&&client.createWorkspace&&!managed)items.push({action:"create-workspa\
+ce",title:"Create new workspace",text:server?"An empty folder on this server":"An empty folder for new articles",primary:!ws,
+secondary:!!ws});if(!portable)items.push({action:"open-workspace",title:"Open existing workspace",text:managed?"One shar\
+ed by the desktop app":server?"A folder on this server":"A folder of Markdown files",primary:!ws&&!writable,secondary:!!ws,
+id:pane.index===0?"welcome-open":""});lead.textContent=portable?"Select an article from Files or Search to open it.":ws?
+"Select an article from Files or Search, or start here.":"Create a workspace for new articles, or open one you already h\
+ave.";const html2=items.map(item=>`<button type="button" class="welcome-action${item.primary?" primary":""}${item.secondary?
+" secondary":""}" data-welcome="${item.action}"${ws?` data-ws="${esc2(ws.key)}"`:""}${item.id?` id="${item.id}"`:""}${item.
+disabled?" disabled":""}><strong>${esc2(item.title)}</strong><small>${esc2(item.text)}</small></button>`).join("");if(html2!==
+welcomeRendered[pane.index]){box.innerHTML=html2;welcomeRendered[pane.index]=html2}}}async function adoptWorkspace(next){
 const existing=wsByKey(workspaceKey(next));if(existing){await applyCatalog(existing,next);await showWorkspace(existing);
 return existing}const ws=addWorkspace(next);focusKey=selectedWs=ws.key;selected2="";renderGitSections();await applyCatalog(
 ws,next);void run(loadPartialTrees)();const known=allTabs().filter(t2=>t2.ws===ws.key||t2.history.some(entry=>entryParts(
 entry).ws===ws.key));const{list,saved,pick}=known.length?{list:[],pick:allTabs().findLast(t2=>t2.ws===ws.key&&tabVisible(
 t2))}:savedTabs(ws);tabs.push(...list);if(pick){if(workspaces.length===1)source2=saved?.source===true;await selectTab(pick.
-id)}else{const tab=currentTab();if(tab&&!tab.path&&!tab.history.length){tab.ws=ws.key;ws.lastTab=tab.id}renderTabs();if(!active)
-$p("welcome").querySelector("p").textContent="Select an article from Files or Search to open it in this tab.";updateStatus(
-ws.status);focusGitSection(ws)}await persistSession();void loadControlPanel();return ws}async function showWorkspace(ws){
+id)}else{const tab=currentTab();if(tab&&!tab.path&&!tab.history.length){tab.ws=ws.key;ws.lastTab=tab.id}renderTabs();renderWelcome();
+updateStatus(ws.status);focusGitSection(ws)}await persistSession();void loadControlPanel();return ws}async function showWorkspace(ws){
 focusKey=selectedWs=ws.key;selected2="";const tab=allTabs().find(t2=>t2.id===ws.lastTab&&t2.ws===ws.key)||allTabs().findLast(
 t2=>t2.ws===ws.key),owner=tab&&paneOfTab(tab.id);if(tab&&owner!==P&&paneTabId(owner)===tab.id)focusPane(owner);else if(tab){
 if(tab.id!==activeTab)await selectTab(tab.id);else focusGitSection(ws)}else{if(!await leaveArticle())return;const created=makeTab(
@@ -15491,60 +15668,66 @@ if(action==="collapse-workspace"){ws.expanded.clear();renderTree()}if(action==="
 fileAction(action,ws,selected2,{folder:ws.index.isFolder(selected2)});if(action==="copy")copyEntry();if(action==="paste")
 await pasteEntry();if(action==="create")await create(false);if(action==="folder")await create(true);if(action==="rename")
 await rename();if(action==="retitle")await retitle();if(action==="move")await rename(true);if(action==="delete")await remove2()});
-$("choose-workspace").onclick=$("welcome-open").onclick=run(choose);$("window-controls").hidden=!client.capabilities.nativeWindow;
-for(const action of["minimize","maximize","close"])$("window-"+action).onclick=run(async()=>{if(action==="close"){if(dirty||
-drafts.size){const answer=await promptUser("Save changes?",count2((dirty?1:0)+drafts.size,"article")+" "+((dirty?1:0)+drafts.
-size===1?"has":"have")+" unsaved changes. Save before closing Weave?",{ok:"Save all",secondary:"Don't save"});if(answer.
-action==="cancel")return;if(answer.action==="ok")await saveAll();else{drafts.clear();setDirty(false)}}await persistSession()}
-const state=await client.windowAction(action);if(action==="maximize"){$("window-maximize").textContent=state?.maximized?
-"\u2750":"\u25A1";$("window-maximize").title=state?.maximized?"Restore window":ui("Maximise")}});$("titlebar").onmousedown=
-run(async e=>{if(!client.capabilities.nativeWindow||e.button!==0||e.detail>1||e.target.closest("button,input"))return;await client.
-windowAction("drag")});$("titlebar").ondblclick=e=>{if(client.capabilities.nativeWindow&&!e.target.closest("button,input"))
-$("window-maximize").click()};var appMenu=$("app-menu");var appMenuButton=$("app-menu-button");if(client.serverAccount){
-const account=document.createElement("button");account.id="server-account";account.setAttribute("role","menuitem");account.
-textContent="Server account\u2026";account.onclick=()=>client.serverAccount();appMenu.append(account)}var appMenuItems=()=>[
-...appMenu.querySelectorAll("button")].filter(item=>!item.hidden&&!item.disabled);function closeAppMenu(focusButton=false){
-if(appMenu.hidden)return;appMenu.hidden=true;appMenuButton.setAttribute("aria-expanded","false");if(focusButton)appMenuButton.
-focus()}function openAppMenu(){let seen=false,pending=null;for(const child of appMenu.children){if(child.matches(".conte\
-xt-separator")){child.hidden=true;if(seen)pending=child}else if(!child.hidden){if(pending)pending.hidden=false;pending=null;
-seen=true}}appMenu.hidden=false;appMenuButton.setAttribute("aria-expanded","true");const box=appMenuButton.getBoundingClientRect();
-appMenu.style.left=Math.max(0,Math.min(box.left,innerWidth-appMenu.offsetWidth))+"px";appMenu.style.top=Math.round(box.bottom+
-4)+"px";appMenuItems()[0]?.focus()}appMenuButton.onclick=()=>appMenu.hidden?openAppMenu():closeAppMenu();appMenuButton.onkeydown=
-e=>{if(e.key==="ArrowDown"&&appMenu.hidden){e.preventDefault();openAppMenu()}};appMenu.addEventListener("click",e=>{if(e.
-target.closest("button:not(:disabled)"))closeAppMenu()});appMenu.addEventListener("keydown",e=>{const items=appMenuItems(),
-index2=items.indexOf(document.activeElement);if(e.key==="ArrowDown"||e.key==="ArrowUp"){e.preventDefault();items[(index2+
-(e.key==="ArrowDown"?1:-1)+items.length)%items.length]?.focus()}else if(e.key==="Home"||e.key==="End"){e.preventDefault();
-items.at(e.key==="Home"?0:-1)?.focus()}else if(e.key==="Escape"||e.key==="Tab"){e.preventDefault();closeAppMenu(true)}});
-$("menu-settings").onclick=()=>settingsDialog.open();for(const button2 of document.querySelectorAll("[data-panel]"))button2.
-onclick=()=>setPanel(button2.dataset.panel,{toggle:true});$("collapse-panel").onclick=collapseSidebar;$("collapse-all").
-onclick=()=>{for(const ws of workspaces)ws.expanded.clear();renderTree()};$("new-note").onclick=run(()=>create(false));$(
-"new-folder").onclick=run(()=>create(true));$("save").onclick=run(()=>save({explicit:true}));$("source-mode").onclick=$(
-"source-toggle").onclick=run(async()=>{if(!active)return;(source2?raw:live).commitTableEdit();const text=(source2?raw:live).
-text,unsaved=dirty;source2=!source2;live.setText(text);raw.setText(text);setDirty(unsaved);updateMode();kanban?.update(P);
-restoreScroll(currentTab());await persistSession()});var contextTab=null;var sideLabel=(verb="Open")=>verb+" to the "+(split&&
-P===sides[1]?"left":"right");for(const pane of panes){const strip=pane.el["file-tabs"];strip.onclick=run(async e=>{const close=e.
-target.closest("[data-close-tab]");if(close)return closeTab(close.dataset.closeTab);const tab=e.target.closest("[data-ta\
-b]");if(tab)await selectTab(tab.dataset.tab)});strip.onmousedown=e=>{if(e.button===1)e.preventDefault()};strip.onauxclick=
-run(async e=>{const tab=e.target.closest("[data-tab-id]");if(e.button===1&&tab){e.preventDefault();await closeTab(tab.dataset.
-tabId)}});pane.el["tab-bar"].oncontextmenu=e=>{const tab=e.target.closest("[data-tab-id]");e.preventDefault();contextTab=
-tab?.dataset.tabId||null;const menu=$("tab-menu");$("context-close-tab").hidden=!tab;const path=tab&&allTabs().find(t2=>t2.
-id===contextTab)?.path;$("context-split-tab").hidden=!path;$("context-split-tab").firstChild.textContent=(split&&P===sides[1]?
-"Split left":"Split right")+" ";$("context-move-tab").hidden=!tab||!split&&visibleTabs().length<2;$("context-move-tab").
-textContent="Move to "+(split&&P===sides[1]?"left":"right")+" side";menu.querySelector(".context-separator").hidden=$("c\
-ontext-split-tab").hidden&&$("context-move-tab").hidden;menu.hidden=false;menu.style.left=Math.max(0,Math.min(e.clientX,
-innerWidth-menu.offsetWidth))+"px";menu.style.top=Math.max(0,Math.min(e.clientY,innerHeight-menu.offsetHeight))+"px";$(tab?
-"context-close-tab":"context-new-tab").focus()};pane.el["new-tab"].onclick=run(newTab);pane.el["close-tabs"].onclick=run(
-()=>closeTab("",true))}initTitlebarTabs({titlebar:$("titlebar"),shell:document.querySelector(".shell"),start:document.querySelector(
-".titlebar-start"),end:document.querySelector(".titlebar-end"),tabBars:()=>panes.map(pane=>pane.el["tab-bar"]),onDrag:run(
-async()=>{if(client.capabilities.nativeWindow)await client.windowAction("drag")}),onMaximize:()=>{if(client.capabilities.
-nativeWindow)$("window-maximize").click()}});$("context-new-tab").onclick=run(async()=>{$("tab-menu").hidden=true;await newTab()});
-$("context-close-tab").onclick=run(async()=>{$("tab-menu").hidden=true;await closeTab(contextTab)});$("context-split-tab").
-onclick=run(async()=>{$("tab-menu").hidden=true;await splitTab(contextTab)});$("context-move-tab").onclick=run(async()=>{
-$("tab-menu").hidden=true;await moveTabToSide(contextTab)});var tabDrag=null;function moveTab(id2,index2){const tab=tabs.
-find(t2=>t2.id===id2);if(!tab)return false;const shown=visibleTabs().filter(t2=>t2!==tab),rest=tabs.filter(t2=>t2!==tab),
-before=shown[index2];rest.splice(before?rest.indexOf(before):shown.length?rest.indexOf(shown.at(-1))+1:rest.length,0,tab);
-if(rest.every((t2,i2)=>t2===tabs[i2]))return false;tabs=rest;return true}var tabIndexAt=(pane,x,id2)=>[...pane.el["file-\
-tabs"].querySelectorAll("[data-tab-id]")].filter(node=>node.dataset.tabId!==id2&&(()=>{const box=node.getBoundingClientRect();
+$("choose-workspace").onclick=run(choose);$("create-workspace").onclick=run(createWorkspace);$("menu-git-setup").onclick=
+run(()=>setupGit(current()));for(const pane of panes)pane.el.welcome.addEventListener("click",run(async event=>{const button2=event.
+target.closest("[data-welcome]");if(!button2||button2.disabled)return;const ws=wsByKey(button2.dataset.ws),action=button2.
+dataset.welcome;if(pane!==P)focusPane(pane);if(action==="create-workspace")await createWorkspace();if(action==="open-wor\
+kspace")await choose();if(action==="browse")sidebars.select("left","files");if(!ws)return;if(action==="new-article"){if(!edit){
+edit=true;prefs.set("edit","true");updateMode()}focusKey=selectedWs=ws.key;selected2="";await create(false,{atRoot:true})}
+if(action==="random-article")await randomArticle(ws);if(action==="setup-git")await setupGit(ws)}));$("window-controls").
+hidden=!client.capabilities.nativeWindow;for(const action of["minimize","maximize","close"])$("window-"+action).onclick=
+run(async()=>{if(action==="close"){if(dirty||drafts.size){const answer=await promptUser("Save changes?",count2((dirty?1:
+0)+drafts.size,"article")+" "+((dirty?1:0)+drafts.size===1?"has":"have")+" unsaved changes. Save before closing Weave?",
+{ok:"Save all",secondary:"Don't save"});if(answer.action==="cancel")return;if(answer.action==="ok")await saveAll();else{
+drafts.clear();setDirty(false)}}await persistSession()}const state=await client.windowAction(action);if(action==="maximi\
+ze"){$("window-maximize").textContent=state?.maximized?"\u2750":"\u25A1";$("window-maximize").title=state?.maximized?"Re\
+store window":ui("Maximise")}});$("titlebar").onmousedown=run(async e=>{if(!client.capabilities.nativeWindow||e.button!==
+0||e.detail>1||e.target.closest("button,input"))return;await client.windowAction("drag")});$("titlebar").ondblclick=e=>{
+if(client.capabilities.nativeWindow&&!e.target.closest("button,input"))$("window-maximize").click()};var appMenu=$("app-\
+menu");var appMenuButton=$("app-menu-button");if(client.serverAccount){const account=document.createElement("button");account.
+id="server-account";account.setAttribute("role","menuitem");account.textContent="Server account\u2026";account.onclick=()=>client.
+serverAccount();appMenu.append(account)}var appMenuItems=()=>[...appMenu.querySelectorAll("button")].filter(item=>!item.
+hidden&&!item.disabled);function closeAppMenu(focusButton=false){if(appMenu.hidden)return;appMenu.hidden=true;appMenuButton.
+setAttribute("aria-expanded","false");if(focusButton)appMenuButton.focus()}function openAppMenu(){let seen=false,pending=null;
+for(const child of appMenu.children){if(child.matches(".context-separator")){child.hidden=true;if(seen)pending=child}else if(!child.
+hidden){if(pending)pending.hidden=false;pending=null;seen=true}}appMenu.hidden=false;appMenuButton.setAttribute("aria-ex\
+panded","true");const box=appMenuButton.getBoundingClientRect();appMenu.style.left=Math.max(0,Math.min(box.left,innerWidth-
+appMenu.offsetWidth))+"px";appMenu.style.top=Math.round(box.bottom+4)+"px";appMenuItems()[0]?.focus()}appMenuButton.onclick=
+()=>appMenu.hidden?openAppMenu():closeAppMenu();appMenuButton.onkeydown=e=>{if(e.key==="ArrowDown"&&appMenu.hidden){e.preventDefault();
+openAppMenu()}};appMenu.addEventListener("click",e=>{if(e.target.closest("button:not(:disabled)"))closeAppMenu()});appMenu.
+addEventListener("keydown",e=>{const items=appMenuItems(),index2=items.indexOf(document.activeElement);if(e.key==="Arrow\
+Down"||e.key==="ArrowUp"){e.preventDefault();items[(index2+(e.key==="ArrowDown"?1:-1)+items.length)%items.length]?.focus()}else if(e.
+key==="Home"||e.key==="End"){e.preventDefault();items.at(e.key==="Home"?0:-1)?.focus()}else if(e.key==="Escape"||e.key===
+"Tab"){e.preventDefault();closeAppMenu(true)}});$("menu-settings").onclick=()=>settingsDialog.open();for(const button2 of document.
+querySelectorAll("[data-panel]"))button2.onclick=()=>setPanel(button2.dataset.panel,{toggle:true});$("collapse-panel").onclick=
+collapseSidebar;$("collapse-all").onclick=()=>{for(const ws of workspaces)ws.expanded.clear();renderTree()};$("new-note").
+onclick=run(()=>create(false));$("new-folder").onclick=run(()=>create(true));$("save").onclick=run(()=>save({explicit:true}));
+$("source-mode").onclick=$("source-toggle").onclick=run(async()=>{if(!active)return;(source2?raw:live).commitTableEdit();
+const text=(source2?raw:live).text,unsaved=dirty;source2=!source2;live.setText(text);raw.setText(text);setDirty(unsaved);
+updateMode();kanban?.update(P);restoreScroll(currentTab());await persistSession()});var contextTab=null;var sideLabel=(verb="\
+Open")=>verb+" to the "+(split&&P===sides[1]?"left":"right");for(const pane of panes){const strip=pane.el["file-tabs"];strip.
+onclick=run(async e=>{const close=e.target.closest("[data-close-tab]");if(close)return closeTab(close.dataset.closeTab);
+const tab=e.target.closest("[data-tab]");if(tab)await selectTab(tab.dataset.tab)});strip.onmousedown=e=>{if(e.button===1)
+e.preventDefault()};strip.onauxclick=run(async e=>{const tab=e.target.closest("[data-tab-id]");if(e.button===1&&tab){e.preventDefault();
+await closeTab(tab.dataset.tabId)}});pane.el["tab-bar"].oncontextmenu=e=>{const tab=e.target.closest("[data-tab-id]");e.
+preventDefault();contextTab=tab?.dataset.tabId||null;const menu=$("tab-menu");$("context-close-tab").hidden=!tab;const path=tab&&
+allTabs().find(t2=>t2.id===contextTab)?.path;$("context-split-tab").hidden=!path;$("context-split-tab").firstChild.textContent=
+(split&&P===sides[1]?"Split left":"Split right")+" ";$("context-move-tab").hidden=!tab||!split&&visibleTabs().length<2;$(
+"context-move-tab").textContent="Move to "+(split&&P===sides[1]?"left":"right")+" side";menu.querySelector(".context-sep\
+arator").hidden=$("context-split-tab").hidden&&$("context-move-tab").hidden;menu.hidden=false;menu.style.left=Math.max(0,
+Math.min(e.clientX,innerWidth-menu.offsetWidth))+"px";menu.style.top=Math.max(0,Math.min(e.clientY,innerHeight-menu.offsetHeight))+
+"px";$(tab?"context-close-tab":"context-new-tab").focus()};pane.el["new-tab"].onclick=run(newTab);pane.el["close-tabs"].
+onclick=run(()=>closeTab("",true))}initTitlebarTabs({titlebar:$("titlebar"),shell:document.querySelector(".shell"),start:document.
+querySelector(".titlebar-start"),end:document.querySelector(".titlebar-end"),tabBars:()=>panes.map(pane=>pane.el["tab-ba\
+r"]),onDrag:run(async()=>{if(client.capabilities.nativeWindow)await client.windowAction("drag")}),onMaximize:()=>{if(client.
+capabilities.nativeWindow)$("window-maximize").click()}});$("context-new-tab").onclick=run(async()=>{$("tab-menu").hidden=
+true;await newTab()});$("context-close-tab").onclick=run(async()=>{$("tab-menu").hidden=true;await closeTab(contextTab)});
+$("context-split-tab").onclick=run(async()=>{$("tab-menu").hidden=true;await splitTab(contextTab)});$("context-move-tab").
+onclick=run(async()=>{$("tab-menu").hidden=true;await moveTabToSide(contextTab)});var tabDrag=null;function moveTab(id2,index2){
+const tab=tabs.find(t2=>t2.id===id2);if(!tab)return false;const shown=visibleTabs().filter(t2=>t2!==tab),rest=tabs.filter(
+t2=>t2!==tab),before=shown[index2];rest.splice(before?rest.indexOf(before):shown.length?rest.indexOf(shown.at(-1))+1:rest.
+length,0,tab);if(rest.every((t2,i2)=>t2===tabs[i2]))return false;tabs=rest;return true}var tabIndexAt=(pane,x,id2)=>[...pane.
+el["file-tabs"].querySelectorAll("[data-tab-id]")].filter(node=>node.dataset.tabId!==id2&&(()=>{const box=node.getBoundingClientRect();
 return box.left+box.width/2<x})()).length;for(const pane of panes){const strip=pane.el["file-tabs"];strip.addEventListener(
 "pointerdown",event=>{if(event.button!==0||event.pointerType==="touch"||event.target.closest(".close-tab")||tabDrag)return;
 const node=event.target.closest("[data-tab-id]");if(node)tabDrag={id:node.dataset.tabId,pane,x:event.clientX,pointer:event.
@@ -15781,10 +15964,10 @@ map(w=>`<li class="workspace-recent" data-workspace-color="${/^#[0-9a-f]{6}$/i.t
 an class="workspace-dot" aria-hidden="true"></span><span class="workspace-recent-label"><strong>${esc2(w.name)}</strong>\
 <small title="${esc2(w.root)}">${esc2(w.root)}</small></span><button data-ws-reopen="${esc2(w.id)}" title="Show ${esc2(w.
 name)} and restore its tabs">Activate</button></li>`).join("");$("recent-workspaces").hidden=!recent.length;$("recent-wo\
-rkspace-list").innerHTML=recentHtml;$("welcome-recent").hidden=!recent.length||!!workspaces.length;$("welcome-recent-lis\
-t").innerHTML=recentHtml;$("workspace-refresh-target-label").hidden=!multi();const target=$("workspace-refresh-target").
-value;$("workspace-refresh-target").innerHTML=workspaces.map(ws=>`<option value="${esc2(ws.key)}">${esc2(workspaceName(ws))}\
-</option>`).join("");$("workspace-refresh-target").value=wsByKey(target)?.key||here?.key||""}var workspaceFromCard=node=>wsByKey(
+rkspace-list").innerHTML=recentHtml;$("welcome-recent").hidden=!recent.length;$("welcome-recent-list").innerHTML=recentHtml;
+renderWelcome();$("workspace-refresh-target-label").hidden=!multi();const target=$("workspace-refresh-target").value;$("\
+workspace-refresh-target").innerHTML=workspaces.map(ws=>`<option value="${esc2(ws.key)}">${esc2(workspaceName(ws))}</opt\
+ion>`).join("");$("workspace-refresh-target").value=wsByKey(target)?.key||here?.key||""}var workspaceFromCard=node=>wsByKey(
 node.closest("[data-ws]")?.dataset.ws);$("workspace-manager").addEventListener("click",run(async event=>{const button2=event.
 target.closest("button");if(!button2||button2.disabled)return;const ws=workspaceFromCard(button2);if(button2.matches("[d\
 ata-ws-move]")&&ws)await moveWorkspace(ws,Number(button2.dataset.wsMove));if(button2.matches("[data-ws-close]")&&ws)await closeWorkspace(
@@ -15843,8 +16026,8 @@ throw new Error("Turn on Edit to rename files.");await rename()},deleteEntry:asy
 ws.key;await remove2()}});sidebars=createSidebars({prefs,onActivate:(next,side)=>{if(next==="search"&&side!=="passive")$(
 "search-query").focus();if(next==="kanban")kanban.renderSidebar();if(next==="card")void kanban.renderPreview();if(next===
 "settings")run(loadControlPanel)();if(next==="files"&&side!=="passive")revealFile();if(next==="git")for(const ws of workspaces)
-run(()=>ws.git.refresh())();if(next==="export")renderExport()}});var mobileLayout=initMobileLayout({sidebars,back:()=>{if($(
-"nav-back").disabled)return false;$("nav-back").click();return true}});var resize=$("sidebar-resize");var resizing=null;
+run(()=>ws.git.refresh())();if(next==="export")renderExport()}});var mobileLayout=initMobileLayout({sidebars,onChange:()=>renderWelcome(),
+back:()=>{if($("nav-back").disabled)return false;$("nav-back").click();return true}});var resize=$("sidebar-resize");var resizing=null;
 var sidebarWidth=width=>document.documentElement.style.setProperty("--sidebar",width+"px");resize.onpointerdown=e=>{if(e.
 button!==0)return;const box=$("sidebar").getBoundingClientRect();resizing={x:e.clientX,width:box.width,saved:document.documentElement.
 style.getPropertyValue("--sidebar")};resize.setPointerCapture(e.pointerId);document.body.classList.add("sidebar-resizing");
@@ -15895,8 +16078,8 @@ let initial=client.initial;if(client.capabilities.session){initial=await client.
 message(initial.restoreError);initial=null}}else if(!initial&&JSON.parse($("weave-data").textContent).mode==="dynamic")initial=
 await client.choose();if(initial){await restoreWorkspaces(initial);if(initial.restoreErrors?.length)message(initial.restoreErrors.
 join(" "));const deep=new URLSearchParams(location.hash.slice(1)).get("note"),ws=current();if(deep&&ws?.index.has(deep))
-await openNote(deep,null,{ws})}await loadControlPanel();if(mobileLayout.active&&workspaces.length&&!active)sidebars.select(
-"left","files")}catch(e){message(e.message);$p("welcome").querySelector(".hint").textContent=e.message}
+await openNote(deep,null,{ws})}await loadControlPanel();renderWelcome()}catch(e){message(e.message);$p("welcome").querySelector(
+".hint").textContent=e.message}
 
 })().catch(e=>{document.getElementById('message').textContent=e.message;});</script>
 </body></html>

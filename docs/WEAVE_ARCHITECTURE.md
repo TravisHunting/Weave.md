@@ -71,7 +71,7 @@ flowchart TB
   subgraph Reader["Reader page (app/weave)"]
     ui["ui.mjs<br/>tabs · split view (panes.mjs) · commands"]
     editor["live-editor.mjs · editor-formatting.mjs<br/>markdown-highlight.mjs · spellcheck.mjs<br/>table-preview.mjs · mermaid.mjs (diagrams, lazy runtime)"]
-    views["render.mjs · okf-bar.mjs<br/>graph-view.mjs · kanban-ui.mjs / kanban-view.mjs<br/>git-ui.mjs · files.mjs"]
+    views["render.mjs · okf-bar.mjs<br/>graph-view.mjs · kanban-ui.mjs / kanban-view.mjs<br/>git-ui.mjs · git-setup.mjs · files.mjs"]
     chrome["sidebars.mjs · titlebar-tabs.mjs · mobile.mjs<br/>settings-dialog.mjs · server-settings.mjs<br/>appearance.mjs · skins.mjs"]
     model["catalog-index.mjs · links.mjs · okf.mjs<br/>kanban.mjs · retrieval.mjs"]
     client["client.mjs picks an adapter"]
@@ -141,7 +141,7 @@ Requests run concurrently on the one `Backend` without a global lock; each open 
 | `markdown.rs` | OKF article metadata, links, resolution and destination-span rewriting |
 | `kanban.rs` | Kanban boards, columns and card references from OKF frontmatter; card `board` values rewritten when boards move |
 | `database.rs` | Unified schema, one writer and pooled WAL readers, incremental index transactions with maintained counts, per-workspace FTS5/BM25, catalog tree and changes |
-| `native_git.rs` | Scoped Git CLI operations, diffs, branches, remotes, conflict resolution and sync |
+| `native_git.rs` | Scoped Git CLI operations, diffs, branches, remotes, conflict resolution and sync; per-workspace SSH deploy keys, and the hardened mode used for HTTP requests |
 | `graph.rs` | Neighbourhood traversal read from the index on demand, streamed by depth over Tauri Channels |
 | `backend.rs` export | Portable workspace export: fills the embedded reader template (`EXPORT_TEMPLATE`) with articles, metadata and graph |
 | `external.rs`, `explorer.rs`, `window_state.rs` | Individually granted external Markdown files, native reveal and window placement |

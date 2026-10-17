@@ -42,6 +42,9 @@ pub struct Config {
     /// behaviour) instead of only this computer's own addresses.
     #[serde(default)]
     pub any_host: bool,
+    /// Hosts Git remotes may reach (empty: any host).
+    #[serde(default)]
+    pub git_hosts: Vec<String>,
 }
 impl Config {
     pub fn parse(args: impl IntoIterator<Item = String>) -> Result<Self, String> {
@@ -52,6 +55,7 @@ impl Config {
             data: ".weave-server".into(),
             origin: None,
             any_host: true,
+            git_hosts: vec![],
         };
         let mut args = args.into_iter();
         while let Some(arg) = args.next() {
@@ -70,6 +74,21 @@ impl Config {
                 "--workspaces" => config.workspaces = value.into(),
                 "--data" => config.data = value.into(),
                 "--origin" => config.origin = Some(normalize_origin(&value)?),
+                "--git-hosts" => {
+                    config.git_hosts = value
+                        .split(',')
+                        .map(|h| h.trim().to_ascii_lowercase())
+                        .filter(|h| !h.is_empty())
+                        .collect();
+                    if config.git_hosts.iter().any(|h| {
+                        h.len() > 253
+                            || !h
+                                .chars()
+                                .all(|c| c.is_ascii_alphanumeric() || ".-:[]".contains(c))
+                    }) {
+                        return Err("Use --git-hosts with comma-separated host names.".into());
+                    }
+                }
                 "--allowed-hosts" => {
                     config.any_host = match value.as_str() {
                         "any" => true,
@@ -162,6 +181,7 @@ pub struct Server {
     secure: bool,
     /// Serve any Host; API calls must still come from a page on that Host.
     any_host: bool,
+    git_hosts: Vec<String>,
 }
 impl Server {
     pub fn new(config: &Config, port: u16, stop: Arc<AtomicBool>) -> Result<Self, String> {
@@ -253,6 +273,7 @@ impl Server {
             authentication: Arc::new(Semaphore::new(2)),
             secure: origins.iter().all(|o| o.starts_with("https://")),
             any_host: config.origin.is_none() && config.any_host,
+            git_hosts: config.git_hosts.clone(),
             backend,
             root,
             selected,
@@ -396,7 +417,7 @@ impl Server {
         let result = match op {
             "health" => Ok(
                 json!({"ok":true,"protocol":3,"backend":"rust","host":"server","instance":self.instance,"capabilities":{
-                "write":true,"git":false,"storage":true,"session":true,"nativeWindow":false,
+                "write":true,"git":true,"storage":true,"session":true,"nativeWindow":false,
                 "graphStream":true,"resources":true,"fts":true,"workspaces":true,"export":true,"catalogChanges":true}}),
             ),
             "serverFolders" => {
@@ -551,6 +572,14 @@ impl Server {
                 if op == "graph" {
                     args["summaryOnly"] = json!(true);
                 }
+                self.backend.request(op, args)
+            }
+            "gitStatus" | "gitIgnore" | "gitDiff" | "gitHistory" | "gitCommitDiff"
+            | "gitAction" => {
+                self.scoped(&args)?;
+                // Browser Git runs hardened (no hooks, network transports only)
+                // and within the permitted hosts; callers cannot relax either.
+                args["_host"] = json!({"hardened":true,"gitHosts":self.git_hosts});
                 self.backend.request(op, args)
             }
             _ => Err("This operation is unavailable on Weave Server.".into()),
@@ -1283,7 +1312,7 @@ async fn serve(
     result
 }
 
-pub const HELP: &str = "Weave Server\n\nweave server [options]\nweave-server [options]\n\n--host IP           Listen address (default 127.0.0.1)\n--port PORT         Listen port (default 8765; 0 chooses a free port)\n--workspaces PATH   Parent of workspace folders (default ./workspaces)\n--data PATH         Private server data (default ./.weave-server)\n--origin URL        Exact browser origin (HTTPS for remote access); only it is accepted\n--allowed-hosts any|local  Without --origin: serve any host name (default), or only\n                    this computer's own addresses (WEAVE_ALLOWED_HOSTS)\n\nadmin status --data PATH\nadmin set-username --data PATH --username NAME\nadmin reset-password --data PATH [--password-file PATH]\nadmin turnstile --data PATH --enabled true|false [--site-key KEY --hostname HOST --secret-file PATH]\n\nOn a new installation the first browser visit creates the administrator account.\nTo create it at start instead, set WEAVE_ADMIN_USERNAME (default admin) and\nWEAVE_ADMIN_PASSWORD or WEAVE_ADMIN_PASSWORD_FILE; they are ignored once it exists.\nRuns without creating a GUI. Ctrl+C/SIGTERM stops gracefully. Remote access requires TLS at a reverse proxy or tunnel.\n";
+pub const HELP: &str = "Weave Server\n\nweave server [options]\nweave-server [options]\n\n--host IP           Listen address (default 127.0.0.1)\n--port PORT         Listen port (default 8765; 0 chooses a free port)\n--workspaces PATH   Parent of workspace folders (default ./workspaces)\n--data PATH         Private server data (default ./.weave-server)\n--origin URL        Exact browser origin (HTTPS for remote access); only it is accepted\n--allowed-hosts any|local  Without --origin: serve any host name (default), or only\n                    this computer's own addresses (WEAVE_ALLOWED_HOSTS)\n--git-hosts LIST    Comma-separated hosts Git remotes may reach, such as\n                    github.com (WEAVE_GIT_HOSTS; default any host)\n\nadmin status --data PATH\nadmin set-username --data PATH --username NAME\nadmin reset-password --data PATH [--password-file PATH]\nadmin turnstile --data PATH --enabled true|false [--site-key KEY --hostname HOST --secret-file PATH]\n\nOn a new installation the first browser visit creates the administrator account.\nTo create it at start instead, set WEAVE_ADMIN_USERNAME (default admin) and\nWEAVE_ADMIN_PASSWORD or WEAVE_ADMIN_PASSWORD_FILE; they are ignored once it exists.\nRuns without creating a GUI. Ctrl+C/SIGTERM stops gracefully. Remote access requires TLS at a reverse proxy or tunnel.\n";
 /// Both binaries enter this code before any desktop initialisation.
 pub fn cli(args: impl IntoIterator<Item = String>) -> i32 {
     let args: Vec<_> = args.into_iter().collect();
@@ -1299,6 +1328,7 @@ pub fn cli(args: impl IntoIterator<Item = String>) -> i32 {
         for (variable, flag) in [
             ("WEAVE_ORIGIN", "--origin"),
             ("WEAVE_ALLOWED_HOSTS", "--allowed-hosts"),
+            ("WEAVE_GIT_HOSTS", "--git-hosts"),
         ] {
             let value = std::env::var(variable).ok().filter(|v| !v.is_empty());
             if let Some(value) = value.filter(|_| !args.iter().any(|arg| arg == flag)) {
@@ -1468,6 +1498,91 @@ mod tests {
         );
     }
     #[test]
+    fn browser_git_is_hardened() {
+        let temporary = tempfile::tempdir().unwrap();
+        let config = Config {
+            host: "127.0.0.1".parse().unwrap(),
+            port: 8765,
+            workspaces: temporary.path().join("workspaces"),
+            data: temporary.path().join("data"),
+            origin: None,
+            any_host: false,
+            git_hosts: vec!["github.com".into()],
+        };
+        let server = Server::new(&config, 8765, Arc::new(AtomicBool::new(false))).unwrap();
+        let ws = server
+            .request("serverOpen", json!({"name":"Notes","create":true}))
+            .unwrap();
+        let scope = ws["scope"].clone();
+        assert!(server.request("gitStatus", json!({})).is_err());
+        let status = server
+            .request("gitStatus", json!({"scope":scope}))
+            .unwrap();
+        if status["available"] != true {
+            return; // Git is not installed on this machine.
+        }
+        assert_eq!(status["repository"], false);
+        let git = |args: Value| {
+            let mut args = args;
+            args["scope"] = scope.clone();
+            server.request("gitAction", args)
+        };
+        git(json!({"action":"init"})).unwrap();
+        // Callers can neither turn hardening off nor widen permitted hosts.
+        let refused = git(json!({"action":"addRemote","name":"origin","url":"https://example.org/notes.git","_host":{"hardened":false,"gitHosts":[]}}));
+        assert!(refused.unwrap_err().contains("github.com"));
+        assert!(git(json!({"action":"addRemote","name":"local","url":"/srv/elsewhere"})).is_err());
+        git(json!({"action":"addRemote","name":"origin","url":"git@github.com:example/notes.git"}))
+            .unwrap();
+        let replaced = git(json!({"action":"addRemote","name":"origin","url":"https://github.com/example/notes.git","replace":true})).unwrap();
+        assert_eq!(
+            replaced["status"]["remotes"][0]["fetch"],
+            "https://github.com/example/notes.git"
+        );
+        assert!(git(json!({"action":"configureIdentity","name":"Tester","email":"nobody"})).is_err());
+        git(json!({"action":"configureIdentity","name":"Weave Tester","email":"tester@example.org"}))
+            .unwrap();
+        // A hook in the repository never runs for browser requests.
+        let root = temporary.path().join("workspaces").join("Notes");
+        let hook = root.join(".git").join("hooks").join("pre-commit");
+        fs::write(&hook, "#!/bin/sh\necho ran > hook-ran\nexit 1\n").unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(&hook, fs::Permissions::from_mode(0o755)).unwrap();
+        }
+        server
+            .request(
+                "create",
+                json!({"scope":scope,"path":"Note.md","text":"# Note"}),
+            )
+            .unwrap();
+        git(json!({"action":"stageAll"})).unwrap();
+        let committed = git(json!({"action":"commit","message":"First"})).unwrap();
+        assert_eq!(committed["status"]["unborn"], false);
+        assert_eq!(committed["status"]["identity"]["name"], "Weave Tester");
+        assert!(!root.join("hook-ran").exists());
+        // Deploy keys stay in private data; only the public key is returned.
+        match git(json!({"action":"createDeployKey"})) {
+            Ok(created) => {
+                let public = created["deployKey"]["publicKey"].as_str().unwrap();
+                assert!(public.starts_with("ssh-ed25519 "), "{public}");
+                assert!(!created.to_string().contains("PRIVATE KEY"));
+                assert!(temporary
+                    .path()
+                    .join("data")
+                    .join("git-keys")
+                    .join("known_hosts")
+                    .is_file());
+                assert!(git(json!({"action":"createDeployKey"})).is_err());
+                assert!(git(json!({"action":"removeDeployKey"})).is_err());
+                let removed = git(json!({"action":"removeDeployKey","confirmed":true})).unwrap();
+                assert!(removed["status"]["deployKey"].is_null());
+            }
+            Err(error) => assert!(error.contains("ssh-keygen"), "{error}"),
+        }
+    }
+    #[test]
     fn scoped_operations_and_grants() {
         let temporary = tempfile::tempdir().unwrap();
         let config = Config {
@@ -1477,6 +1592,7 @@ mod tests {
             data: temporary.path().join("data"),
             origin: None,
             any_host: false,
+            git_hosts: vec![],
         };
         let server = Server::new(&config, 8765, Arc::new(AtomicBool::new(false))).unwrap();
         assert!(server
@@ -1498,7 +1614,6 @@ mod tests {
             "open",
             "restore",
             "shutdown",
-            "gitAction",
             "revealPath",
             "exportWorkspace",
             "workspaceLayout",
@@ -1556,6 +1671,7 @@ mod tests {
             data: temp.path().join("data"),
             origin: None,
             any_host: false,
+            git_hosts: vec![],
         };
         let backend =
             Arc::new(Backend::new(config.data.clone(), Arc::new(AtomicBool::new(false))).unwrap());
@@ -1626,6 +1742,7 @@ mod tests {
             data: temp.path().join("data"),
             origin: None,
             any_host: false,
+            git_hosts: vec![],
         };
         let backend =
             Arc::new(Backend::new(config.data.clone(), Arc::new(AtomicBool::new(false))).unwrap());

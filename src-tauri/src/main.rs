@@ -140,6 +140,49 @@ async fn choose_workspace(app: AppHandle) -> Result<Option<Value>, String> {
     .await
     .map_err(|e| e.to_string())?
 }
+/// Creates a new, empty workspace folder named by the page inside a parent
+/// folder chosen in the native picker, then opens it.
+#[tauri::command]
+async fn create_workspace(app: AppHandle, name: String) -> Result<Option<Value>, String> {
+    let name = name.trim().to_string();
+    if name.is_empty()
+        || name.len() > 120
+        || name.starts_with('.')
+        || name.ends_with(['.', ' '])
+        || name
+            .chars()
+            .any(|c| c.is_control() || r#"<>:"/\|?*"#.contains(c))
+    {
+        return Err("Enter a folder name without a path, a leading dot or the characters < > : \" / \\ | ? * (up to 120 characters).".into());
+    }
+    tauri::async_runtime::spawn_blocking(move || {
+        let window = app
+            .get_webview_window("main")
+            .ok_or("Weave window unavailable")?;
+        let Some(parent) = app
+            .dialog()
+            .file()
+            .set_parent(&window)
+            .set_title(format!("Choose where to create the {name} workspace"))
+            .blocking_pick_folder()
+        else {
+            return Ok(None);
+        };
+        let root = parent.into_path().map_err(|e| e.to_string())?.join(&name);
+        if root.exists() {
+            return Err(format!(
+                "{} already exists. Choose another name or location, or open it as an existing workspace.",
+                root.display()
+            ));
+        }
+        std::fs::create_dir(&root).map_err(|e| e.to_string())?;
+        app.state::<weave::Service>()
+            .request(&app, "open", json!({"root": root}))
+            .map(Some)
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
 /// Exports a workspace as a portable read-only HTML reader. The destination
 /// comes only from the native save dialog, never from the page.
 #[tauri::command]
@@ -294,6 +337,7 @@ fn main() {
             server_control,
             weave_graph_neighborhood,
             choose_workspace,
+            create_workspace,
             export_workspace,
             reveal_export,
             choose_storage_directory,

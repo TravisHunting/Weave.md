@@ -5,6 +5,7 @@ import {createGraph} from './graph-view.mjs';
 import {renderNote, esc} from './render.mjs';
 import {LiveEditor, literalMatches} from './live-editor.mjs';
 import {createGitPanel} from './git-ui.mjs';
+import {openGitSetup} from './git-setup.mjs';
 import {initAppearance} from './appearance.mjs';
 import {createSidebars} from './sidebars.mjs';
 import {retitleArticle} from './article-title.mjs';
@@ -45,8 +46,10 @@ const pageData = JSON.parse($('weave-data').textContent || '{}'), portable = pag
 }
 for (const element of document.querySelectorAll('[data-capability]')) element.hidden = !client.capabilities[element.dataset.capability];
 document.querySelector('[data-panel="git"]').hidden = !client.capabilities.git;
-if (pageData.mode === 'server') for (const id of ['choose-workspace','welcome-open']) $(id).textContent = 'Open server workspace…';
-if (portable) for (const id of ['choose-workspace', 'welcome-open']) $(id).hidden = true;
+if (pageData.mode === 'server') $('choose-workspace').textContent = 'Open server workspace…';
+if (portable) $('choose-workspace').hidden = true;
+$('create-workspace').hidden = portable || !client.writable || !client.createWorkspace;
+$('menu-git-setup').hidden = portable || !client.writable || !client.capabilities.git;
 if (!graphFeature) {for (const id of ['toggle-graph', 'view-graph']) $(id).hidden = true; for (const index of [0, 1]) $(paneId('connections', index)).hidden = true;}
 if (portable && pageData.root) document.title = pageData.root + ' · Weave';
 if (portable) document.documentElement.style.setProperty('--sidebar', '180px');
@@ -185,6 +188,8 @@ function createWorkspaceGit(ws) {
     openFile: file => openNote(file, null, {ws}),
     onPendingCount: count => {ws.gitCount = count; renderGitSections();},
     onBusy: busy => {ws.gitBusy = busy; $('git-panel').setAttribute('aria-busy', String(workspaces.some(w => w.gitBusy)));},
+    onStatus: () => renderWelcome(),
+    onSetup: () => run(setupGit)(ws),
     beforeAction: async () => {
       if (!workspaces.includes(ws)) throw new Error('This workspace is inactive.');
       if (!await ensureDraftsSaved(key => key.startsWith(ws.key + '\n'), 'using Git')) throw new Error('Save or discard unsaved articles before using Git.');
@@ -530,8 +535,7 @@ async function restoreWorkspaces(initial) {
 function showEmptyTab() {
   openSerial++; active = null; selected = ''; live.setText(''); raw.setText(''); updatePath(); updateMode();
   if (evidencePane === P) {evidenceSerial++; $('evidence-panel').hidden = true;}
-  $p('note-panel').hidden = true; $p('welcome').hidden = false; kanban?.update(P);
-  $p('welcome').querySelector('p').textContent = workspaces.length ? 'Select an article from Files or Search to open it in this tab.' : 'Open a folder of Markdown files to begin.';
+  $p('note-panel').hidden = true; $p('welcome').hidden = false; kanban?.update(P); renderWelcome();
   history.replaceState(null, '', location.pathname + location.search); updatePanes();
 }
 async function selectTab(id) {
@@ -860,6 +864,60 @@ async function choose() {
   await adoptWorkspace(next);
   message(client.writable ? (multi() ? workspaceName(wsByKey(workspaceKey(next))) + ' is open.' : 'Workspace open.') : 'Read-only browser view.');
 }
+/** Creates an empty workspace folder (the desktop asks where; the server
+ * creates it in its workspace directory) and opens it. */
+async function createWorkspace() {
+  if (!client.createWorkspace || !client.writable) throw new Error('This host cannot create workspaces.');
+  if (panelInfo?.managedWorkspaces) throw new Error('This server shows workspaces chosen in the desktop app. Create workspaces there.');
+  const server = pageData.mode === 'server';
+  const answer = await promptUser('Create workspace', server ? 'Name the new workspace. Weave creates an empty folder with this name on the server.' : 'Name the new workspace. Next, choose the folder to create it in.', {value: 'Notes', ok: server ? 'Create workspace' : 'Choose location…'});
+  if (answer.action !== 'ok') return;
+  if (!answer.value) throw new Error('Enter a workspace name.');
+  await persistSession();
+  const next = await client.createWorkspace(answer.value); if (!next) return;
+  if (!client.capabilities.workspaces) resetWorkspaces();
+  const ws = await adoptWorkspace(next); message(workspaceName(ws) + ' created. Add your first article.');
+}
+/** Opens an article of `ws` chosen at random. */
+async function randomArticle(ws) {
+  const paths = ws.index.paths; if (!paths.length) throw new Error(workspaceName(ws) + ' has no articles yet.');
+  const others = paths.length > 1 ? paths.filter(path => path !== paneActive(P)?.path) : paths;
+  await openNote(others[Math.floor(Math.random() * others.length)], null, {ws});
+}
+/** Opens the guided Git setup for a workspace (repository, author, remote, deploy key). */
+async function setupGit(ws) {
+  if (!ws) throw new Error('Open a workspace to set up Git.');
+  if (!client.capabilities.git) throw new Error('Git is unavailable on this host.');
+  if (!ws.git.status) await ws.git.refresh();
+  if (ws.git.status && ws.git.status.available === false) throw new Error(ws.git.status.error || 'Git is unavailable. Install Git and reopen Weave.');
+  openGitSetup({git: ws.git, name: workspaceName(ws), server: pageData.mode === 'server', openResource: url => client.openResource(url),
+    showSourceControl: () => {sidebars.select('right', 'git'); focusGitSection(ws); ws.gitSection.open = true;},
+    ask: async (title, text, ok) => (await promptUser(title, text, {ok})).action === 'ok'});
+}
+/** Git is set up when the workspace is a repository with a remote. */
+const needsGitSetup = ws => {const s = ws?.git?.status; return !!(client.capabilities.git && client.writable && s && s.available !== false && !s.parentRepository && (!s.repository || !s.remotes?.length));};
+const welcomeRendered = ['', ''];
+/** The empty tab's starting points: workspace actions, and with a workspace,
+ * New article, Random article and Set up Git when it is not connected yet. */
+function renderWelcome() {
+  for (const pane of panes) {
+    const box = pane.el.welcome.querySelector('.welcome-actions'), lead = pane.el.welcome.querySelector('p'); if (!box) continue;
+    const ws = portable ? null : wsByKey(paneTabs(pane).find(tab => tab.id === paneTabId(pane))?.ws) || current();
+    const server = pageData.mode === 'server', managed = !!panelInfo?.managedWorkspaces, writable = client.writable && !portable;
+    const items = [];
+    if (ws) {
+      if (writable) items.push({action: 'new-article', title: 'New article', text: 'Start writing in ' + workspaceName(ws), primary: true});
+      items.push({action: 'random-article', title: 'Random article', text: ws.index?.size ? 'Rediscover one of ' + count(ws.index.size, 'article') : 'No articles yet', disabled: !ws.index?.size});
+      if (needsGitSetup(ws)) items.push({action: 'setup-git', title: 'Set up Git', text: 'Keep history and sync with GitHub'});
+      if (document.documentElement.dataset.layout === 'mobile') items.push({action: 'browse', title: 'Browse files', text: 'Show the articles of ' + workspaceName(ws)});
+    }
+    if (writable && client.createWorkspace && !managed) items.push({action: 'create-workspace', title: 'Create new workspace', text: server ? 'An empty folder on this server' : 'An empty folder for new articles', primary: !ws, secondary: !!ws});
+    if (!portable) items.push({action: 'open-workspace', title: 'Open existing workspace', text: managed ? 'One shared by the desktop app' : server ? 'A folder on this server' : 'A folder of Markdown files', primary: !ws && !writable, secondary: !!ws, id: pane.index === 0 ? 'welcome-open' : ''});
+    lead.textContent = portable ? 'Select an article from Files or Search to open it.' : ws ? 'Select an article from Files or Search, or start here.' : 'Create a workspace for new articles, or open one you already have.';
+    const html = items.map(item => `<button type="button" class="welcome-action${item.primary ? ' primary' : ''}${item.secondary ? ' secondary' : ''}" data-welcome="${item.action}"${ws ? ` data-ws="${esc(ws.key)}"` : ''}${item.id ? ` id="${item.id}"` : ''}${item.disabled ? ' disabled' : ''}><strong>${esc(item.title)}</strong><small>${esc(item.text)}</small></button>`).join('');
+    if (html !== welcomeRendered[pane.index]) {box.innerHTML = html; welcomeRendered[pane.index] = html;}
+  }
+}
 async function adoptWorkspace(next) {
   const existing = wsByKey(workspaceKey(next));
   if (existing) {await applyCatalog(existing, next); await showWorkspace(existing); return existing;}
@@ -872,7 +930,7 @@ async function adoptWorkspace(next) {
   else {
     // An empty tab of no particular workspace can show this one.
     const tab = currentTab(); if (tab && !tab.path && !tab.history.length) {tab.ws = ws.key; ws.lastTab = tab.id;}
-    renderTabs(); if (!active) $p('welcome').querySelector('p').textContent = 'Select an article from Files or Search to open it in this tab.'; updateStatus(ws.status); focusGitSection(ws);
+    renderTabs(); renderWelcome(); updateStatus(ws.status); focusGitSection(ws);
   }
   await persistSession(); void loadControlPanel();
   return ws;
@@ -1420,7 +1478,24 @@ $('file-menu').onclick = run(async e => {
   if (action === 'copy') copyEntry(); if (action === 'paste') await pasteEntry();
   if (action === 'create') await create(false); if (action === 'folder') await create(true); if (action === 'rename') await rename(); if (action === 'retitle') await retitle(); if (action === 'move') await rename(true); if (action === 'delete') await remove();
 });
-$('choose-workspace').onclick = $('welcome-open').onclick = run(choose);
+$('choose-workspace').onclick = run(choose);
+$('create-workspace').onclick = run(createWorkspace);
+$('menu-git-setup').onclick = run(() => setupGit(current()));
+for (const pane of panes) pane.el.welcome.addEventListener('click', run(async event => {
+  const button = event.target.closest('[data-welcome]'); if (!button || button.disabled) return;
+  const ws = wsByKey(button.dataset.ws), action = button.dataset.welcome;
+  if (pane !== P) focusPane(pane);
+  if (action === 'create-workspace') await createWorkspace();
+  if (action === 'open-workspace') await choose();
+  if (action === 'browse') sidebars.select('left', 'files');
+  if (!ws) return;
+  if (action === 'new-article') {
+    if (!edit) {edit = true; prefs.set('edit', 'true'); updateMode();}
+    focusKey = selectedWs = ws.key; selected = ''; await create(false, {atRoot: true});
+  }
+  if (action === 'random-article') await randomArticle(ws);
+  if (action === 'setup-git') await setupGit(ws);
+}));
 $('window-controls').hidden = !client.capabilities.nativeWindow;
 for (const action of ['minimize','maximize','close']) $('window-' + action).onclick = run(async () => {
   if (action === 'close') {
@@ -1900,7 +1975,7 @@ function renderWorkspaceManager() {
   $('add-workspace').disabled = !client.writable || capable && workspaces.length >= (panelInfo?.maxOpen || 12);
   const recentHtml = recent.map(w => `<li class="workspace-recent" data-workspace-color="${/^#[0-9a-f]{6}$/i.test(w.color || '') ? w.color : '#7c8594'}"><span class="workspace-dot" aria-hidden="true"></span><span class="workspace-recent-label"><strong>${esc(w.name)}</strong><small title="${esc(w.root)}">${esc(w.root)}</small></span><button data-ws-reopen="${esc(w.id)}" title="Show ${esc(w.name)} and restore its tabs">Activate</button></li>`).join('');
   $('recent-workspaces').hidden = !recent.length; $('recent-workspace-list').innerHTML = recentHtml;
-  $('welcome-recent').hidden = !recent.length || !!workspaces.length; $('welcome-recent-list').innerHTML = recentHtml;
+  $('welcome-recent').hidden = !recent.length; $('welcome-recent-list').innerHTML = recentHtml; renderWelcome();
   $('workspace-refresh-target-label').hidden = !multi();
   const target = $('workspace-refresh-target').value;
   $('workspace-refresh-target').innerHTML = workspaces.map(ws => `<option value="${esc(ws.key)}">${esc(workspaceName(ws))}</option>`).join('');
@@ -2003,7 +2078,7 @@ sidebars = createSidebars({prefs,onActivate:(next, side) => {
   if (next === 'git') for (const ws of workspaces) run(() => ws.git.refresh())();
   if (next === 'export') renderExport();
 }});
-const mobileLayout = initMobileLayout({sidebars, back: () => {if ($('nav-back').disabled) return false; $('nav-back').click(); return true;}});
+const mobileLayout = initMobileLayout({sidebars, onChange: () => renderWelcome(), back: () => {if ($('nav-back').disabled) return false; $('nav-back').click(); return true;}});
 // The left sidebar follows the pointer all the way to the rail, like the right
 // one; released below 100 px it collapses and keeps its last usable width.
 const resize = $('sidebar-resize'); let resizing = null;
@@ -2100,6 +2175,5 @@ try {
     if (deep && ws?.index.has(deep)) await openNote(deep, null, {ws});
   }
   await loadControlPanel();
-  // A phone starting without an article shows Files rather than an empty tab, so the workspace is in view at once.
-  if (mobileLayout.active && workspaces.length && !active) sidebars.select('left', 'files');
+  renderWelcome();
 } catch (e) {message(e.message); $p('welcome').querySelector('.hint').textContent = e.message;}

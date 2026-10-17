@@ -33,10 +33,19 @@ try {
   assert.equal(await page.evaluate(() => document.documentElement.dataset.skin), 'aurora aurora-thin aurora-flow', 'the default skin applies');
   assert.equal(await page.evaluate(() => document.documentElement.dataset.scheme), 'grey', 'the default scheme applies');
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 393, 'nothing scrolls sideways');
-  // Without an article to show, the phone starts on Files so the workspace is in view at once.
-  await page.waitForFunction(() => !document.body.classList.contains('sidebar-collapsed'));
-  assert(await page.locator('#files-panel').isVisible(), 'Files is shown at start'); assert.equal(await rightOpen(), false);
+  // Without an article to show, the phone starts on the welcome screen with its actions in view, no drawer over them.
+  await page.locator('#welcome [data-welcome="browse"]').waitFor();
+  assert.equal(await leftOpen(), false, 'no drawer covers the start'); assert.equal(await rightOpen(), false);
+  for (const action of ['random-article', 'browse', 'open-workspace']) {
+    const button = page.locator(`#welcome [data-welcome="${action}"]`); assert(await button.isVisible(), action + ' is offered');
+    assert((await button.boundingBox()).height >= 40, action + ' is a touch target');
+  }
   await page.waitForTimeout(400); await shot('start');
+  // Browse files opens the Files drawer.
+  await page.locator('#welcome [data-welcome="browse"]').tap();
+  await page.waitForFunction(() => !document.body.classList.contains('sidebar-collapsed'));
+  assert(await page.locator('#files-panel').isVisible(), 'Browse files shows Files');
+  await page.waitForTimeout(400);
   // The article column fills the window behind it; the scrim puts the drawer away.
   assert.equal((await box('main')).width, 393, 'the article column is the whole width');
   await page.locator('#mobile-scrim').tap({position: {x: 380, y: 400}}); assert.equal(await leftOpen(), false);

@@ -17,9 +17,82 @@ pub struct Git {
     pub preferences: Value,
     pub pulls: Value,
     pub stopping: Arc<AtomicBool>,
+    /// Private directory holding SSH material for every workspace
+    /// (`<data>/git-keys`): one folder per workspace plus `known_hosts`.
+    pub keys: Option<PathBuf>,
+    /// Workspace identifier naming its deploy-key folder.
+    pub key_id: String,
+    /// Set for each request arriving over HTTP: hooks are disabled, only
+    /// network transports are allowed and the repository's own SSH command
+    /// is ignored.
+    pub hardened: bool,
+    /// Remote hosts the server permits (empty: any host).
+    pub hosts: Vec<String>,
 }
+/// Host keys GitHub and GitLab.com publish, so the first connection to
+/// them is verified rather than trusted. Other hosts are recorded on first use.
+const KNOWN_HOSTS: &str = "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+github.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg=
+github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=
+gitlab.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAfuCHKVTjquxvt6CM6tdG4SLp1Btn/nOeHHE5UOzRdf
+gitlab.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFSMqzJeV9rUzU4kWitGjeR4PWSa29SPqJ1fVkhtj3Hw9xjLVXVYrU9QlYWrOLXBpQ6KWjbjTDTdDkoohFzgbEY=
+gitlab.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsj2bNKTBSpIYDEGk9KxsGh3mySTRgMtXL583qmBpzeQ+jqCMRgBqB98u3z++J1sKlXHWfM9dyhSevkMwSbhoR8XIq/U0tCNyokEi/ueaBMCvbcTHhO7FcwzY92WK4Yt0aGROY5qX2UKSeOvuP4D6TPqKF1onrSzH9bx9XUf2lEdWT/ia1NEKjunUqu1xOB/StKDHMoX4/OKyIzuS0q/T1zOATthvasJFoPrAjkohTyaDUz2LN5JoH839hViyEG82yB+MjcFV5MU3N1l1QL3cVUCh93xSaua1N85qivl+siMkPGbO5xR/En4iEY6K2XPASUEMaieWVNTRCtJ4S8H+9
+";
 fn s<'a>(v: &'a Value, k: &str) -> &'a str {
     v[k].as_str().unwrap_or("")
+}
+/// A path quoted for the POSIX shell Git runs `GIT_SSH_COMMAND` through.
+fn quoted(p: &Path) -> String {
+    format!(
+        "'{}'",
+        p.to_string_lossy().replace('\\', "/").replace('\'', "'\\''")
+    )
+}
+/// Validates a remote URL: HTTP(S), SSH or scp-like `user@host:path`, never
+/// carrying credentials, queries or local paths.
+fn remote_url(u: &str) -> Result<()> {
+    if u.is_empty()
+        || u.len() > 2000
+        || u.chars()
+            .any(|c| c.is_whitespace() || c.is_control() || "?#".contains(c))
+    {
+        return Err("Use an HTTP(S) or SSH URL without credentials or query parameters.".into());
+    }
+    if let Ok(url) = url::Url::parse(u) {
+        if !["http", "https", "ssh"].contains(&url.scheme())
+            || url.host_str().is_none()
+            || url.password().is_some()
+            || (url.scheme() != "ssh" && !url.username().is_empty())
+        {
+            return Err("Use your system Git credentials.".into());
+        }
+    } else if !regex::Regex::new(r"^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+:[\w./-]+$")
+        .unwrap()
+        .is_match(u)
+    {
+        return Err("Use an HTTP(S) or SSH Git URL.".into());
+    }
+    Ok(())
+}
+/// The host a remote URL connects to, lower-cased.
+pub fn remote_host(u: &str) -> Option<String> {
+    if let Ok(url) = url::Url::parse(u) {
+        if ["http", "https", "ssh"].contains(&url.scheme()) {
+            return url.host_str().map(|h| h.to_ascii_lowercase());
+        }
+        return None;
+    }
+    let (_, rest) = u.split_once('@')?;
+    let (host, _) = rest.split_once(':')?;
+    (!host.is_empty()).then(|| host.to_ascii_lowercase())
+}
+/// A commit author's name or email: one short line.
+fn identity_field(v: &str, what: &str) -> Result<String> {
+    let v = v.trim();
+    if v.is_empty() || v.len() > 200 || v.chars().any(|c| c.is_control() || "<>".contains(c)) {
+        return Err(format!("Enter a {what} of at most 200 characters."));
+    }
+    Ok(v.into())
 }
 fn private(p: &str) -> bool {
     p.split('/').any(|c| {
@@ -75,7 +148,117 @@ impl Git {
                 .map(|a| json!(a))
                 .unwrap_or(json!([])),
             stopping,
+            keys: None,
+            key_id: String::new(),
+            hardened: false,
+            hosts: vec![],
         }
+    }
+    /// Keeps this workspace's deploy key under `keys/<id>`.
+    pub fn with_keys(mut self, keys: PathBuf, id: &str) -> Self {
+        self.keys = Some(keys);
+        self.key_id = id.into();
+        self
+    }
+    fn key_dir(&self) -> Option<PathBuf> {
+        let id = &self.key_id;
+        (!id.is_empty() && id.chars().all(|c| c.is_ascii_alphanumeric() || "-_".contains(c)))
+            .then(|| self.keys.as_ref().map(|k| k.join(id)))
+            .flatten()
+    }
+    fn key_file(&self) -> Option<PathBuf> {
+        self.key_dir()
+            .map(|d| d.join("id_ed25519"))
+            .filter(|p| p.is_file())
+    }
+    fn known_hosts(&self) -> Result<PathBuf> {
+        let keys = self.keys.as_ref().ok_or("Deploy keys are unavailable on this host.")?;
+        fs::create_dir_all(keys).map_err(err)?;
+        let file = keys.join("known_hosts");
+        if !file.exists() {
+            fs::write(&file, KNOWN_HOSTS).map_err(err)?;
+        }
+        Ok(file)
+    }
+    /// The public half of this workspace's deploy key, for the setup guide.
+    pub fn deploy_key(&self) -> Value {
+        let Some(dir) = self.key_dir() else {
+            return Value::Null;
+        };
+        let Ok(public) = fs::read_to_string(dir.join("id_ed25519.pub")) else {
+            return Value::Null;
+        };
+        if !dir.join("id_ed25519").is_file() {
+            return Value::Null;
+        }
+        let about: Value = fs::read(dir.join("key.json"))
+            .ok()
+            .and_then(|b| serde_json::from_slice(&b).ok())
+            .unwrap_or(json!({}));
+        json!({"publicKey":public.trim(),"fingerprint":about["fingerprint"],"created":about["created"]})
+    }
+    fn ssh_keygen() -> PathBuf {
+        if cfg!(windows) {
+            // Git for Windows ships OpenSSH beside git.exe; Windows has its own.
+            if let Some(base) = Self::executable().parent().and_then(Path::parent) {
+                let p = base.join("usr/bin/ssh-keygen.exe");
+                if p.is_file() {
+                    return p;
+                }
+            }
+            let system = PathBuf::from(
+                std::env::var_os("SystemRoot").unwrap_or_else(|| "C:\\Windows".into()),
+            )
+            .join("System32/OpenSSH/ssh-keygen.exe");
+            if system.is_file() {
+                return system;
+            }
+        } else if !std::env::var_os("PATH").is_some_and(|paths| {
+            std::env::split_paths(&paths).any(|dir| dir.join("ssh-keygen").is_file())
+        }) {
+            for p in ["/usr/bin/ssh-keygen", "/usr/local/bin/ssh-keygen"] {
+                if Path::new(p).is_file() {
+                    return p.into();
+                }
+            }
+        }
+        PathBuf::from("ssh-keygen")
+    }
+    /// Creates (or with `replace`, replaces) this workspace's ed25519 deploy
+    /// key. The private key never leaves the private data directory.
+    fn create_deploy_key(&self, replace: bool, comment: &str) -> Result<Value> {
+        let dir = self.key_dir().ok_or("Deploy keys are unavailable on this host.")?;
+        if self.key_file().is_some() && !replace {
+            return Err("This workspace already has a deploy key.".into());
+        }
+        self.known_hosts()?;
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(&dir).map_err(err)?;
+        let key = dir.join("id_ed25519");
+        let path = key.to_string_lossy().replace('\\', "/");
+        let mut cmd = Command::new(Self::ssh_keygen());
+        cmd.args(["-q", "-t", "ed25519", "-N", "", "-C", comment, "-f", &path]);
+        self.execute(cmd, false, None).map_err(|e| {
+            if e.starts_with("Could not start") {
+                "SSH key tools are unavailable. Install OpenSSH (ssh-keygen), then retry.".into()
+            } else {
+                e
+            }
+        })?;
+        let mut cmd = Command::new(Self::ssh_keygen());
+        cmd.args(["-l", "-f", &format!("{path}.pub")]);
+        let listed = self.execute(cmd, true, None)?;
+        let fingerprint = String::from_utf8_lossy(&listed.1)
+            .split_whitespace()
+            .nth(1)
+            .unwrap_or("")
+            .to_string();
+        fs::write(
+            dir.join("key.json"),
+            json!({"fingerprint":fingerprint,"created":chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs,true)}).to_string(),
+        )
+        .map_err(err)?;
+        Ok(self.deploy_key())
     }
     pub fn saved(&self) -> Value {
         json!({"preferences":self.preferences,"pulls":self.pulls})
@@ -139,16 +322,51 @@ impl Git {
             "core.quotePath=false",
             "-c",
             "core.fsmonitor=false",
-        ])
-        .args(args)
-        .current_dir(&self.root)
-        .env("GIT_TERMINAL_PROMPT", "0")
-        .env("GCM_INTERACTIVE", "Never")
-        .env("GIT_OPTIONAL_LOCKS", "0")
-        .env("GIT_PAGER", "cat")
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped());
+        ]);
+        if self.hardened {
+            // Requests from browsers run no hooks and reach only network
+            // remotes; containers own folders under another user ID.
+            let hooks = self
+                .keys
+                .as_ref()
+                .map(|k| k.join("no-hooks"))
+                .ok_or("Git is unavailable on this host.")?;
+            fs::create_dir_all(&hooks).map_err(err)?;
+            cmd.arg("-c")
+                .arg(format!("core.hooksPath={}", hooks.to_string_lossy().replace('\\', "/")))
+                .args([
+                    "-c",
+                    "protocol.allow=never",
+                    "-c",
+                    "protocol.https.allow=always",
+                    "-c",
+                    "protocol.http.allow=always",
+                    "-c",
+                    "protocol.ssh.allow=always",
+                    "-c",
+                    "submodule.recurse=false",
+                ])
+                .arg("-c")
+                .arg(format!(
+                    "safe.directory={}",
+                    self.root.to_string_lossy().replace('\\', "/")
+                ));
+        }
+        // A workspace's deploy key authenticates its SSH remotes; requests
+        // from browsers ignore any SSH command configured in the repository.
+        if let Some(key) = self.key_file() {
+            cmd.env(
+                "GIT_SSH_COMMAND",
+                format!(
+                    "ssh -i {} -o IdentitiesOnly=yes -o UserKnownHostsFile={} -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=20",
+                    quoted(&key),
+                    quoted(&self.known_hosts()?)
+                ),
+            );
+        } else if self.hardened {
+            cmd.env("GIT_SSH_COMMAND", "ssh -o BatchMode=yes -o ConnectTimeout=20");
+        }
+        cmd.args(args).current_dir(&self.root);
         for (key, _) in std::env::vars_os() {
             let k = key.to_string_lossy();
             if [
@@ -167,14 +385,35 @@ impl Git {
                 cmd.env_remove(key);
             }
         }
+        self.execute(cmd, allow, input).map_err(|e| {
+            if let Some(reason) = e.strip_prefix("Could not start: ") {
+                format!("Git is unavailable. Install Git and reopen Weave: {reason}")
+            } else {
+                e
+            }
+        })
+    }
+    /// Runs a fixed command with bounded output, a 90 second limit and
+    /// redacted errors.
+    fn execute(
+        &self,
+        mut cmd: Command,
+        allow: bool,
+        input: Option<&[u8]>,
+    ) -> Result<(i32, Vec<u8>, String)> {
+        cmd.env("GIT_TERMINAL_PROMPT", "0")
+            .env("GCM_INTERACTIVE", "Never")
+            .env("GIT_OPTIONAL_LOCKS", "0")
+            .env("GIT_PAGER", "cat")
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped());
         #[cfg(windows)]
         {
             use std::os::windows::process::CommandExt;
             cmd.creation_flags(0x08000000);
         }
-        let mut child = cmd
-            .spawn()
-            .map_err(|e| format!("Git is unavailable. Install Git and reopen Weave: {e}"))?;
+        let mut child = cmd.spawn().map_err(|e| format!("Could not start: {e}"))?;
         let mut stdout = child.stdout.take().unwrap();
         let mut stderr = child.stderr.take().unwrap();
         let overflow = Arc::new(AtomicBool::new(false));
@@ -283,11 +522,25 @@ impl Git {
     pub fn status(&self) -> Result<Value> {
         let mut info = match self.repository() {
             Ok(v) => v,
-            Err(e) => return Ok(json!({"available":false,"repository":false,"error":e})),
+            Err(e) => {
+                return Ok(
+                    json!({"available":false,"repository":false,"error":e,"deployKey":self.deploy_key()}),
+                )
+            }
         };
+        info["deployKey"] = self.deploy_key();
         if info["repository"] != true {
             return Ok(info);
         }
+        let (_, configured, _) =
+            self.run(&["config", "--get-regexp", r"^user\.(name|email)$"], true, None)?;
+        let mut identity = json!({"name":"","email":""});
+        for line in configured.lines() {
+            if let Some((key, value)) = line.split_once(' ') {
+                identity[key.trim_start_matches("user.")] = json!(value);
+            }
+        }
+        info["identity"] = identity;
         let mut state = parse_status(&self.output(&[
             "status",
             "--porcelain=v2",
@@ -718,11 +971,176 @@ impl Git {
             self.output(&["init", "--initial-branch=main"])?;
             return Ok(json!({"message":"Initialized Git repository.","status":self.status()?}));
         }
+        if action == "createDeployKey" {
+            let name: String = self
+                .root
+                .file_name()
+                .unwrap_or_default()
+                .to_string_lossy()
+                .chars()
+                .filter(|c| c.is_ascii_alphanumeric() || "-_.".contains(*c))
+                .take(60)
+                .collect();
+            let key = self.create_deploy_key(args["replace"] == true, &format!("weave-{name}"))?;
+            return Ok(json!({"message":"Deploy key created. Add it to your repository's deploy keys.","deployKey":key,"status":self.status()?}));
+        }
+        if action == "removeDeployKey" {
+            if args["confirmed"] != true {
+                return Err("Confirm removing the deploy key.".into());
+            }
+            if let Some(dir) = self.key_dir() {
+                if dir.exists() {
+                    fs::remove_dir_all(dir).map_err(err)?;
+                }
+            }
+            return Ok(json!({"message":"Deploy key removed. Also delete it from your repository's deploy keys.","status":self.status()?}));
+        }
         self.require()?;
         let state = self.status()?;
         let entries = state["files"].as_array().unwrap();
         let mut message = "Git operation completed.".to_string();
+        let mut extra = json!({});
+        // The server may limit which hosts its remotes reach.
+        if !self.hosts.is_empty()
+            && [
+                "fetch",
+                "pull",
+                "push",
+                "sync",
+                "testRemote",
+                "useRemoteBranch",
+            ]
+            .contains(&action)
+        {
+            let mut names = vec![json!(if s(args, "remote").is_empty() {
+                s(&state, "syncRemote")
+            } else {
+                s(args, "remote")
+            })];
+            if ["push", "sync"].contains(&action) {
+                names.extend(
+                    args.get("pushRemotes")
+                        .unwrap_or(&state["pushRemotes"])
+                        .as_array()
+                        .cloned()
+                        .unwrap_or_default(),
+                );
+            }
+            for name in names {
+                for remote in state["remotes"].as_array().unwrap() {
+                    if remote["name"] == name {
+                        for url in [s(remote, "fetch"), s(remote, "push")] {
+                            if !url.is_empty() {
+                                self.allowed_host(url)?;
+                            }
+                        }
+                    }
+                }
+            }
+        }
         match action {
+            "configureIdentity" => {
+                let name = identity_field(s(args, "name"), "name")?;
+                let email = identity_field(s(args, "email"), "email address")?;
+                if !email.contains('@') || email.contains(char::is_whitespace) {
+                    return Err("Enter an email address such as you@example.com.".into());
+                }
+                self.output(&["config", "user.name", &name])?;
+                self.output(&["config", "user.email", &email])?;
+                message = "Commit author saved for this repository.".into();
+            }
+            "testRemote" => {
+                let remote = s(args, "remote");
+                if !state["remotes"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .any(|r| s(r, "name") == remote)
+                {
+                    return Err("Add the remote first.".into());
+                }
+                let listed = self.output(&["ls-remote", "--symref", remote]).map_err(|e| {
+                    let lower = e.to_lowercase();
+                    if lower.contains("permission denied") || lower.contains("publickey") {
+                        format!("The remote refused this deploy key. Check that it was added to the repository's deploy keys (with write access), then retry. {e}")
+                    } else if lower.contains("host key verification failed")
+                        || lower.contains("remote host identification has changed")
+                    {
+                        format!("The server's SSH host key did not match the one recorded earlier. {e}")
+                    } else if lower.contains("could not read from remote")
+                        || lower.contains("not found")
+                    {
+                        format!("The repository was not found, or this key cannot reach it. Check the URL and the deploy key. {e}")
+                    } else {
+                        e
+                    }
+                })?;
+                let mut branches = vec![];
+                let mut default = Value::Null;
+                for line in listed.lines() {
+                    if let Some(rest) = line.strip_prefix("ref: refs/heads/") {
+                        if let Some((branch, head)) = rest.split_once('\t') {
+                            if head == "HEAD" {
+                                default = json!(branch);
+                            }
+                        }
+                    } else if let Some((_, name)) = line.split_once('\t') {
+                        if let Some(branch) = name.strip_prefix("refs/heads/") {
+                            branches.push(json!(branch));
+                        }
+                    }
+                }
+                if default.is_null() {
+                    default = branches
+                        .iter()
+                        .find(|b| *b == "main" || *b == "master")
+                        .or(branches.first())
+                        .cloned()
+                        .unwrap_or(Value::Null);
+                }
+                message = if branches.is_empty() {
+                    "Connected. The remote repository is empty.".into()
+                } else {
+                    format!(
+                        "Connected. The remote has {} {}.",
+                        branches.len(),
+                        if branches.len() == 1 { "branch" } else { "branches" }
+                    )
+                };
+                extra = json!({"connected":true,"remoteBranches":branches,"defaultBranch":default});
+            }
+            "useRemoteBranch" => {
+                // A new repository adopts the remote's history, keeping any
+                // files here that the remote does not have.
+                if state["unborn"] != true {
+                    return Err("This repository already has commits. Use Sync to combine them with the remote.".into());
+                }
+                if entries.iter().any(|f| f["untracked"] != true) {
+                    return Err("Unstage changes before using the remote branch.".into());
+                }
+                let remote = s(args, "remote");
+                if !state["remotes"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .any(|r| s(r, "name") == remote)
+                {
+                    return Err("Add the remote first.".into());
+                }
+                let branch = reference(s(args, "branch"))?;
+                self.output(&["fetch", "--prune", "--", remote])?;
+                let tracking = format!("{remote}/{branch}");
+                self.output(&["checkout", "--track", "-b", branch, &tracking])
+                    .map_err(|e| {
+                        if e.contains("would be overwritten") {
+                            format!("Files here have the same names as files in the remote repository. Move or rename them, then retry. {e}")
+                        } else {
+                            e
+                        }
+                    })?;
+                message = format!("Downloaded {tracking}. This workspace now follows it.");
+                self.preferences = json!({"syncRemote":remote,"pushRemotes":[remote]});
+            }
             "configureRemotes" => {
                 let remote = s(args, "remote");
                 let names = args["pushRemotes"]
@@ -830,7 +1248,14 @@ impl Git {
                     return Err("Use a commit message of at most 10,000 characters.".into());
                 }
                 message = self
-                    .run(&["commit", "--file=-"], false, Some(input.as_bytes()))?
+                    .run(&["commit", "--file=-"], false, Some(input.as_bytes()))
+                    .map_err(|e| {
+                        if e.contains("tell me who you are") || e.contains("empty ident") {
+                            "Set the commit author name and email in Git setup, then retry.".into()
+                        } else {
+                            e
+                        }
+                    })?
                     .1;
             }
             "fetch" | "pull" | "push" | "sync" => {
@@ -994,29 +1419,21 @@ impl Git {
                     return Err("Use a valid remote name.".into());
                 }
                 let u = s(args, "url");
-                if u.len() > 2000
-                    || u.chars()
-                        .any(|c| c.is_whitespace() || c.is_control() || "?#".contains(c))
-                {
-                    return Err(
-                        "Use an HTTP(S) or SSH URL without credentials or query parameters.".into(),
-                    );
-                }
-                if let Ok(url) = url::Url::parse(u) {
-                    if !["http", "https", "ssh"].contains(&url.scheme())
-                        || url.host_str().is_none()
-                        || url.password().is_some()
-                        || (url.scheme() != "ssh" && !url.username().is_empty())
-                    {
-                        return Err("Use your system Git credentials.".into());
-                    }
-                } else if !regex::Regex::new(r"^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+:[\w./-]+$")
+                remote_url(u)?;
+                self.allowed_host(u)?;
+                let exists = state["remotes"]
+                    .as_array()
                     .unwrap()
-                    .is_match(u)
-                {
-                    return Err("Use an HTTP(S) or SSH Git URL.".into());
-                }
-                message = self.output(&["remote", "add", name, u])?;
+                    .iter()
+                    .any(|r| s(r, "name") == name);
+                // Setup replaces an existing remote's address when asked.
+                message = if exists && args["replace"] == true {
+                    self.output(&["remote", "set-url", name, u])?;
+                    format!("Remote {name} now uses {u}.")
+                } else {
+                    self.output(&["remote", "add", name, u])?;
+                    format!("Remote {name} added.")
+                };
             }
             "stash" => {
                 if state["unborn"] == true || entries.iter().any(|f| f["conflict"] == true) {
@@ -1169,11 +1586,28 @@ impl Git {
             }
             _ => return Err("Unknown Git action.".into()),
         }
-        Ok(if action == "sync" {
+        let mut result = if action == "sync" {
             json!({"committed":!entries.is_empty()||state["merging"]==true,"message":"All changes committed and synced.","status":self.status()?})
         } else {
             json!({"message":redact(message.trim()).chars().take(6000).collect::<String>(),"status":self.status()?})
-        })
+        };
+        if let (Some(map), Some(more)) = (result.as_object_mut(), extra.as_object()) {
+            map.extend(more.clone());
+        }
+        Ok(result)
+    }
+    /// Refuses remotes outside the server's permitted hosts.
+    fn allowed_host(&self, url: &str) -> Result<()> {
+        if self.hosts.is_empty() {
+            return Ok(());
+        }
+        match remote_host(url) {
+            Some(host) if self.hosts.iter().any(|h| h.eq_ignore_ascii_case(&host)) => Ok(()),
+            _ => Err(format!(
+                "This server allows Git remotes only on {}.",
+                self.hosts.join(", ")
+            )),
+        }
     }
 }
 fn parse_status(raw: &str) -> Value {

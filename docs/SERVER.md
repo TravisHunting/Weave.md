@@ -1,6 +1,6 @@
 # Weave Server
 
-Weave Server provides single-user HTTP access to Weave's existing Rust backend and browser interface, either inside the desktop app or as a dedicated headless process. Markdown remains authoritative. One SQLite database stores registrations, labels, monitoring preferences, deletion settings and derived indexes. The dedicated headless binary requires no Tauri, WebView, Node.js, Git executable or database service at runtime.
+Weave Server provides single-user HTTP access to Weave's existing Rust backend and browser interface, either inside the desktop app or as a dedicated headless process. Markdown remains authoritative. One SQLite database stores registrations, labels, monitoring preferences, deletion settings and derived indexes. The dedicated headless binary requires no Tauri, WebView, Node.js or database service at runtime; Git and OpenSSH are needed only for Source control ([Git and GitHub](#git-and-github)), and the Docker image includes both.
 
 ## Run locally
 
@@ -32,7 +32,7 @@ Up to 12 registered workspaces run concurrently, each with its existing `kb-…`
 
 The primary Windows and Linux desktop executable includes the HTTP server. Open **Settings › Web server**, select the workspaces to serve, whether to listen on **This computer only** (`127.0.0.1`) or **All network interfaces** (`0.0.0.0`) (**Advanced** accepts any address), the port and an optional browser origin, then select **Start server**. While it runs, the status card links every address the server accepts. Starting without an administrator password scrolls to the password field and explains what is missing. **Save settings** persists configuration without starting it. Set an administrator password before the first desktop-hosted start. **Save authentication** changes the username, replaces the password or configures Turnstile even while running; empty password/secret fields preserve existing values. **Restart server** stops and restarts the listener. **Stop server** drains admitted requests and releases the port. Stop before changing configuration. The server does not start automatically when opening the desktop.
 
-The workspace list defaults to the desktop’s active workspaces. Select any combination of known workspaces, even from different locations, or use **Open another workspace…** to add one through the desktop picker. **Use active workspaces** restores the current active selection. Saved selections persist. Only selected workspace identities are browser grants; other desktop workspaces remain private. Fresh browser tabs automatically load every selected workspace, while reloading the same tab preserves its deactivations until the controller selection changes. Use **W › Open workspace folder…** or **Settings › Workspaces › Open workspace folder…** in the browser to reopen a selected workspace. Browser users cannot add or remove controller grants. Desktop and HTTP access use the **same Backend, SQLite database, workspace scope, watcher and write lock**. HTTP registration cannot grant arbitrary desktop paths. Browser navigation stays per browser tab. Deactivating a desktop workspace keeps browser access alive; stopping the server keeps desktop access alive. The combined limit is 12 loaded workspaces. Stopping HTTP releases server-only workspaces and leaves desktop workspaces usable.
+The workspace list defaults to the desktop’s active workspaces. Select any combination of known workspaces, even from different locations, or use **Open another workspace…** to add one through the desktop picker. **Use active workspaces** restores the current active selection. Saved selections persist. Only selected workspace identities are browser grants; other desktop workspaces remain private. Fresh browser tabs automatically load every selected workspace, while reloading the same tab preserves its deactivations until the controller selection changes. Use **W › Open workspace folder…** or **Settings › Workspaces › Open workspace folder…** in the browser to reopen a selected workspace. Browser users cannot add or remove controller grants, so the browser start page offers Open but not Create workspace. Browser Source control uses this computer's Git with the hardening described in [Git and GitHub](#git-and-github). Deploy keys are stored in the desktop's data folder and shared by the desktop and its browsers. A workspace without a deploy key pushes over SSH with this account's own keys or agent. Desktop and HTTP access use the **same Backend, SQLite database, workspace scope, watcher and write lock**. HTTP registration cannot grant arbitrary desktop paths. Browser navigation stays per browser tab. Deactivating a desktop workspace keeps browser access alive; stopping the server keeps desktop access alive. The combined limit is 12 loaded workspaces. Stopping HTTP releases server-only workspaces and leaves desktop workspaces usable.
 
 Enable **Leave server running in background when Weave closes** before starting. Closing the window while the server runs hides it and preserves its state and unsaved drafts. The tray offers **Open Weave**, **Stop web server**, and **Quit Weave and stop server**. Launching Weave again restores the existing window. Quit still checks unsaved changes. Background mode requires a system tray; it lasts until Quit, logout or shutdown and is not a Windows service or Linux system service. Linux desktops need an AppIndicator-compatible tray (or reopen by launching Weave).
 
@@ -68,7 +68,16 @@ Open [localhost:8765](http://localhost:8765), or this computer's network address
 
 The Dockerfile builds the frontend with Node and the core with `--no-default-features --features server`. It fetches crates only for the container's own Linux target and leaves the Tauri CLI out of `npm ci`, so no desktop or Windows build tooling is downloaded. The Debian slim runtime contains the server, its system C runtime and dictionary licences. It runs as UID/GID `10001` with dropped capabilities, a read-only root filesystem, temporary `/tmp` and no privilege escalation. Scripts, styles, dictionaries and the export template are embedded. Source articles and repository secrets are excluded from the build context.
 
-For host-managed Markdown, replace the workspace volume in a Compose override:
+To keep workspaces and data in folders you choose rather than named volumes, run the helper once before starting. It creates the folders, gives them to the container's user (UID/GID `10001`, using `sudo` when needed) on Linux and writes `compose.override.yaml`:
+
+```sh
+sh scripts/server/prepare-folders.sh                                   # ./weave/workspaces and ./weave/data
+sh scripts/server/prepare-folders.sh --workspaces ~/Notes --data ~/.local/share/weave-server
+```
+
+On Windows with Docker Desktop, use `.\scripts\server\prepare-folders.ps1 [-Workspaces D:\Notes] [-Data D:\WeaveData]`; Docker Desktop maps ownership itself. Each direct child folder of the workspaces folder is a workspace, and the data folder holds accounts, indexes and Git deploy keys, so keep it private and back it up. Run the helper again with `--force` (`-Force`) to replace the override.
+
+To write the override by hand instead, replace the workspace volume:
 
 ```yaml
 services:
@@ -82,6 +91,40 @@ Keep libraries under that directory, or mount each separately at `/workspaces/Na
 Build arguments `NODE_VERSION` and `RUST_VERSION` pin the toolchain. `WEAVE_IMAGE` selects the image name. Once a trusted prebuilt image is available, select its tag/digest and use `docker compose up -d --no-build`. This change does not publish an image.
 
 Stop the server before copying both persistent volumes for a consistent backup. SIGTERM/Control+C stops accepting requests, drains admitted operations, stops the monitor and checkpoints SQLite. Each browser tab keeps navigation in session storage; the most recent saved session in local storage supplies article positions and layouts for a new tab or browser session. Desktop-hosted browser tabs always initially open the controller’s selected workspaces. New installations and restored appearance defaults use Aurora Flow and Light grey; saved explicit appearance choices remain unchanged. Clearing browser storage removes those preferences. Browser navigation and appearance are not server backups. Authentication sessions are managed separately by the server; include its private authentication store and initialization marker in backups. Unsaved drafts are not recovery backups; save before closing a tab.
+
+## Git and GitHub
+
+Browser users have the same **Source control** panel as the desktop: commit, stage, diff, branches, stashes, conflicts, pull, push and **Commit all & sync**. Weave authenticates to GitHub (or GitLab, or any SSH Git host) with a **deploy key**: an SSH key created by Weave for one workspace, whose public half you add to one repository. The private half stays in the server's data folder (`<data>/git-keys/<workspace id>/`) and is never sent to the browser.
+
+**Requirements.** The Docker image includes Git and OpenSSH. A server run directly needs `git` and `ssh`/`ssh-keygen` on its `PATH` (`sudo apt install git openssh-client` on Debian/Ubuntu; Git for Windows supplies both on Windows).
+
+### Set up Git for a workspace
+
+Open the workspace, then choose **Set up Git** on its start page (an empty tab), **W › Set up Git…**, or **Set up Git…** in Source control. The guide marks each step as it is done and can be closed and reopened at any point:
+
+1. **Create a Git repository.** Weave runs `git init` in the workspace folder. Your files are not changed.
+2. **Name your commits.** Enter the name and email shown on GitHub beside your changes. They are saved in this repository's Git configuration. To keep your address private, use the `…@users.noreply.github.com` address from GitHub › **Settings** › **Emails**.
+3. **Choose the GitHub repository.** On GitHub, select **New repository**. Leave the README, `.gitignore` and licence options off so it starts empty, or use an existing repository. Paste its address: the page URL (`https://github.com/you/notes`), the SSH address (`git@github.com:you/notes.git`) or `you/notes`. Weave stores the SSH form as the `origin` remote, because deploy keys authenticate over SSH.
+4. **Give Weave access with a deploy key.** Select **Create deploy key**, then **Copy public key**, then **Open GitHub deploy keys** (it opens *repository › Settings › Deploy keys › Add deploy key*; you need to be the repository's owner or an admin). On GitHub:
+   - **Title:** something recognisable, for example `Weave – Notes` (the guide offers one to copy).
+   - **Key:** paste the public key (it starts with `ssh-ed25519`).
+   - Tick **Allow write access**. Without it Weave can download but not push.
+   - Select **Add key**.
+
+   Back in Weave, select **Test connection**. The guide explains a refused key, a missing repository or a changed host key.
+5. **Connect and sync.** If the GitHub repository is empty, **Upload and sync** commits the workspace and pushes it as the first version. If it already has articles and this workspace has no commits yet, **Download from origin** checks out its default branch, keeping files here that the remote does not have. If a local file has the same name as one in the repository, the download stops so nothing is overwritten. Rename or move that file and retry.
+
+Afterwards, use **Commit all & sync** in Source control as usual. GitHub accepts a deploy key in one repository only, so each workspace gets its own key. **Create a new key** replaces it (add the new key on GitHub and delete the old one), and **Remove key** deletes it from the server. Removing a workspace from the server keeps its key; restore it by opening the folder again.
+
+GitHub's and GitLab.com's published SSH host keys are built in, so first connections to them are verified. For other hosts, the key presented on first contact is recorded in `<data>/git-keys/known_hosts`, and a later mismatch stops the connection.
+
+### Safety of server-side Git
+
+Browser requests run Git with repository hooks disabled, only `https`, `http` and `ssh` transports allowed, no submodule recursion, and Weave's SSH command in place of any `core.sshCommand` in the repository. Remotes must be HTTP(S) or SSH addresses without embedded credentials, and browsers can never write inside `.git`. Each workspace's Git lock keeps one Git operation per workspace at a time. Other workspaces, reading, searching and editing continue while it fetches or pushes, and a Git command stops after 90 seconds.
+
+To limit which hosts remotes may reach, set `--git-hosts github.com` (`WEAVE_GIT_HOSTS=github.com,gitlab.example.org` in `.env` for Compose). Remotes on other hosts, and existing remotes pointing elsewhere, are then refused. Anyone signed in to Weave can use a workspace's deploy key, so give a key write access only to repositories this Weave instance should change.
+
+Back up the data folder (or volume) with the workspaces: it holds the deploy keys. A lost key is simply replaced. Create a new key and add it on GitHub.
 
 ## Protected remote access
 
@@ -150,7 +193,7 @@ The allowlist exposes existing CRUD, monitoring, catalog delta/paging, search/ev
 
 Graph neighbourhoods return the existing bounded depth chunks in one HTTP response, using the same frontend adapter as Tauri Channels. Changes use status/catalog-delta polling, approximately every 1.4 seconds for visible tabs. WebSocket/SSE protocols are deferred. Core requests run on Tokio's blocking pool without a global backend lock. Workspace registration leaves initial indexing to the monitor.
 
-`POST /api/export` accepts `{op:"export", args:{scope, folder, graph, otherFiles}}` and returns a downloadable read-only HTML file. The server chooses its staging path and template. Caller-supplied OS paths/templates cannot redirect writes. Native dialogs, reveal commands, data relocation, arbitrary external-file writes, shutdown, metrics and Git execution are absent from the HTTP allowlist. Git hooks/configuration can execute host programs, so server Git execution is deferred; externally managed Git remains compatible.
+`POST /api/export` accepts `{op:"export", args:{scope, folder, graph, otherFiles}}` and returns a downloadable read-only HTML file. The server chooses its staging path and template. Caller-supplied OS paths/templates cannot redirect writes. Native dialogs, reveal commands, data relocation, arbitrary external-file writes, shutdown and metrics are absent from the HTTP allowlist. Git requests (`gitStatus`, `gitDiff`, `gitHistory`, `gitCommitDiff`, `gitIgnore`, `gitAction`) are allowed for scoped workspaces and always run hardened (see [Git and GitHub](#git-and-github)); the server sets that mode itself, so a caller cannot relax it or widen `--git-hosts`.
 
 Saves and Kanban writes require the current hash. Stale changes return HTTP 409 and leave the draft intact. Rename previews keep their existing expiring tokens and snapshots. There is no simultaneous editing merge, user model, CRDT or collaborative Git protocol. Evidence APIs remain available to programmatic callers; the existing core has no model/agent execution provider to expose. Normal browser clipboard permissions apply, and clipboard APIs require a secure context.
 

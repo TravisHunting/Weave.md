@@ -18,7 +18,14 @@ A tour of what Weave does and where to find it. For the Markdown format itself, 
 
 ## Workspaces
 
-Each folder you open is a workspace. Up to 12 can be active at once, each watched, searched and shown in its own Files and Source control section, with its own name and colour. Weave restores open workspaces, their tabs and the window position on the next launch.
+Each folder you open is a workspace. An empty tab shows the start page, whose buttons are the quickest way in:
+
+- **Create new workspace** asks for a name and makes an empty folder (on the desktop you then choose where; on Weave Server it is created in the server's workspace folder). **W › Create workspace…** does the same.
+- **Open existing workspace** opens a folder of Markdown files (**W › Open workspace folder…**).
+- **Activate a deactivated workspace** lists workspaces you deactivated, when there are any.
+- With a workspace open: **New article**, **Random article**, and **Set up Git** while the workspace is not yet connected to a Git remote.
+
+Up to 12 workspaces can be active at once, each watched, searched and shown in its own Files and Source control section, with its own name and colour. Weave restores open workspaces, their tabs and the window position on the next launch.
 
 **Control panel › Workspaces** renames, recolours, reorders and deactivates workspaces. A deactivated workspace keeps its tabs and cache and can be reactivated from the same list or the opening screen. The *workspace in use* is the active tab's: new articles, new tabs and Deep search use it.
 
@@ -86,7 +93,9 @@ Boards and cards are ordinary articles with a little frontmatter ([format](AUTHO
 
 ## Source control
 
-Source control has one section per workspace. It needs Git installed separately and uses your system credentials.
+Source control has one section per workspace. It needs Git installed separately (Weave Server's Docker image includes it). On the desktop it uses your system credentials or a deploy key; Weave Server uses deploy keys.
+
+**Set up Git** (start page, **W › Set up Git…**, or Source control) is a step-by-step guide. It creates the repository, sets the commit author, connects a GitHub repository by its address and creates a **deploy key**: Weave keeps the private key and you add the public key under the repository's **Settings › Deploy keys** on GitHub, with **Allow write access** ticked. It then tests the connection and uploads the workspace, or downloads an existing repository into it. [SERVER.md › Git and GitHub](SERVER.md#git-and-github) walks through each step. On the desktop, **Use my own Git credentials** skips the deploy key.
 
 - Stage, unstage, discard and commit (Ctrl+Enter); side-by-side or unified diffs; history; branches; stash; fetch, pull and push.
 - **Commit all & sync** commits, merges incoming changes and pushes to every checked remote.
@@ -113,7 +122,7 @@ Source control has one section per workspace. It needs Git installed separately 
 
 ## Phones and narrow windows
 
-In browsers narrower than 760 px, and on phones, Weave switches to a phone layout: the article fills the screen, Files and the sidebars slide in as drawers, the tab bar hides while you read, the graph pinch-zooms and the browser's Back closes menus and drawers first. It works with every skin.
+In browsers narrower than 760 px, and on phones, Weave switches to a phone layout: it opens on the start page with large buttons (including **Browse files**), the article fills the screen, Files and the sidebars slide in as drawers, the tab bar hides while you read, the graph pinch-zooms and the browser's Back closes menus and drawers first. It works with every skin.
 
 ## Your data
 
@@ -126,6 +135,7 @@ Weave keeps one application folder, outside your workspaces:
   webview/
   operations/         rename journals for recovery
   trash/              only if delete backups are enabled
+  git-keys/           deploy keys made by Set up Git (private; one folder per workspace)
 ```
 
 - The graph, search and Kanban rows in `weave.sqlite` are rebuilt from your Markdown whenever needed, but keep the file: it also holds sessions, workspace names and colours, and Git preferences.

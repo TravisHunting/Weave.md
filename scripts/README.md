@@ -89,7 +89,7 @@ Running it by hand (Actions › Release › Run workflow) shows a form: tick the
 git tag v1.0.0 && git push origin v1.0.0
 ```
 
-[docs/LINUX.md](../docs/LINUX.md) records the Linux build machine and toolchain. The headless server builds with `npm run build:server:native`; see [docs/SERVER.md](../docs/SERVER.md).
+[docs/LINUX.md](../docs/LINUX.md) records the Linux build machine and toolchain. The headless server builds with `npm run build:server:native`; see [docs/SERVER.md](../docs/SERVER.md). `scripts/server/prepare-folders.sh` (Linux/macOS) and `prepare-folders.ps1` (Windows) prepare host folders for the Docker image (owned by its UID 10001 on Linux) and write `compose.override.yaml`. A server run outside Docker needs `git` and OpenSSH (`ssh`, `ssh-keygen`) for browser Source control and deploy keys.
 
 ## Benchmarks
 

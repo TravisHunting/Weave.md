@@ -123,3 +123,5 @@
 @media (prefers-reduced-motion:reduce){
   :root[data-layout=mobile] :is(.shell>:is(.rail,#sidebar,#right-sidebar),main>.editor-group,#tab-bar){transition:none!important}
 }
+:root[data-layout=mobile][data-skin] .welcome-actions{grid-template-columns:1fr;gap:8px}:root[data-layout=mobile][data-skin] .welcome-action{min-height:48px}:root[data-layout=mobile][data-skin] .git-setup-dialog{width:100vw;max-width:none;max-height:100dvh;height:100dvh;margin:0;border-radius:0;padding:16px}:root[data-layout=mobile][data-skin] .git-setup-dialog button{min-height:40px}:root[data-layout=mobile][data-skin] .git-setup-body{padding-left:0}
+:root[data-layout=mobile][data-skin] .git-setup-summary{margin-left:0}

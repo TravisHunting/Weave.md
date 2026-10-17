@@ -11,7 +11,7 @@ Weave is a local-first Markdown workspace for structured, shared knowledge. Arti
 - **Links that say what they mean.** `[Snowflake](./snowflake.md "depends-on")` is a normal Markdown link that also tells the graph *how* two things relate, so you can answer "what feeds this table?" rather than only "what mentions this note?".
 - **Portable by default.** Relative links, optional OKF frontmatter, no `[[wiki links]]` and no proprietary database. Your library works without Weave.
 - **Several workspaces at once.** Keep personal notes beside team and organisation knowledge bases in one window, each with its own colour, and search across all of them.
-- **Git built in.** Stage, commit, diff, branch, sync to several remotes and resolve merge conflicts visually, with no plugin.
+- **Git built in.** Stage, commit, diff, branch, sync to several remotes and resolve merge conflicts visually, with no plugin. A guided setup connects a workspace to GitHub with a deploy key, from the desktop or any browser.
 - **Share a whole knowledge base as one file.** Export a workspace as a single offline, read-only `.html` file anyone can open in a browser.
 - **Fast and small.** A Rust backend with embedded SQLite FTS5, a native WebView instead of a bundled Chromium, and an interface that stays responsive at hundreds of thousands of articles.
 - **Made for agents too.** Plain files, prose relationships, a validator and authoring rules mean AI agents can read and maintain the same knowledge you do.

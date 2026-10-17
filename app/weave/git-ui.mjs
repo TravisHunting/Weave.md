@@ -65,15 +65,15 @@ function renderDiff(text, split = false) {
 }
 
 // Several panels can exist, one per open workspace; `idSuffix` keeps their element IDs unique.
-export function createGitPanel({client, container, beforeAction = async () => {}, afterMutation = async () => {}, openFile = async () => {}, idSuffix = '', onPendingCount, onBusy}) {
+export function createGitPanel({client, container, beforeAction = async () => {}, afterMutation = async () => {}, openFile = async () => {}, idSuffix = '', onPendingCount, onBusy, onStatus, onSetup}) {
   let state = null, busy = false, generation = 0, refreshing = false, refreshedAt = 0, refreshCost = 0, selectedRemote = '', pushRemotes = [], defaultMessage = '', historyLoaded = false, diff = null, split = true, conflict = null, conflictChoice = 'manual';
   const dialog = document.createElement('dialog'); dialog.id = 'git-diff-dialog' + idSuffix; dialog.className = 'git-diff-dialog'; dialog.setAttribute('aria-labelledby', 'git-diff-title'); document.body.append(dialog);
   const conflictDialog = document.createElement('dialog'); conflictDialog.id = 'git-conflict-dialog' + idSuffix; conflictDialog.className = 'git-diff-dialog git-conflict-dialog'; conflictDialog.setAttribute('aria-labelledby', 'git-conflict-title'); document.body.append(conflictDialog);
   container.innerHTML = `<div class="git-toolbar" role="toolbar" aria-label="Source control actions">${iconButton('sync','Commit all & sync','id="git-commit-sync"')}${iconButton('commit','Commit staged changes','id="git-commit"')}${iconButton('stageAll','Stage all changes')}${iconButton('unstageAll','Unstage all changes')}${iconButton('push','Push branch to selected remotes')}${iconButton('pull','Pull (fast-forward only)')}${iconButton('fetch','Fetch remote updates')}${iconButton('refresh','Refresh source control')}</div>
-    <div class="git-summary"><strong id="git-branch">Source control</strong></div><p id="git-repository-note" class="hint"></p><div id="git-notice" class="git-notice" role="status" aria-live="polite"></div><div id="git-setup" hidden></div>
+    <div class="git-summary"><strong id="git-branch">Source control</strong></div><p id="git-repository-note" class="hint"></p><div id="git-notice" class="git-notice" role="status" aria-live="polite"></div><div id="git-setup" hidden></div><div id="git-connect" class="git-connect" hidden><p>This repository is not connected to GitHub or another remote yet.</p>${button('setup', 'Set up Git…', 'Connect this workspace to GitHub with a deploy key')}</div>
     <div id="git-repository" hidden><form id="git-commit-form"><label for="git-commit-message" class="git-visually-hidden">Commit message</label><input id="git-commit-message" type="text" maxlength="10000" placeholder="Commit message (Ctrl+Enter)" aria-label="Commit message" title="Current UTC timestamp by default. Enter your own message to replace it." autocomplete="off"></form><p id="git-sync-status" class="hint"></p><div id="git-changes"></div>
     <div class="git-repository-controls"><div class="git-branch-control"><label for="git-branches">Branch</label><select id="git-branches" aria-label="Current Git branch"></select>${button('newBranch', '+', 'Create branch')}</div></div>
-    ${button('editIgnore','Edit .gitignore')}<details id="git-remote-management"><summary>Remote management</summary><div class="git-remote-control"><label for="git-remotes">Fetch / pull</label><select id="git-remotes" aria-label="Git fetch and pull remote"></select></div><p class="hint">Sync fetches and merges from this remote, then pushes to every checked remote. Only this remote can set the branch upstream.</p><fieldset class="git-push-remotes"><legend>Push to</legend><div id="git-push-remotes"></div></fieldset><form id="git-add-remote-form"><label for="git-remote-name">Remote name</label><input id="git-remote-name" maxlength="100" placeholder="origin" required autocomplete="off"><label for="git-remote-url">Clone URL (HTTPS or SSH)</label><input id="git-remote-url" maxlength="2000" placeholder="https://host/repository.git" required autocomplete="off"><button type="submit">Add remote</button></form></details>
+    ${button('editIgnore','Edit .gitignore')}<details id="git-remote-management"><summary>Remote management</summary>${button('setup', 'Git setup & deploy key…', 'Open the Git setup guide: commit author, remote and deploy key')}<div class="git-remote-control"><label for="git-remotes">Fetch / pull</label><select id="git-remotes" aria-label="Git fetch and pull remote"></select></div><p class="hint">Sync fetches and merges from this remote, then pushes to every checked remote. Only this remote can set the branch upstream.</p><fieldset class="git-push-remotes"><legend>Push to</legend><div id="git-push-remotes"></div></fieldset><form id="git-add-remote-form"><label for="git-remote-name">Remote name</label><input id="git-remote-name" maxlength="100" placeholder="origin" required autocomplete="off"><label for="git-remote-url">Clone URL (HTTPS or SSH)</label><input id="git-remote-url" maxlength="2000" placeholder="https://host/repository.git" required autocomplete="off"><button type="submit">Add remote</button></form></details>
     <details id="git-recent-pulls"><summary>Recently pulled files</summary><div id="git-recent-pull-list"></div></details><details id="git-more"><summary>Branches &amp; stashes</summary><p class="hint">Save tracked changes in a stash before switching branches. Stage new files to include them.</p>${button('stash', 'Stash tracked changes')}<div id="git-stashes"></div></details><details id="git-history"><summary>Recent commits</summary><div id="git-history-list"></div></details></div>`;
   const ignoreDialog = document.createElement('dialog'); ignoreDialog.id='git-ignore-dialog'+idSuffix; ignoreDialog.className='git-diff-dialog';
   ignoreDialog.innerHTML='<form><div class="git-diff-heading"><h2>Edit .gitignore</h2><button type="button" data-ignore-close aria-label="Close .gitignore editor">×</button></div><p class="hint">Patterns are relative to the repository root. Saving does not stage or commit the file.</p><label for="git-ignore-text">Ignored files and folders</label><textarea id="git-ignore-text" spellcheck="false"></textarea><p data-ignore-error role="alert"></p><div class="git-diff-footer"><button type="button" data-ignore-close>Cancel</button><button type="submit">Save .gitignore</button></div></form>';
@@ -150,8 +150,9 @@ export function createGitPanel({client, container, beforeAction = async () => {}
     find('git-branch').textContent = state?.repository ? (state.detached ? 'Detached HEAD · ' + state.oid.slice(0, 8) : '⑂ ' + state.branch) : 'Source control';
     if (!state?.repository) {
       find('git-repository-note').textContent = !client.capabilities.git ? 'Source control is available in the desktop application.' : state?.parentRepository ? 'Open the repository root to manage every change together: ' + state.parentRepository : state?.error || 'This workspace is not a Git repository.';
-      find('git-setup').innerHTML = client.capabilities.git && state?.available && !state.parentRepository ? button('init', ui('Initialise repository')) : '';
-      updateControls();
+      find('git-setup').innerHTML = client.capabilities.git && state?.available && !state.parentRepository ? (onSetup ? `<p>Keep a history of this workspace and share it through GitHub.</p>${button('setup', 'Set up Git…', 'Set up Git for this workspace')} ` : '') + button('init', ui('Initialise repository')) : '';
+      find('git-connect').hidden = true;
+      updateControls(); onStatus?.(state);
       return;
     }
     find('git-repository-note').textContent = state.root; find('git-repository-note').title = state.root;
@@ -169,7 +170,8 @@ export function createGitPanel({client, container, beforeAction = async () => {}
     find('git-changes').innerHTML = fileGroup('Merge changes', conflicts, false) + fileGroup('Staged changes', staged, true) + fileGroup('Changes', unstaged, false) + (!state.files.length ? `<div class="git-clean"><span aria-hidden="true">✓</span><strong>${state.merging ? 'Conflicts resolved' : 'Working tree clean'}</strong><p>${state.merging ? 'Commit to complete the merge.' : 'All changes are committed.'}</p></div>` : '');
     find('git-stashes').innerHTML = state.stashes.map(stash => `<div class="git-stash"><span>${esc(stash.message)}</span>${button('applyStash', 'Apply', 'Apply ' + stash.ref + ' (keep stash)', `data-ref="${esc(stash.ref)}"`)}</div>`).join('') || '<p class="hint">No saved stashes.</p>';
     if (state.privateStaged) announce('Private Weave data is staged. Unstage it in an external Git client before committing.', true);
-    updateControls();
+    find('git-connect').hidden = !onSetup || state.remotes.length > 0;
+    updateControls(); onStatus?.(state);
   }
   async function refresh({quiet = false} = {}) {
     if (refreshing || busy || !client.capabilities.git) {if (!client.capabilities.git) render(); return;}
@@ -284,6 +286,7 @@ export function createGitPanel({client, container, beforeAction = async () => {}
       } return;
     }
     if (name === 'editIgnore') return editIgnore();
+    if (name === 'setup') return onSetup?.();
     if (name === 'init' && !await ask(ui('Initialise repository?'), 'Create Git history for this workspace. Stage and commit selected files to record your first version.', {confirm: ui('Initialise')})) return;
     if (serial !== generation) return;
     await action(name, {path: target.closest('.git-file')?.dataset.path, ref: target.dataset.ref});
@@ -297,6 +300,18 @@ export function createGitPanel({client, container, beforeAction = async () => {}
   find('git-history').ontoggle = () => {if (find('git-history').open) loadHistory();};
   dialog.addEventListener('click', event => {if (event.target === dialog) {const rect = dialog.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();}});
   const timer = setInterval(() => {if (!document.hidden) {if (!busy) timestampMessage(); refresh({quiet: true});}}, 6000);
+  /** Runs one Git action for the setup guide; errors are thrown to the caller. */
+  async function perform(name, args = {}) {
+    if (busy) throw new Error('Source control is busy. Try again in a moment.');
+    const serial = generation; lock(true);
+    try {
+      await beforeAction(name);
+      const result = await client.call('gitAction', {action: name, ...args});
+      if (serial === generation) {state = result.status; historyLoaded = false; render(); announce(result.message || 'Done.');}
+      await afterMutation(name);
+      return result;
+    } finally {lock(false);}
+  }
   render();
-  return {refresh, reset() {generation++; state = null; historyLoaded = false; selectedRemote = ''; pushRemotes = []; timestampMessage(true); find('git-remote-name').value = ''; find('git-remote-url').value = ''; find('git-history-list').innerHTML = ''; announce(''); dialog.close(); conflictDialog.close(); ignoreDialog.close();fileMenu.hidden=true;render();}, destroy() {clearInterval(timer); dialog.remove(); conflictDialog.remove();ignoreDialog.remove();fileMenu.remove();document.removeEventListener('click',closeMenu);document.removeEventListener('keydown',closeMenu);}};
+  return {refresh, perform, get status() {return state;}, reset() {generation++; state = null; historyLoaded = false; selectedRemote = ''; pushRemotes = []; timestampMessage(true); find('git-remote-name').value = ''; find('git-remote-url').value = ''; find('git-history-list').innerHTML = ''; announce(''); dialog.close(); conflictDialog.close(); ignoreDialog.close();fileMenu.hidden=true;render();}, destroy() {clearInterval(timer); dialog.remove(); conflictDialog.remove();ignoreDialog.remove();fileMenu.remove();document.removeEventListener('click',closeMenu);document.removeEventListener('keydown',closeMenu);}};
 }

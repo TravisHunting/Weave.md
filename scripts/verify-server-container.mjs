@@ -48,19 +48,26 @@ async function stop() {
 try {
   await start();
   assert.equal(await run('exec',name,'id','-u'),'10001');
-  const binaries=await run('exec',name,'sh','-c','for tool in node npm cargo git; do command -v "$tool" || true; done');
+  const binaries=await run('exec',name,'sh','-c','for tool in node npm cargo; do command -v "$tool" || true; done');
   assert.equal(binaries,'','the production image has no build/desktop helper tools');
+  assert.equal((await run('exec',name,'sh','-c','for tool in git ssh ssh-keygen; do command -v "$tool"; done')).split('\n').length,3,'Git and OpenSSH are installed for Source control');
   const a=await call('serverOpen',{name:'Alpha',create:true}), b=await call('serverOpen',{name:'Beta',create:true});
   await call('create',{scope:a.scope,path:'Start.md',text:'# Container persistence\n'});
   await call('create',{scope:b.scope,path:'Start.md',text:'# Independent workspace\n'});
   await call('configureWorkspace',{id:a.workspace.id,name:'Container notes',color:'#123456'});
+  // Browser Source control: a repository, a commit and a deploy key kept in /data.
+  const git=(action,args={})=>call('gitAction',{scope:a.scope,action,...args});
+  await git('init'); await git('configureIdentity',{name:'Container Tester',email:'tester@example.org'});
+  await git('stageAll'); assert.equal((await git('commit',{message:'First'})).status.unborn,false,'commits work in the read-only container');
+  const key=(await git('createDeployKey')).deployKey; assert.match(key.publicKey,/^ssh-ed25519 /);
   const first=instance; await stop(); await start(); assert.notEqual(instance,first);
   const panel=await call('controlPanel'); assert.equal(panel.workspaces.length,2);
   assert.equal(panel.workspaces.find(w=>w.id===a.workspace.id).name,'Container notes');
   const restored=await call('reopen',{id:a.workspace.id});
   assert.equal((await call('getDocument',{scope:restored.scope,path:'Start.md'})).text,'# Container persistence\n');
+  assert.equal((await call('gitStatus',{scope:restored.scope})).deployKey.publicKey,key.publicKey,'the deploy key persists in the data volume');
   await stop();
-  console.log('Container passed: UID 10001, read-only root, dropped capabilities, no build helpers, independent workspaces, volume persistence after recreation and graceful SIGTERM.');
+  console.log('Container passed: UID 10001, read-only root, dropped capabilities, no build helpers, Git with persistent deploy keys, independent workspaces, volume persistence after recreation and graceful SIGTERM.');
 } finally {
   await run('rm','-f',name).catch(()=>{});
   await run('volume','rm',data,workspaces).catch(()=>{});

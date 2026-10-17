@@ -57,6 +57,17 @@ fn lock(directory: &Path) -> Result<fs::File> {
     })?;
     Ok(f)
 }
+/// The workspace's Git, set up for the request's host: the HTTP server marks
+/// its requests (`_host`) so Git runs hardened and within permitted hosts.
+fn git_for<'a>(m: &'a Mutex<Git>, args: &Value) -> std::sync::MutexGuard<'a, Git> {
+    let mut git = guard(m);
+    git.hardened = args["_host"]["hardened"] == true;
+    git.hosts = args["_host"]["gitHosts"]
+        .as_array()
+        .map(|a| a.iter().filter_map(|h| h.as_str().map(String::from)).collect())
+        .unwrap_or_default();
+    git
+}
 fn guard<T>(m: &Mutex<T>) -> std::sync::MutexGuard<'_, T> {
     m.lock().unwrap_or_else(|poisoned| poisoned.into_inner())
 }
@@ -538,7 +549,10 @@ impl Backend {
         let known = self.database.has_entries(&id)?;
         let scope = self.next_scope.fetch_add(1, Ordering::AcqRel) + 1;
         let workspace = Arc::new(Workspace {
-            git: Mutex::new(Git::new(&root, git_state, self.stopping.clone())),
+            git: Mutex::new(
+                Git::new(&root, git_state, self.stopping.clone())
+                    .with_keys(self.runtime.join("git-keys"), &id),
+            ),
             sensitive: detect_case(&root),
             id,
             name,
@@ -1804,16 +1818,16 @@ impl Backend {
             "kanbanSave" => self.kanban_save(w, &args),
             "buildEvidenceBundle" => self.evidence(w, &args),
             "exportWorkspace" => self.export(w, &args),
-            "gitStatus" => guard(&w.git).status(),
-            "gitIgnore" => guard(&w.git).ignore(),
-            "gitDiff" => guard(&w.git).diff(&args),
-            "gitHistory" => guard(&w.git).history(),
-            "gitCommitDiff" => guard(&w.git).commit_diff(&args),
+            "gitStatus" => git_for(&w.git, &args).status(),
+            "gitIgnore" => git_for(&w.git, &args).ignore(),
+            "gitDiff" => git_for(&w.git, &args).diff(&args),
+            "gitHistory" => git_for(&w.git, &args).history(),
+            "gitCommitDiff" => git_for(&w.git, &args).commit_diff(&args),
             "gitAction" => {
                 // Git runs under this workspace's Git lock only: reading,
                 // searching and editing continue while it fetches or pushes.
                 let (result, saved) = {
-                    let mut git = guard(&w.git);
+                    let mut git = git_for(&w.git, &args);
                     let result = git.action(&args);
                     (result, git.saved())
                 };
@@ -1822,6 +1836,10 @@ impl Backend {
                 // returning; the watcher covers the rest.
                 let index_only = [
                     "init",
+                    "configureIdentity",
+                    "createDeployKey",
+                    "removeDeployKey",
+                    "testRemote",
                     "configureRemotes",
                     "addRemote",
                     "saveIgnore",

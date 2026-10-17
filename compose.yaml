@@ -8,6 +8,11 @@ name: weave
 #   WEAVE_ORIGIN               accept only this public https:// origin
 #   WEAVE_ALLOWED_HOSTS=local  accept only localhost and the container's own
 #                              addresses (default any host name)
+#   WEAVE_GIT_HOSTS            hosts Git remotes may reach, e.g. github.com
+#                              (default any host)
+# To keep workspaces in folders of your own, run scripts/server/prepare-folders.sh
+# (Linux/macOS) or scripts/server/prepare-folders.ps1 (Windows) first; it writes
+# compose.override.yaml.
 services:
   weave:
     image: ${WEAVE_IMAGE:-weave-server:local}
@@ -18,6 +23,7 @@ services:
     environment:
       WEAVE_ORIGIN: ${WEAVE_ORIGIN:-}
       WEAVE_ALLOWED_HOSTS: ${WEAVE_ALLOWED_HOSTS:-}
+      WEAVE_GIT_HOSTS: ${WEAVE_GIT_HOSTS:-}
       WEAVE_ADMIN_USERNAME: ${WEAVE_ADMIN_USERNAME:-}
       WEAVE_ADMIN_PASSWORD: ${WEAVE_ADMIN_PASSWORD:-}
     ports:

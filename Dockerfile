@@ -27,8 +27,15 @@ RUN cargo build --offline --locked --release --manifest-path src-tauri/Cargo.tom
     && strip src-tauri/target/release/weave-server
 
 FROM docker.io/library/debian:bookworm-slim AS runtime
-RUN groupadd --gid 10001 weave && useradd --uid 10001 --gid weave --no-create-home weave \
+# Git and OpenSSH power Source control from the browser: commits, and pushes
+# with per-workspace deploy keys kept in /data/git-keys.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git openssh-client ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --gid 10001 weave && useradd --uid 10001 --gid weave --no-create-home weave \
     && mkdir /data /workspaces && chown weave:weave /data /workspaces
+# The root filesystem is read-only; Git and SSH get a writable home in /tmp.
+ENV HOME=/tmp
 COPY --from=backend /src/src-tauri/target/release/weave-server /usr/local/bin/weave-server
 COPY --from=frontend /src/node_modules/dictionary-en/license /usr/share/doc/weave/dictionary-en.txt
 COPY --from=frontend /src/node_modules/dictionary-en-gb/license /usr/share/doc/weave/dictionary-en-gb.txt

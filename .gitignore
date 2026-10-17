@@ -10,3 +10,5 @@ src-tauri/gen/
 .weave-server/
 /workspaces/
 .env
+/weave/
+compose.override.yaml

@@ -87,6 +87,7 @@ export async function createHttpClient({fetch: fetcher = globalThis.fetch.bind(g
   const client = await createNativeClient({Channel, invoke: async (command, input = {}) => {
     if (command === 'weave_request') return call(input.op, input.args || {});
     if (command === 'choose_workspace') return adopt(await choose(post));
+    if (command === 'create_workspace') return adopt(await post('serverOpen', {name: input.name, create: true}));
     if (command === 'weave_graph_neighborhood') {
       const result = await post('graphNeighborhood', input.args);
       for (const chunk of result.chunks) input.onChunk.onmessage(chunk);

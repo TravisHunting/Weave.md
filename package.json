@@ -1,6 +1,6 @@
 {
   "name": "weave",
-  "version": "1.0.0",
+  "version": "0.3.1",
   "private": true,
   "type": "module",
   "description": "Local Markdown knowledge with typed relationships and native chunk-based FTS5 search",

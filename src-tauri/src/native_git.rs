@@ -1,5 +1,6 @@
 //! Fixed Git vocabulary, argument arrays only, scoped to an opened repository.
 use crate::native_files::{self as files, err, Result};
+use fs2::FileExt;
 use serde_json::{json, Value};
 use std::{
     fs,
@@ -28,6 +29,58 @@ pub struct Git {
     pub hardened: bool,
     /// Remote hosts the server permits (empty: any host).
     pub hosts: Vec<String>,
+    /// Automatic snapshot settings (`snapshot_settings`), kept with the
+    /// workspace's other Git preferences.
+    pub snapshots: Value,
+    /// The latest snapshot and why the last attempt did not commit.
+    pub snapshot_state: Value,
+}
+/// Seconds after which another Weave process may take over a repository's
+/// snapshot lease that was not renewed.
+const LEASE_SECONDS: u64 = 180;
+/// Validated automatic snapshot settings: `enabled`, `trigger` (`idle`: after
+/// `minutes` without changes; `interval`: every `minutes`), `push` and `onClose`.
+pub fn snapshot_settings(v: &Value) -> Result<Value> {
+    let mut out = json!({"enabled":false,"trigger":"idle","minutes":15,"push":false,"onClose":true});
+    if let Some(map) = v.as_object() {
+        for (key, value) in map {
+            match key.as_str() {
+                "enabled" | "push" | "onClose" => {
+                    out[key] = json!(value
+                        .as_bool()
+                        .ok_or("Choose on or off for each snapshot setting.")?)
+                }
+                "trigger" => {
+                    let trigger = value.as_str().unwrap_or("");
+                    if !["idle", "interval"].contains(&trigger) {
+                        return Err("Choose when snapshots are taken.".into());
+                    }
+                    out[key] = json!(trigger);
+                }
+                "minutes" => {
+                    out[key] = json!(value
+                        .as_u64()
+                        .filter(|m| (1..=1440).contains(m))
+                        .ok_or("Snapshot times are between 1 and 1440 minutes.")?)
+                }
+                _ => return Err("Unknown snapshot setting.".into()),
+            }
+        }
+    }
+    Ok(out)
+}
+/// A full commit ID from the history.
+fn commit_id(id: &str) -> Result<&str> {
+    if !(40..=64).contains(&id.len()) || !id.bytes().all(|b| b.is_ascii_hexdigit()) {
+        return Err("Choose a commit from the history.".into());
+    }
+    Ok(id)
+}
+fn unix_now() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0)
 }
 /// Host keys GitHub and GitLab.com publish, so the first connection to
 /// them is verified rather than trusted. Other hosts are recorded on first use.
@@ -152,6 +205,13 @@ impl Git {
             key_id: String::new(),
             hardened: false,
             hosts: vec![],
+            snapshots: snapshot_settings(&saved["snapshots"])
+                .unwrap_or_else(|_| snapshot_settings(&Value::Null).unwrap()),
+            snapshot_state: if saved["snapshotState"].is_object() {
+                saved["snapshotState"].clone()
+            } else {
+                json!({})
+            },
         }
     }
     /// Keeps this workspace's deploy key under `keys/<id>`.
@@ -261,7 +321,7 @@ impl Git {
         Ok(self.deploy_key())
     }
     pub fn saved(&self) -> Value {
-        json!({"preferences":self.preferences,"pulls":self.pulls})
+        json!({"preferences":self.preferences,"pulls":self.pulls,"snapshots":self.snapshots,"snapshotState":self.snapshot_state})
     }
     fn executable() -> PathBuf {
         if cfg!(windows) {
@@ -491,7 +551,7 @@ impl Git {
             .map_err(|e| format!("Choose a file inside this repository. {e}"))?;
         Ok(p.into())
     }
-    fn repository(&self) -> Result<Value> {
+    pub(crate) fn repository(&self) -> Result<Value> {
         let (code, out, error) = self.run(&["rev-parse", "--show-toplevel"], true, None)?;
         if code != 0 {
             if error.contains("not a git repository") {
@@ -621,6 +681,11 @@ impl Git {
         info["merging"] = json!(merging);
         info["pendingFileCount"] = json!(pending.len());
         info["recentPulls"] = self.pulls.clone();
+        let mut snapshots = self.snapshots.clone();
+        if let (Some(map), Some(state)) = (snapshots.as_object_mut(), self.snapshot_state.as_object()) {
+            map.extend(state.clone());
+        }
+        info["snapshots"] = snapshots;
         info["busy"] = Value::Null;
         Ok(info)
     }
@@ -802,50 +867,69 @@ impl Git {
             json!({"path":p,"staged":args["staged"]==true,"binary":text.contains("\nBinary files "),"text":text}),
         )
     }
-    pub fn history(&self) -> Result<Value> {
+    /// Recent commits, newest first: `limit` (1–200, default 40) after
+    /// `skip`, optionally only those that changed `path`. Snapshots that Weave
+    /// made are marked `snapshot` with their kind.
+    pub fn history(&self, args: &Value) -> Result<Value> {
         self.require()?;
-        let (code, out, e) = self.run(
-            &[
-                "log",
-                "-40",
-                "--date=iso-strict",
-                "--format=%H%x00%h%x00%an%x00%ad%x00%s%x00%D%x1e",
-            ],
-            true,
-            None,
-        )?;
+        let limit = format!("-{}", args["limit"].as_u64().unwrap_or(40).clamp(1, 200));
+        let skip = format!("--skip={}", args["skip"].as_u64().unwrap_or(0).min(1_000_000));
+        let path = match s(args, "path") {
+            "" => None,
+            p if private(p) => return Err("Choose a file inside this repository.".into()),
+            p => Some(self.safe(p, true)?),
+        };
+        let mut command = vec![
+            "log",
+            &limit,
+            &skip,
+            "--date=iso-strict",
+            "--format=%H%x00%h%x00%an%x00%ad%x00%s%x00%D%x00%(trailers:key=Weave-Snapshot,valueonly,separator=%x2C)%x1e",
+        ];
+        if let Some(p) = &path {
+            command.extend(["--", p.as_str()]);
+        }
+        let (code, out, e) = self.run(&command, true, None)?;
         if code != 0 {
             if e.contains("does not have any commits") {
                 return Ok(json!([]));
             }
             return Err(e);
         }
-        Ok(json!(out.split('\u{1e}').filter_map(|r|{let p:Vec<_>=r.trim().split('\0').collect();(p.len()>=6).then(||json!({"id":p[0],"short":p[1],"author":p[2],"date":p[3],"subject":redact(p[4]),"refs":p[5]}))}).collect::<Vec<_>>()))
+        Ok(json!(out.split('\u{1e}').filter_map(|r|{let p:Vec<_>=r.trim().split('\0').collect();(p.len()>=6).then(||{let kind=p.get(6).map(|k|k.trim()).unwrap_or("");json!({"id":p[0],"short":p[1],"author":p[2],"date":p[3],"subject":redact(p[4]),"refs":p[5],"snapshot":if kind.is_empty(){Value::Null}else{json!(kind)}})})}).collect::<Vec<_>>()))
     }
+    /// One commit's changes, with the files it changed (`files`: path and
+    /// status letter). With `path`, only that file's changes are shown.
     pub fn commit_diff(&self, args: &Value) -> Result<Value> {
         self.require()?;
-        let id = s(args, "id");
-        if !(40..=64).contains(&id.len()) || !id.bytes().all(|b| b.is_ascii_hexdigit()) {
-            return Err("Choose a commit from the history.".into());
-        }
+        let id = commit_id(s(args, "id"))?;
         let names = self.output(&[
             "diff-tree",
             "--no-commit-id",
-            "--name-only",
+            "--name-status",
+            "--no-renames",
             "-r",
             "-z",
             "--root",
             id,
         ])?;
-        let paths: Vec<_> = names
-            .split('\0')
-            .filter(|p| !p.is_empty() && !private(p))
-            .collect();
-        for p in &paths {
-            self.safe(p, true)?;
+        let mut files = vec![];
+        let mut it = names.split('\0').filter(|p| !p.is_empty());
+        while let (Some(status), Some(p)) = (it.next(), it.next()) {
+            if !private(p) {
+                self.safe(p, true)?;
+                files.push(json!({"path":p,"status":&status[..1]}));
+            }
         }
+        let wanted = s(args, "path");
+        let paths: Vec<&str> = files
+            .iter()
+            .map(|f| s(f, "path"))
+            .filter(|p| wanted.is_empty() || *p == wanted)
+            .collect();
+        let title = if wanted.is_empty() { &id[..8] } else { wanted };
         if paths.is_empty() {
-            return Ok(json!({"path":&id[..8],"text":"This commit has no viewable file changes."}));
+            return Ok(json!({"path":title,"files":files,"text":"This commit has no viewable file changes."}));
         }
         let mut cmd = vec![
             "show",
@@ -860,7 +944,8 @@ impl Git {
             "--",
         ];
         cmd.extend(paths);
-        Ok(json!({"path":&id[..8],"text":self.output(&cmd)?}))
+        let text = self.output(&cmd)?;
+        Ok(json!({"path":title,"files":files,"text":text}))
     }
     fn record_pull(&mut self, from: &str, remote: &str, branch: &str) -> Result<()> {
         let to = self.output(&["rev-parse", "HEAD"])?.trim().to_string();
@@ -961,6 +1046,229 @@ impl Git {
         }
         Ok(format!("Pushed to {}.", done.join(", ")))
     }
+    /// Why Git cannot take a snapshot now, or `None`: never during a merge,
+    /// rebase or cherry-pick, on a detached HEAD, while another Git process
+    /// holds the index, or while changes are staged for a manual commit.
+    fn snapshot_blocked(&self, state: &Value) -> Result<Option<&'static str>> {
+        let entries = state["files"].as_array().unwrap();
+        let paths = self.output(&[
+            "rev-parse",
+            "--git-path",
+            "index.lock",
+            "--git-path",
+            "rebase-merge",
+            "--git-path",
+            "rebase-apply",
+            "--git-path",
+            "CHERRY_PICK_HEAD",
+            "--git-path",
+            "REVERT_HEAD",
+        ])?;
+        let mut paths = paths.lines().map(|p| self.root.join(p.trim()).exists());
+        Ok(if paths.next() == Some(true) {
+            Some("Another Git program is using this repository. Snapshots resume when it finishes.")
+        } else if state["detached"] == true {
+            Some("Snapshots wait while no branch is checked out.")
+        } else if state["merging"] == true || paths.any(|p| p) {
+            Some("Snapshots wait until the merge, rebase or cherry-pick is finished.")
+        } else if entries.iter().any(|f| f["conflict"] == true) {
+            Some("Snapshots wait until merge conflicts are resolved.")
+        } else if state["privateStaged"] == true
+            || entries.iter().any(|f| f["untracked"] != true && f["index"] != ".")
+        {
+            Some("Snapshots wait while changes are staged for a manual commit.")
+        } else {
+            None
+        })
+    }
+    /// The file in the repository's Git directory naming the Weave process
+    /// that takes this repository's automatic snapshots.
+    fn lease_file(&self) -> Result<fs::File> {
+        let common = self.output(&["rev-parse", "--git-common-dir"])?;
+        let path = self.root.join(common.trim()).join("weave-snapshots.lease");
+        let file = fs::OpenOptions::new()
+            .read(true)
+            .write(true)
+            .create(true)
+            .truncate(false)
+            .open(path)
+            .map_err(err)?;
+        file.lock_exclusive().map_err(err)?;
+        Ok(file)
+    }
+    /// Takes or renews the snapshot lease for `owner`. False while another
+    /// Weave process holds an unexpired lease, so one scheduler commits per
+    /// repository even when several Weave hosts open it.
+    pub fn lease(&self, owner: &str) -> Result<bool> {
+        let mut file = self.lease_file()?;
+        let mut text = String::new();
+        let _ = file.read_to_string(&mut text);
+        let held: Value = serde_json::from_str(&text).unwrap_or(Value::Null);
+        let now = unix_now();
+        let mine = held["owner"].as_str().is_none_or(|o| o == owner)
+            || held["at"].as_u64().is_none_or(|at| now.saturating_sub(at) > LEASE_SECONDS);
+        if mine {
+            file.set_len(0).map_err(err)?;
+            std::io::Seek::rewind(&mut file).map_err(err)?;
+            file.write_all(json!({"owner":owner,"at":now}).to_string().as_bytes())
+                .map_err(err)?;
+        }
+        let _ = FileExt::unlock(&file);
+        Ok(mine)
+    }
+    /// Gives up `owner`'s lease so another Weave process can take over at once.
+    pub fn release_lease(&self, owner: &str) {
+        if self.repository().is_ok_and(|r| r["repository"] == true) {
+            if let Ok(mut file) = self.lease_file() {
+                let mut text = String::new();
+                let _ = file.read_to_string(&mut text);
+                let held: Value = serde_json::from_str(&text).unwrap_or(Value::Null);
+                if held["owner"] == owner {
+                    let _ = file.set_len(0);
+                }
+                let _ = FileExt::unlock(&file);
+            }
+        }
+    }
+    /// Commits every change (respecting `.gitignore`, never private Weave
+    /// data) as a snapshot of `kind`: `automatic`, `close`, `manual`,
+    /// `restore` (before a restore) or `restored`. Returns `committed: false`
+    /// with `skipped` when it must not commit now, and leaves a manual
+    /// commit's staged changes alone. With `owner`, only the lease holder
+    /// commits. Snapshots run no hooks and are never signed, so they cannot
+    /// wait for input; without a configured author they are signed as Weave.
+    pub fn snapshot(&mut self, kind: &str, subject: Option<String>, push: bool, owner: Option<&str>) -> Result<Value> {
+        self.require()?;
+        if let Some(owner) = owner {
+            if !self.lease(owner)? {
+                return Ok(json!({"committed":false,"skipped":"Another Weave app or server takes this repository's snapshots."}));
+            }
+        }
+        let state = self.status()?;
+        if let Some(reason) = self.snapshot_blocked(&state)? {
+            self.snapshot_state["skipped"] = json!(reason);
+            // Blocked by work in progress: the scheduler retries soon.
+            return Ok(json!({"committed":false,"skipped":reason,"waiting":true}));
+        }
+        self.snapshot_state["skipped"] = Value::Null;
+        let entries = state["files"].as_array().unwrap();
+        if entries.is_empty() {
+            return Ok(json!({"committed":false,"message":"No changes since the last snapshot."}));
+        }
+        let mut paths = vec![];
+        for f in entries {
+            paths.push(self.safe(s(f, "path"), true)?);
+        }
+        let staged = (|| -> Result<()> {
+            for batch in paths.chunks(100) {
+                let mut cmd = vec!["add", "--all", "--"];
+                cmd.extend(batch.iter().map(String::as_str));
+                self.output(&cmd)?;
+            }
+            Ok(())
+        })();
+        let count = paths.len();
+        let subject = subject.unwrap_or_else(|| {
+            format!(
+                "{} · {count} {}",
+                match kind {
+                    "close" => "Snapshot when Weave closed",
+                    "manual" => "Snapshot",
+                    "restore" => "Snapshot before restoring",
+                    _ => "Automatic snapshot",
+                },
+                if count == 1 { "file" } else { "files" }
+            )
+        });
+        let mut message = format!("{subject}\n\n");
+        for p in paths.iter().take(20) {
+            message.push_str(&format!("- {p}\n"));
+        }
+        if count > 20 {
+            message.push_str(&format!("- and {} more\n", count - 20));
+        }
+        message.push_str(&format!("\nWeave-Snapshot: {kind}\n"));
+        let unnamed = s(&state["identity"], "name").is_empty() || s(&state["identity"], "email").is_empty();
+        let mut cmd = vec![];
+        if unnamed {
+            cmd.extend(["-c", "user.name=Weave", "-c", "user.email=snapshots@weave.invalid"]);
+        }
+        cmd.extend(["-c", "commit.gpgsign=false", "commit", "--no-verify", "--quiet", "--file=-"]);
+        if let Err(e) = staged.and_then(|_| self.run(&cmd, false, Some(message.as_bytes())).map(|_| ())) {
+            // Leave the index as it was: nothing was staged before.
+            for batch in paths.chunks(100) {
+                let mut cmd = if state["unborn"] == true {
+                    vec!["rm", "--cached", "--force", "--ignore-unmatch", "--quiet", "--"]
+                } else {
+                    vec!["restore", "--staged", "--"]
+                };
+                cmd.extend(batch.iter().map(String::as_str));
+                let _ = self.run(&cmd, true, None);
+            }
+            self.snapshot_state["error"] = json!(e);
+            return Err(e);
+        }
+        let id = self.output(&["rev-parse", "HEAD"])?.trim().to_string();
+        let at = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
+        self.snapshot_state["last"] = json!({"id":id,"at":at,"files":count,"kind":kind});
+        self.snapshot_state["error"] = Value::Null;
+        self.snapshot_state["pushError"] = Value::Null;
+        let mut result = json!({"committed":true,"id":id,"files":count,"message":format!("{subject}.")});
+        if push {
+            let state = self.status()?;
+            let remote = s(&state, "syncRemote").to_string();
+            if !remote.is_empty() && state["pushRemotes"].as_array().is_some_and(|r| !r.is_empty()) {
+                let branch = s(&state, "upstream")
+                    .strip_prefix(&format!("{remote}/"))
+                    .unwrap_or(s(&state, "branch"))
+                    .to_string();
+                let pushed = if self.hosts.is_empty() {
+                    Ok(())
+                } else {
+                    state["remotes"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .filter(|r| state["pushRemotes"].as_array().unwrap().contains(&r["name"]))
+                        .flat_map(|r| [s(r, "fetch"), s(r, "push")])
+                        .filter(|u| !u.is_empty())
+                        .try_for_each(|u| self.allowed_host(u))
+                }
+                .and_then(|_| self.push(&json!({}), &state, &remote, &branch));
+                match pushed {
+                    Ok(text) => {
+                        self.snapshot_state["last"]["pushed"] = json!(true);
+                        result["message"] = json!(format!("{subject}. {text}"));
+                    }
+                    Err(e) => {
+                        self.snapshot_state["pushError"] = json!(e);
+                        result["pushError"] = json!(e);
+                    }
+                }
+            }
+        }
+        Ok(result)
+    }
+    /// A restore source: the commit itself, or with `before` its parent.
+    fn restore_source(&self, args: &Value) -> Result<String> {
+        let id = commit_id(s(args, "id"))?;
+        if args["before"] != true {
+            return Ok(id.into());
+        }
+        let parent = format!("{id}^");
+        if self.run(&["rev-parse", "--verify", "-q", &parent], true, None)?.0 != 0 {
+            return Err("This file was added in that commit; there is no earlier version.".into());
+        }
+        Ok(parent)
+    }
+    /// Before a restore overwrites files, records current changes as a
+    /// snapshot when snapshots are on (their history keeps both versions).
+    fn snapshot_before_restore(&mut self) -> Result<()> {
+        if self.snapshots["enabled"] == true {
+            self.snapshot("restore", None, false, None)?;
+        }
+        Ok(())
+    }
     pub fn action(&mut self, args: &Value) -> Result<Value> {
         let action = s(args, "action");
         if action == "init" {
@@ -1039,6 +1347,91 @@ impl Git {
             }
         }
         match action {
+            "configureSnapshots" => {
+                let mut next = self.snapshots.clone();
+                for key in ["enabled", "trigger", "minutes", "push", "onClose"] {
+                    if let Some(v) = args.get(key) {
+                        next[key] = v.clone();
+                    }
+                }
+                self.snapshots = snapshot_settings(&next)?;
+                if self.snapshots["enabled"] != true {
+                    self.snapshot_state["skipped"] = Value::Null;
+                }
+                message = if self.snapshots["enabled"] == true {
+                    "Automatic snapshots are on."
+                } else {
+                    "Automatic snapshots are off."
+                }
+                .into();
+            }
+            "snapshot" => {
+                let push = self.snapshots["push"] == true;
+                let result = self.snapshot("manual", None, push, None)?;
+                message = if let Some(reason) = result["skipped"].as_str() {
+                    return Err(reason.into());
+                } else {
+                    s(&result, "message").into()
+                };
+                if let Some(e) = result["pushError"].as_str() {
+                    message = format!("{message} Push failed: {e}");
+                }
+            }
+            "restoreFile" => {
+                if args["confirmed"] != true {
+                    return Err("Confirm before restoring an earlier version.".into());
+                }
+                let p = s(args, "path");
+                if private(p) {
+                    return Err("Choose a file inside this repository.".into());
+                }
+                let p = self.safe(p, true)?;
+                let source = self.restore_source(args)?;
+                if self.run(&["cat-file", "-e", &format!("{source}:{p}")], true, None)?.0 != 0 {
+                    return Err("This file does not exist in that version.".into());
+                }
+                if entries.iter().any(|f| f["conflict"] == true && f["path"] == p) {
+                    return Err("Resolve this file's merge conflict first.".into());
+                }
+                self.snapshot_before_restore()?;
+                self.output(&["restore", "--worktree", &format!("--source={source}"), "--", &p])?;
+                message = format!("Restored {p}.");
+                extra = json!({"restoredPaths":[p]});
+            }
+            "restoreSnapshot" => {
+                if args["confirmed"] != true {
+                    return Err("Confirm before restoring a snapshot.".into());
+                }
+                if state["merging"] == true || entries.iter().any(|f| f["conflict"] == true) {
+                    return Err("Finish the merge before restoring a snapshot.".into());
+                }
+                let source = self.restore_source(args)?;
+                self.snapshot_before_restore()?;
+                let names = self.output(&["diff", "--name-only", "--no-renames", "-z", &source, "--"])?;
+                let mut paths = vec![];
+                for p in names.split('\0').filter(|p| !p.is_empty() && !private(p)) {
+                    paths.push(self.safe(p, true)?);
+                }
+                for batch in paths.chunks(100) {
+                    let mut cmd = vec!["restore", "--worktree", "--source", &source, "--"];
+                    cmd.extend(batch.iter().map(String::as_str));
+                    self.output(&cmd)?;
+                }
+                let date = self.output(&["show", "-s", "--format=%cd", "--date=format:%Y-%m-%d %H:%M", &source])?;
+                message = if paths.is_empty() {
+                    "The workspace already matches this snapshot.".into()
+                } else {
+                    format!("Restored {} {} from {}.", paths.len(), if paths.len() == 1 { "file" } else { "files" }, date.trim())
+                };
+                if !paths.is_empty() && self.snapshots["enabled"] == true {
+                    let subject = format!("Restored snapshot of {} ({})", date.trim(), &source[..8.min(source.len())]);
+                    let result = self.snapshot("restored", Some(subject), false, None)?;
+                    if let Some(reason) = result["skipped"].as_str() {
+                        message = format!("{message} {reason}");
+                    }
+                }
+                extra = json!({"restoredPaths":paths});
+            }
             "configureIdentity" => {
                 let name = identity_field(s(args, "name"), "name")?;
                 let email = identity_field(s(args, "email"), "email address")?;

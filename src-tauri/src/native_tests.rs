@@ -1484,3 +1484,115 @@ fn catalog_pages_cover_the_tree_in_order() {
     assert_eq!(json!(other), full["otherFiles"]);
     assert_eq!(json!(folders), full["folders"]);
 }
+#[test]
+fn automatic_snapshots_schedule_lease_restore_and_close() {
+    let mut f = Fixture::new();
+    if f.call("gitStatus", json!({})).unwrap()["available"] != true {
+        panic!("Git required for native acceptance");
+    }
+    f.call("gitAction", json!({"action":"init"})).unwrap();
+    let status = f.call("gitStatus", json!({})).unwrap();
+    assert_eq!(status["snapshots"]["enabled"], false);
+    assert_eq!(status["snapshots"]["minutes"], 15);
+    assert_eq!(status["snapshots"]["push"], false);
+    assert!(f
+        .call("gitAction", json!({"action":"configureSnapshots","minutes":0}))
+        .is_err());
+    f.call(
+        "gitAction",
+        json!({"action":"configureSnapshots","enabled":true,"minutes":1,"remote":"ignored"}),
+    )
+    .unwrap();
+    fs::write(f.root().join(".gitignore"), "ignored.md\n").unwrap();
+    fs::write(f.root().join("ignored.md"), "# Ignored").unwrap();
+    fs::create_dir(f.root().join(".weave")).unwrap();
+    fs::write(f.root().join(".weave/secret"), "private").unwrap();
+    let w = f.backend.current().unwrap();
+    // Idle trigger: nothing is due until the workspace has been quiet long enough.
+    f.backend.snapshot_tick(&w); // renews the lease only
+    assert!(f.call("gitHistory", json!({})).unwrap().as_array().unwrap().is_empty());
+    assert!(!f.backend.snapshot_due(&w));
+    guard_clock(&w).changed -= std::time::Duration::from_secs(61);
+    assert!(f.backend.snapshot_due(&w));
+    f.backend.snapshot_tick(&w);
+    let history = f.call("gitHistory", json!({})).unwrap();
+    assert_eq!(history[0]["snapshot"], "automatic", "{history}");
+    assert!(history[0]["subject"].as_str().unwrap().starts_with("Automatic snapshot"));
+    let first = history[0]["id"].as_str().unwrap().to_string();
+    let files = f
+        .call("gitCommitDiff", json!({"id":first}))
+        .unwrap()["files"]
+        .clone();
+    let paths: Vec<_> = files.as_array().unwrap().iter().map(|f| f["path"].as_str().unwrap()).collect();
+    assert!(paths.contains(&"Start.md") && paths.contains(&".gitignore"));
+    assert!(!paths.iter().any(|p| p.contains("ignored") || p.contains(".weave")));
+    // Unchanged revision: not due again.
+    assert!(!f.backend.snapshot_due(&w));
+    // A manual commit in progress (staged changes) is never swept into a snapshot.
+    fs::write(f.root().join("Start.md"), "# Staged").unwrap();
+    fs::write(f.root().join("Store.md"), "# Unstaged").unwrap();
+    f.call("gitAction", json!({"action":"stage","path":"Start.md"})).unwrap();
+    assert!(f.call("gitAction", json!({"action":"snapshot"})).is_err());
+    guard_clock(&w).checked = 0;
+    f.backend.snapshot_tick(&w);
+    assert!(guard_clock(&w).retry.is_some(), "a postponed snapshot is retried soon");
+    assert!(f.call("gitStatus", json!({})).unwrap()["snapshots"]["skipped"]
+        .as_str()
+        .unwrap()
+        .contains("staged"));
+    f.call("gitAction", json!({"action":"unstage","path":"Start.md"})).unwrap();
+    let manual = f.call("gitAction", json!({"action":"snapshot"})).unwrap();
+    assert!(manual["message"].as_str().unwrap().contains("2 files"));
+    // Another Weave process holding the lease takes the snapshots instead.
+    let other = crate::native_git::Git::new(&f.root(), json!({}), Arc::new(AtomicBool::new(false)));
+    assert!(other.lease("other-process").is_ok_and(|mine| !mine));
+    // Restore one file, then a whole snapshot; current changes are kept in a snapshot first.
+    fs::write(f.root().join("Start.md"), "# Unsaved idea").unwrap();
+    f.call(
+        "gitAction",
+        json!({"action":"restoreFile","id":first,"path":"Start.md","confirmed":true}),
+    )
+    .unwrap();
+    assert!(fs::read_to_string(f.root().join("Start.md")).unwrap().contains("ABC-901"));
+    assert!(f
+        .call("searchKnowledge", json!({"query":"ABC-901"}))
+        .unwrap()["results"][0]["path"]
+        == "Start.md");
+    let history = f.call("gitHistory", json!({"path":"Start.md","limit":10})).unwrap();
+    assert_eq!(history[0]["snapshot"], "restore");
+    assert!(f
+        .call("gitCommitDiff", json!({"id":history[0]["id"],"path":"Start.md"}))
+        .unwrap()["text"]
+        .as_str()
+        .unwrap()
+        .contains("+# Unsaved idea"));
+    fs::write(f.root().join("Store.md"), "# Changed again").unwrap();
+    fs::write(f.root().join("New.md"), "# New").unwrap();
+    f.call("gitAction", json!({"action":"snapshot"})).unwrap();
+    let restored = f
+        .call("gitAction", json!({"action":"restoreSnapshot","id":first,"confirmed":true}))
+        .unwrap();
+    assert!(restored.get("restoredPaths").is_none());
+    assert!(fs::read_to_string(f.root().join("Store.md")).unwrap().contains("Warehouse"));
+    assert!(!f.root().join("New.md").exists());
+    assert_eq!(f.call("gitHistory", json!({})).unwrap()[0]["snapshot"], "restored");
+    // Closing Weave commits outstanding changes.
+    fs::write(f.root().join("Store.md"), "# Before closing").unwrap();
+    f.backend.snapshot_on_exit();
+    assert_eq!(f.call("gitHistory", json!({})).unwrap()[0]["snapshot"], "close");
+    assert!(other.lease("other-process").unwrap(), "the lease is released on exit");
+}
+fn guard_clock(w: &crate::backend::Workspace) -> std::sync::MutexGuard<'_, crate::backend::SnapshotClock> {
+    w.snapshots.lock().unwrap()
+}
+#[test]
+fn created_workspaces_start_with_history() {
+    let f = Fixture::new();
+    let scope = f.backend.scope();
+    f.backend.start_history(scope, &json!({})).unwrap();
+    let status = f.backend.request("gitStatus", json!({"scope":scope})).unwrap();
+    assert_eq!(status["repository"], true);
+    assert_eq!(status["branch"], "main");
+    assert_eq!(status["snapshots"]["enabled"], true);
+    assert_eq!(status["snapshots"]["push"], false);
+}

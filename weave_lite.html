@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><title>Weave</title><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-wuayep04GCs1xy2WDFsNjZ6/VqqOGuWUvexQNwWBRgQ=' 'sha256-f3daS1YJ9Pcxabj/1H4sZ607Bt5FVEngYLzszbIPdf8=' 'sha256-smgTRSyBQv9YBTKMlG6Q/APpDxfduzoD8NUsWWR6mFM='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'"><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2262%22%20height%3D%2262%22%20rx%3D%2213%22%20fill%3D%22%2325382f%22%2F%3E%3Cpath%20d%3D%22M13%2018%2022%2047%2032%2028%2042%2047%2051%2018%22%20fill%3D%22none%22%20stroke%3D%22%23eaf1e7%22%20stroke-width%3D%225.4%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E%0D%0A"><style>/* The skin contract: every visual decision a skin may change, with the Classic
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><title>Weave</title><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-wuayep04GCs1xy2WDFsNjZ6/VqqOGuWUvexQNwWBRgQ=' 'sha256-ACRCMmSMWmqkRnGnO2eS/kkiLqKEQxqsYrsQ2gCus2g=' 'sha256-smgTRSyBQv9YBTKMlG6Q/APpDxfduzoD8NUsWWR6mFM='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'"><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2262%22%20height%3D%2262%22%20rx%3D%2213%22%20fill%3D%22%2325382f%22%2F%3E%3Cpath%20d%3D%22M13%2018%2022%2047%2032%2028%2042%2047%2051%2018%22%20fill%3D%22none%22%20stroke%3D%22%23eaf1e7%22%20stroke-width%3D%225.4%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E%0D%0A"><style>/* The skin contract: every visual decision a skin may change, with the Classic
    skin's values. Colour schemes own the palette (--bg, --paper, --ink, --muted,
    --line, --accent, --wash, --code, …, written on the root by appearance.mjs);
    skins (skins/*.css) own shape, type, density, surfaces and depth, and derive
@@ -342,7 +342,7 @@ footer #index-status{flex-shrink:0;padding-left:15px;border-left:1px solid var(-
 #workspace-name.workspace-badge::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--workspace-color)}
 #workspace-manager{display:flex;flex-direction:column;gap:8px;margin-top:6px}
 #workspace-manager .hint{margin:0}
-#open-workspaces,#recent-workspace-list,#welcome-recent-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+#open-workspaces,#recent-workspace-list,#welcome-recent-list,#welcome-available-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .workspace-card{display:flex;align-items:flex-start;gap:8px;padding:8px;border:1px solid var(--line);border-radius:var(--radius-card);background:color-mix(in srgb,var(--workspace-color) 6%,var(--paper))}
 .workspace-card.current{background:color-mix(in srgb,var(--workspace-color) 14%,var(--paper));border-color:var(--workspace-color);box-shadow:inset 0 0 0 1px var(--workspace-color)}
 .workspace-card>.workspace-dot{margin-top:6px}
@@ -357,14 +357,14 @@ footer #index-status{flex-shrink:0;padding-left:15px;border-left:1px solid var(-
 :is(#settings-panel,.settings-dialog) .workspace-card button.workspace-show,.workspace-card .workspace-show{display:block;align-self:flex-start;margin:2px 0 0;padding:0;border:0;background:transparent;color:var(--accent);font-size:11px;text-align:left;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.workspace-card .workspace-show:hover{text-decoration:underline}
 #settings-panel .workspace-card-actions button,.workspace-card-actions button{display:inline-block;margin:0;padding:2px 7px;font-size:11px;line-height:1.4}
 #settings-panel #add-workspace{margin:0;align-self:flex-start}
-#recent-workspaces h4,#welcome-recent h2{margin:6px 0;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+#recent-workspaces h4,#welcome-recent h2,#welcome-available h2{margin:6px 0;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
 .workspace-recent{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px dashed var(--line);border-radius:var(--radius-card)}
 .workspace-recent-label{display:flex;flex-direction:column;min-width:0;flex:1;text-align:left}
 .workspace-recent-label strong{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .workspace-recent-label small{font-size:10.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #settings-panel .workspace-recent button,.workspace-recent button{display:inline-block;margin:0;padding:2px 9px;font-size:11px}
-#welcome-recent{margin:26px auto 0;max-width:420px}
-#welcome-recent h2{text-align:left;font-family:inherit}
+#welcome-recent,#welcome-available{margin:26px auto 0;max-width:420px}
+#welcome-recent h2,#welcome-available h2{text-align:left;font-family:inherit}
 /* Tabs: bold titles; with several workspaces each tab takes its workspace colour
    and may name it in small text at the bottom without growing the tab. */
 .file-tab [data-tab]{position:relative;display:block;min-width:0;line-height:1.25}
@@ -559,6 +559,17 @@ footer #save-status{flex-shrink:0;font-size:inherit}footer #save-status:empty{di
 .git-setup-dialog{max-width:640px;width:calc(100vw - 32px);max-height:calc(100dvh - 40px);overflow:auto;box-shadow:var(--shadow-dialog)}.git-setup-heading{display:flex;align-items:flex-start;gap:12px}.git-setup-heading>div{flex:1;min-width:0}.git-setup-heading .eyebrow{margin:0 0 6px}.git-setup-heading h2{margin:0;overflow-wrap:anywhere}.git-setup-heading>button{border:0;background:transparent;font-size:24px;padding:0 8px}.git-setup-steps{display:flex;flex-direction:column;gap:6px;margin:18px 0 8px}.git-setup-step{border:1px solid var(--line);border-radius:var(--radius-card);padding:10px 14px}.git-setup-step.current{border-color:var(--accent)}.git-setup-step h3{display:flex;align-items:center;gap:10px;margin:0;font-size:14px;font-weight:600}.git-setup-step:not(.current):not(.done) h3{color:var(--muted)}.git-setup-index{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;border:1px solid var(--line);font-size:12px;flex-shrink:0}.git-setup-step.current .git-setup-index{border-color:var(--accent);color:var(--accent)}.git-setup-step.done .git-setup-index{background:var(--accent);border-color:var(--accent);color:var(--paper)}.git-setup-body{font-size:13px;line-height:1.6;padding:6px 0 4px 34px}.git-setup-body p{margin:6px 0}.git-setup-body code{overflow-wrap:anywhere}.git-setup-body button{margin:4px 6px 4px 0}.git-setup-body button.primary,.git-setup-dialog .dialog-actions .primary{border-color:var(--accent);background:var(--accent);color:var(--paper)}.git-setup-step.done .git-setup-body{color:var(--muted)}.git-setup-list{padding-left:20px;margin:6px 0}.git-setup-list li{margin:6px 0}.git-setup-form{display:flex;flex-direction:column;gap:4px}.git-setup-form label{display:flex;flex-direction:column;gap:2px;font-size:12px}.git-setup-form input{width:100%;margin:2px 0 6px}.git-setup-form .hint{margin:0 0 6px}.git-setup-form button{align-self:flex-start}.git-setup-key{display:block;width:100%;font:12px/1.5 var(--ui-mono-font);resize:none;margin:6px 0;overflow-wrap:anywhere;word-break:break-all}.git-setup-fingerprint{display:block;color:var(--muted);font-size:11px;overflow-wrap:anywhere}.git-setup-link{border:0;background:transparent;color:var(--accent);padding:0;text-decoration:underline}.git-setup-copy{white-space:nowrap}.git-setup-notice{font-size:12px;min-height:1.6em;margin:8px 0;white-space:pre-wrap;overflow-wrap:anywhere}.git-setup-notice.git-error,.git-setup-body .git-error{color:var(--danger)}.git-setup-notice:empty{display:none}
 :root[data-theme=dark] .git-setup-body button.primary,:root[data-theme=dark] .git-setup-dialog .dialog-actions .primary,:root[data-theme=dark] #git-setup [data-git-action=setup],:root[data-theme=dark] #git-panel .git-connect button{color:#182b20}
 .git-setup-summary{display:flex;align-items:baseline;gap:8px;margin:4px 0 0 34px;font-size:12px;color:var(--muted)}.git-setup-summary span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Automatic snapshots: settings in the Git panel and the snapshot browser. */
+.git-snapshot-badge{font-size:10px;font-weight:600;padding:1px 6px;margin-left:6px;border-radius:var(--radius-control);background:var(--wash);color:var(--muted)}.git-snapshot-badge.on{color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent)}
+#git-panel .git-snapshots p{margin:6px 0}.git-snapshot-warning{font-size:11px;color:var(--warning);overflow-wrap:anywhere}.git-check{display:flex;align-items:center;gap:7px;margin:6px 0;cursor:pointer}.git-check input{margin:0;width:auto;flex:none}
+.git-snapshot-timing{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:6px 0}.git-snapshot-timing select{flex:1 1 140px;min-width:0}.git-snapshot-timing input{width:64px}.git-snapshot-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.git-snapshot-dialog .git-diff-toolbar{min-height:38px}.git-snapshot-note{font-size:11px;color:var(--muted);overflow-wrap:anywhere}.git-snapshot-body{display:grid;grid-template-columns:minmax(220px,340px) minmax(0,1fr);flex:1;min-height:0}
+.git-snapshot-list{overflow:auto;border-right:1px solid var(--line);padding:6px}.git-snapshot-list>p{padding:12px}.git-snapshot-list>button[data-snapshot-more]{margin:10px auto;display:block;font-size:11px}
+.git-snapshot-item{display:block;width:100%;text-align:left;border:0;border-radius:var(--radius-control);background:transparent;padding:8px 10px;margin-bottom:2px}.git-snapshot-item strong{display:block;font-weight:500;overflow-wrap:anywhere}.git-snapshot-item small{display:block;font-size:10.5px;color:var(--muted);margin-top:2px}.git-snapshot-item.snapshot strong::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:6px;vertical-align:1px}.git-snapshot-item:hover{background:var(--wash)}.git-snapshot-item[aria-pressed=true]{background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.git-snapshot-detail{overflow:auto;padding:14px 20px}.git-snapshot-detail-heading{display:flex;align-items:flex-start;gap:14px;margin-bottom:12px}.git-snapshot-detail-heading>div{flex:1;min-width:0}.git-snapshot-detail-heading strong{display:block;font-size:14px;overflow-wrap:anywhere}.git-snapshot-detail-heading small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.git-snapshot-files{list-style:none;margin:0;padding:0;font-size:12px}.git-snapshot-files li{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}.git-snapshot-file-path{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.git-snapshot-files button{font-size:11px;padding:3px 8px}
+.git-snapshot-file-status{font:600 10px var(--ui-mono-font);width:16px;text-align:center;color:var(--muted)}.git-snapshot-file-status[data-status=A]{color:var(--accent)}.git-snapshot-file-status[data-status=D]{color:var(--danger)}
+@media (max-width:760px){.git-snapshot-body{grid-template-columns:1fr;grid-template-rows:minmax(120px,40%) 1fr}.git-snapshot-list{border-right:0;border-bottom:1px solid var(--line)}.git-snapshot-files li{flex-wrap:wrap}.git-snapshot-file-path{flex-basis:calc(100% - 30px)}}
 
 /* Local appearance preferences are shared by reading and live editing. */
 :root{--reading-font-size:15px;--reading-line-height:1.7;--code-line-height:1.7;--reading-font-weight:400;--reading-paragraph-spacing:0em;--reading-font-family:'Segoe UI',system-ui,Arial,sans-serif;--code-font-family:'Cascadia Mono',Consolas,monospace;--code-font-size:15px;--reading-width:none;--article-indent:40px;--article-zoom:1;--line-number-color:var(--muted);--line-number-opacity:.5;--table-cell-padding:9px;--table-border-width:2px;--table-header-tint:100%;--tableBorder:var(--line)}
@@ -1409,6 +1420,8 @@ body.kanban-dragging,body.kanban-dragging *{cursor:grabbing!important}
 }
 :root[data-layout=mobile][data-skin] .welcome-actions{grid-template-columns:1fr;gap:8px}:root[data-layout=mobile][data-skin] .welcome-action{min-height:48px}:root[data-layout=mobile][data-skin] .git-setup-dialog{width:100vw;max-width:none;max-height:100dvh;height:100dvh;margin:0;border-radius:0;padding:16px}:root[data-layout=mobile][data-skin] .git-setup-dialog button{min-height:40px}:root[data-layout=mobile][data-skin] .git-setup-body{padding-left:0}
 :root[data-layout=mobile][data-skin] .git-setup-summary{margin-left:0}
+/* Snapshot controls and the start page's workspace lists. */
+:root[data-layout=mobile][data-skin] :is(.git-snapshot-dialog button,.git-snapshot-actions button,#welcome-available button,#welcome-recent button){min-height:var(--mobile-touch)}:root[data-layout=mobile][data-skin] .git-check{min-height:var(--mobile-touch)}
 </style><script>(()=>{var l={classic:{name:"Classic",description:"The original Weave look: bordered controls, tabbed panes and compact chrome."},studio:{name:"Studio",description:"Floating rounded panels, borderless controls and soft depth."},"studio-flow":{name:"Studio Flow",extends:"studio",description:"Studio pared back for space, with tabs that curve into the article like a browser."},compact:{name:"Compact",description:"A dense, square-cornered workbench with an activity bar and coloured status bar."},slate:{name:"Slate",extends:"compact",description:"Compact density with softened corners and tabs that merge into the editor."},editorial:{name:"Editorial",description:"Quiet paper chrome, serif headings, hairline rules and generous spacing."},folio:{name:"Folio",extends:"editorial",description:"Editorial with folder tabs that join the page and slimmer margins."},aurora:{name:"Aurora",description:"Translucent glass panels over a soft gradient drawn from the accent colour."},"aurora-thin":{name:"Aurora Thin",extends:"aurora",description:"Aurora with slim bars, tight margins, roomier tabs and hairline glass scrollbars."},"aurora-flow":{name:"Aurora Flow",extends:"aurora-thin",description:"Aurora Thin with glass tabs that flow into the article from the gradient."}},w="aurora-flow",A=Object.keys(l).filter(a=>a!=="classic").map(a=>`skins/${a}.css`),d=a=>typeof a=="string"&&Object.hasOwn(l,a)?a:w;function g(a){let e=[];for(let n=d(a);n&&!e.includes(n);n=l[n].extends)e.unshift(n);return e}var h={scheme:"Match colour scheme",pastel:"Soft pastels",vivid:"Vivid",mono:"Monochrome",mermaid:"Mermaid default"};var p={grey:{name:"Light grey",mode:"light",colors:["#eeeeee","#fafafa","#292929","#666666","#d4d4d4","#505968","#e3e5e8","#e9e9e9","#b9cce8","#a0a0a0","#fafafa"]},graphite:{name:"Graphite",mode:"dark",colors:["#202124","#292a2d","#e8eaed","#b0b3bb","#474950","#abc4ef","#383e49","#34363c","#4e6385","#777a83","#292a2d"]},paper:{name:"Warm paper",mode:"light",colors:["#eee8dc","#fffaf0","#3c342b","#736657","#d9cfbd","#80613b","#eee2cd","#f2e9da","#e6cfa7","#ad9d84","#fffaf0"]},sage:{name:"Sage",mode:"light",colors:["#edf1eb","#fafcf8","#293b30","#5c7163","#cdd9ce","#34664d","#dfeadc","#e8efe3","#b5d7bd","#91a493","#fafcf8"]},ocean:{name:"Ocean",mode:"dark",colors:["#182731","#20333f","#e4eff4","#a5bdcb","#405764","#99cfe6","#304b5b","#29414e","#446d86","#668799","#20333f"]},lavender:{name:"Lavender",mode:"light",colors:["#eeebf2","#fcfaff","#36303f","#70667f","#d9d0e5","#735494","#e8e0f0","#eee8f4","#d2bce9","#ad9ebf","#fcfaff"]}},b="grey",S={bg:"Sidebar & background",paper:"Article & panels",ink:"Text",muted:"Secondary text",line:"Borders",accent:"Links & accents",wash:"Selected & hover",code:"Code background",selection:"Text selection",tableBorder:"Table borders",titleBar:"Top bar"},s={system:'"Segoe UI", system-ui, Arial, sans-serif',serif:'Georgia, "Times New Roman", serif',sans:"Arial, Helvetica, sans-serif",mono:'Consolas, "Courier New", monospace',calibri:'Calibri, "Segoe UI", sans-serif',cambria:"Cambria, Georgia, serif",verdana:"Verdana, Geneva, sans-serif",tahoma:'Tahoma, "Segoe UI", sans-serif',trebuchet:'"Trebuchet MS", Arial, sans-serif',palatino:'"Palatino Linotype", Palatino, Georgia, serif',times:'"Times New Roman", Times, serif',cascadia:'"Cascadia Code", "Cascadia Mono", Consolas, monospace'},$={system:typeof navigator<"u"&&!/Windows/.test(navigator.userAgent)?"System":"System (Segoe UI)",serif:"Georgia",sans:"Arial",mono:"Consolas",calibri:"Calibri",cambria:"Cambria",verdana:"Verdana",tahoma:"Tahoma",trebuchet:"Trebuchet MS",palatino:"Palatino",times:"Times New Roman",cascadia:"Cascadia Code"},f={consolas:s.mono,cascadia:s.cascadia,cascadiaMono:'"Cascadia Mono", Consolas, monospace',courier:'"Courier New", Courier, monospace',lucida:'"Lucida Console", Consolas, monospace',jetbrains:'"JetBrains Mono", Consolas, monospace',fira:'"Fira Code", Consolas, monospace',source:'"Source Code Pro", Consolas, monospace'};var C={fontSize:15,fontWeight:400,lineHeight:1.7,codeLineSpacing:0,paragraphSpacing:0,font:"system",codeFont:"cascadiaMono",codeFontSize:15,articleZoom:100,articleIndent:40,readableWidth:!1,width:880,lineNumbers:"both",lineNumberColor:null,lineNumberOpacity:50,lineNumberSize:9,titlebarTabs:!0,tabTint:!0,tabTintOpacity:10,graphCounts:!1,graphSpacing:!1,graphColours:!1,spellColor:"#e5484d",highlightColor:"#ffd43b",spellOpacity:55,spellThickness:1.5,spellStyle:"wavy",tablePadding:9,tableBorders:"grid",tableBorderWidth:2,tableHeaderTint:100,tableStriped:!0,tableEditing:"visual",tableAutoFormat:!0,tableHoverControls:!0,mermaid:!0,mermaidPreview:!0,mermaidPalette:"scheme",mermaidAccent:null,mermaidLook:"classic",mermaidCurve:"smooth",mermaidFrame:"card",mermaidSize:"fit",mermaidAlign:"centre"},y={mermaidPalette:Object.keys(h),mermaidLook:["classic","handDrawn"],mermaidCurve:["smooth","rounded","straight","stepped"],mermaidFrame:["card","plain"],mermaidSize:["fit","natural"],mermaidAlign:["centre","left"]};var x={fontSize:[12,28],fontWeight:[100,900],codeLineSpacing:[-.8,1.2],codeFontSize:[10,28],articleZoom:[50,200],articleIndent:[32,160],lineHeight:[1.2,2.4],paragraphSpacing:[0,1.5],width:[560,1400],lineNumberOpacity:[0,100],lineNumberSize:[7,20],spellOpacity:[10,100],spellThickness:[1,4],tabTintOpacity:[5,100],tablePadding:[2,18],tableBorderWidth:[0,3],tableHeaderTint:[0,100]};function z(a){let e=a&&typeof a=="object"?a:{},n=Object.hasOwn(p,e.preset)?e.preset:b,r=Object.fromEntries(Object.keys(S).map((i,o)=>[i,/^#[0-9a-f]{6}$/i.test(e.colors?.[i])?e.colors[i]:p[n].colors[o]]));e.colors?.tableBorder===void 0&&/^#[0-9a-f]{6}$/i.test(e.colors?.line)&&(r.tableBorder=e.colors.line);let t={...C};for(let[i,[o,k]]of Object.entries(x)){let c=e.reading?.[i];typeof c=="number"&&Number.isFinite(c)&&(t[i]=Math.max(o,Math.min(k,c)))}e.reading&&e.reading.fontWeight===void 0&&e.reading.paragraphSpacing===.45&&(t.paragraphSpacing=0),Object.hasOwn(s,e.reading?.font)&&(t.font=e.reading.font),Object.hasOwn(f,e.reading?.codeFont)&&(t.codeFont=e.reading.codeFont),["off","read","edit","both"].includes(e.reading?.lineNumbers)&&(t.lineNumbers=e.reading.lineNumbers),/^#[0-9a-f]{6}$/i.test(e.reading?.lineNumberColor)&&(t.lineNumberColor=e.reading.lineNumberColor),/^#[0-9a-f]{6}$/i.test(e.reading?.spellColor)&&(t.spellColor=e.reading.spellColor),/^#[0-9a-f]{6}$/i.test(e.reading?.highlightColor)&&(t.highlightColor=e.reading.highlightColor.toLowerCase()),["wavy","dotted","dashed","solid"].includes(e.reading?.spellStyle)&&(t.spellStyle=e.reading.spellStyle),["grid","rows","none"].includes(e.reading?.tableBorders)&&(t.tableBorders=e.reading.tableBorders),["visual","source"].includes(e.reading?.tableEditing)&&(t.tableEditing=e.reading.tableEditing);for(let[i,o]of Object.entries(y))o.includes(e.reading?.[i])&&(t[i]=e.reading[i]);/^#[0-9a-f]{6}$/i.test(e.reading?.mermaidAccent)&&(t.mermaidAccent=e.reading.mermaidAccent.toLowerCase());for(let i of["tableStriped","tableAutoFormat","tableHoverControls","titlebarTabs","tabTint","graphCounts","graphSpacing","graphColours","mermaid","mermaidPreview"])typeof e.reading?.[i]=="boolean"&&(t[i]=e.reading[i]);return t.readableWidth=e.reading?.readableWidth===!0,{preset:n,colors:r,reading:t,skin:d(e.skin)}}function u(a){let e;try{e=JSON.parse(a.get("appearance"))}catch{}return z(e||{preset:a.get("theme")==="dark"?"graphite":a.get("theme")==="light"?"grey":b})}function m(a,e=document.documentElement){let n=p[a.preset].mode;e.dataset.theme=n,e.dataset.scheme=a.preset,e.dataset.skin=g(a.skin).join(" "),e.dataset.lineNumbers=a.reading.lineNumbers,e.dataset.tableBorders=a.reading.tableBorders,e.dataset.tableStriped=String(a.reading.tableStriped),e.dataset.tableEditing=a.reading.tableEditing,e.dataset.tableAutoFormat=String(a.reading.tableAutoFormat),e.dataset.tableHoverControls=String(a.reading.tableHoverControls),e.dataset.tabTint=String(a.reading.tabTint),e.dataset.mermaid=String(a.reading.mermaid),e.dataset.mermaidPreview=String(a.reading.mermaidPreview);for(let t of Object.keys(y))e.dataset[t]=a.reading[t];e.dataset.mermaidAccent=a.reading.mermaidAccent||"",e.dataset.titlebarTabs=String(a.reading.titlebarTabs),e.style.setProperty("--highlight-color",a.reading.highlightColor),e.style.setProperty("--spell-color",a.reading.spellColor),e.style.setProperty("--spell-opacity",a.reading.spellOpacity+"%"),e.style.setProperty("--spell-thickness",a.reading.spellThickness+"px"),e.style.setProperty("--spell-style",a.reading.spellStyle),e.dataset.graphCounts=String(a.reading.graphCounts),e.dataset.graphSpacing=String(a.reading.graphSpacing),e.dataset.graphColours=String(a.reading.graphColours),e.style.setProperty("--tab-tint",a.reading.tabTintOpacity+"%"),e.style.setProperty("--tab-tint-active",Math.min(100,Math.round(a.reading.tabTintOpacity*1.5))+"%");for(let[t,i]of Object.entries(a.colors))e.style.setProperty("--"+t,i);let r=a.reading.articleZoom/100;return e.style.setProperty("--reading-font-size",Number((a.reading.fontSize*r).toFixed(2))+"px"),e.style.setProperty("--reading-line-height",a.reading.lineHeight),e.style.setProperty("--reading-font-weight",a.reading.fontWeight),e.style.setProperty("--code-line-height",Math.max(1,a.reading.lineHeight+a.reading.codeLineSpacing)),e.style.setProperty("--reading-paragraph-spacing",a.reading.paragraphSpacing+"em"),e.style.setProperty("--reading-font-family",s[a.reading.font]),e.style.setProperty("--code-font-family",f[a.reading.codeFont]),e.style.setProperty("--code-font-size",Number((a.reading.codeFontSize*r).toFixed(2))+"px"),e.style.setProperty("--article-indent",a.reading.articleIndent+"px"),e.style.setProperty("--article-zoom",r),e.style.setProperty("--line-number-color",a.reading.lineNumberColor||a.colors.muted),e.style.setProperty("--line-number-opacity",a.reading.lineNumberOpacity/100),e.style.setProperty("--line-number-size",Number((a.reading.lineNumberSize*r).toFixed(2))+"px"),e.style.setProperty("--table-cell-padding",a.reading.tablePadding+"px"),e.style.setProperty("--table-border-width",a.reading.tableBorderWidth+"px"),e.style.setProperty("--table-header-tint",a.reading.tableHeaderTint+"%"),e.style.setProperty("--reading-width",a.reading.readableWidth?a.reading.width+"px":"none"),n}var v="(max-width: 760px), (pointer: coarse) and (max-height: 500px)";try{m(u({get:e=>localStorage.getItem("weave:"+e)}))}catch{try{m(u({get:()=>null}))}catch{}}matchMedia(v).matches&&(document.documentElement.dataset.layout="mobile");})();</script></head>
 <body>
 <header id="titlebar"><div class="titlebar-start"><button id="app-menu-button" aria-haspopup="menu" aria-expanded="false" aria-controls="app-menu" title="Menu" aria-label="Menu"><span class="brand-mark" aria-hidden="true">W</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg></button><button id="nav-back" title="Back (Alt+Left)" aria-label="Back" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><button id="nav-forward" title="Forward (Alt+Right)" aria-label="Forward" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button></div><div class="titlebar-spacer"></div><div class="titlebar-end"><button id="view-graph" aria-pressed="false" title="Show or hide the graph">Graph</button><button id="toggle-right-sidebar" aria-label="Toggle right sidebar" title="Toggle right sidebar" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg></button><button id="edit-mode" aria-pressed="false" title="Enable editing">Edit</button><button id="source-toggle" aria-pressed="false" title="Show the Markdown source" disabled>Source</button><div id="window-controls" hidden><button id="window-minimize" aria-label="Minimise window" title="Minimise" data-ui>−</button><button id="window-maximize" aria-label="Maximise window" title="Maximise" data-ui>□</button><button id="window-close" aria-label="Close window" title="Close">×</button></div></div></header>
@@ -1464,7 +1477,7 @@ body.kanban-dragging,body.kanban-dragging *{cursor:grabbing!important}
 <main>
 <div class="editor-group focused" id="editor-left" data-pane="0">
 <div id="tab-bar" class="tab-bar"><div id="file-tabs" role="tablist" aria-label="Open articles"></div><button id="new-tab" title="New tab (Ctrl+T)" aria-label="New tab">+</button><span class="tab-bar-divider" aria-hidden="true"></span><button id="close-tabs" title="Close all tabs" aria-label="Close all tabs">× All</button></div>
-<div id="find-bar" role="search" aria-label="Find in article" hidden><input id="find-query" type="search" placeholder="Find in article" aria-label="Find in article" autocomplete="off" spellcheck="false"><span id="find-count" aria-live="polite"></span><button id="find-previous" title="Previous match (Shift+Enter)" aria-label="Previous match">↑</button><button id="find-next" title="Next match (Enter)" aria-label="Next match">↓</button><button id="find-close" title="Close (Escape)" aria-label="Close find">×</button></div><section id="welcome"><div class="welcome-mark">W</div><h1>Your notes, connected.</h1><p>Open a folder of Markdown files to begin.</p><div class="welcome-actions" role="group" aria-label="Get started"></div><div id="welcome-recent" hidden><h2>Activate a deactivated workspace</h2><ul id="welcome-recent-list" aria-label="Deactivated workspaces"></ul></div><p class="hint welcome-note">Weave keeps knowledge in your files. Search and graph indexes can always be rebuilt.</p></section>
+<div id="find-bar" role="search" aria-label="Find in article" hidden><input id="find-query" type="search" placeholder="Find in article" aria-label="Find in article" autocomplete="off" spellcheck="false"><span id="find-count" aria-live="polite"></span><button id="find-previous" title="Previous match (Shift+Enter)" aria-label="Previous match">↑</button><button id="find-next" title="Next match (Enter)" aria-label="Next match">↓</button><button id="find-close" title="Close (Escape)" aria-label="Close find">×</button></div><section id="welcome"><div class="welcome-mark">W</div><h1>Your notes, connected.</h1><p>Open a folder of Markdown files to begin.</p><div class="welcome-actions" role="group" aria-label="Get started"></div><div id="welcome-available" hidden><h2>Workspaces on this server</h2><ul id="welcome-available-list" aria-label="Workspaces on this server"></ul></div><div id="welcome-recent" hidden><h2>Activate a deactivated workspace</h2><ul id="welcome-recent-list" aria-label="Deactivated workspaces"></ul></div><p class="hint welcome-note">Weave keeps knowledge in your files. Search and graph indexes can always be rebuilt.</p></section>
 <section id="note-panel" hidden><div id="note-warning" role="status"></div><div id="kanban-view" hidden></div><div id="okf-bar" role="toolbar" aria-label="Article properties" hidden></div><article id="article"></article><div id="source-editor" hidden></div><details id="connections"><summary>Connections</summary><div id="relationships"></div></details></section>
 <section id="evidence-panel" hidden><div class="evidence-heading"><div><span class="eyebrow">DEEP SEARCH</span><h1 id="evidence-question"></h1></div><button id="close-evidence">Back to article</button></div><p id="evidence-notices" class="hint"></p><div id="evidence"></div></section>
 <section id="graph-panel" hidden><div class="graph-bar"><details><summary>Graph controls</summary><div class="graph-controls"><label>Depth <select id="graph-depth"><option>1</option><option>2</option><option>3</option></select></label><label>Direction <select id="graph-direction"><option value="both">Both</option><option value="upstream">Incoming</option><option value="downstream">Outgoing</option></select></label><button id="graph-fit">Fit</button><button id="graph-reset">Reset layout</button><label class="graph-spacing-control">Node spacing <input id="graph-spacing" type="range" min="100" max="250" step="10" value="100" aria-label="Node spacing"><output id="graph-spacing-value">100%</output></label><button id="graph-shuffle">Shuffle nodes</button><button id="graph-palette" data-ui>Colours</button><button id="zoom-out" aria-label="Zoom out">−</button><span id="zoom-label">100%</span><button id="zoom-in" aria-label="Zoom in">+</button></div></details><span id="graph-count"></span></div><svg id="graph" aria-label="Interactive relationship graph"><defs><marker id="arrow-dependency" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#6389aa"/></marker></defs><g id="graph-viewport"><g id="graph-edges-svg"></g><g id="graph-nodes"></g></g></svg></section>
@@ -6787,31 +6800,32 @@ if(order)state.open=[...order];persist();return{order:state.open}}if(op==="close
 scopes.get(args.scope));persist();return{closed:true}}if(op==="restore"){const panel=await post("controlPanel"),known=new Set(
 panel.workspaces.map(w=>w.id));const defaults3=panel.defaultWorkspaces||panel.workspaces.map(w=>w.id);const selection=JSON.
 stringify(defaults3);const reset=panel.managedWorkspaces&&(freshTab||state.selection!==selection);const wanted=(reset?defaults3:
-state.open||defaults3).filter(id2=>known.has(id2));state.selection=selection;freshTab=false;const catalogs=[],errors=[];
-state.open=[];for(const id2 of wanted){try{catalogs.push(adopt(await post("reopen",{id:id2})))}catch(error){errors.push(
-error.message)}}persist();if(!catalogs.length)return errors.length?{restoreError:errors.join("\n")}:null;const{tree,...first}=catalogs[0];
-return{...first,workspaces:catalogs,layout:state.layout,restoreErrors:errors}}if(op==="controlPanel"){const panel=await post(
-op,args);panel.workspaces=panel.workspaces.map(w=>({...w,open:(state.open||[]).includes(w.id)}));panel.open=state.open||
-[];return panel}if(op==="searchKnowledge"&&args.searchChannel)args={...args,searchChannel:channel+":"+args.searchChannel};
-const result=await post(op,args);if(op==="reopen")return adopt(result);if(result?.workspace)result.session=state.sessions[result.
-workspace.id]||{};return result}class Channel{onmessage(){}}const client2=await createNativeClient({Channel,invoke:async(command2,input={})=>{
-if(command2==="weave_request")return call(input.op,input.args||{});if(command2==="choose_workspace")return adopt(await choose2(
-post));if(command2==="create_workspace")return adopt(await post("serverOpen",{name:input.name,create:true}));if(command2===
-"weave_graph_neighborhood"){const result=await post("graphNeighborhood",input.args);for(const chunk of result.chunks)input.
-onChunk.onmessage(chunk);return result.summary}if(command2==="editor_state")return;if(command2==="open_resource"){const url=new URL(
-input.url);if(!["http:","https:"].includes(url.protocol)||url.username||url.password)throw new Error("Only HTTP(S) resou\
-rces without credentials can be opened.");window.open(url.href,"_blank","noopener,noreferrer");return}throw new Error("T\
-his desktop operation is unavailable in a browser.")}});delete client2.chooseDirectory;delete client2.chooseMarkdownFile;
-delete client2.readExternal;delete client2.saveExternal;client2.serverAccount=()=>window.open("/account","_blank","noope\
-ner,noreferrer");client2.exportWorkspace=async(scope,{name:name2="workspace",...options}={})=>{const{blob,documents,relationships,
-diagrams}=await post("export",{scope,...options},"/api/export");const filename2=name2.replace(/[<>:"/\\|?*\x00-\x1f]/g,"\
--").replace(/\s+/g,"_")+".html";const url=URL.createObjectURL(blob),anchor=document.createElement("a");anchor.href=url;anchor.
-download=filename2;anchor.click();setTimeout(()=>URL.revokeObjectURL(url),3e4);return{path:filename2,bytes:blob.size,documents,
-relationships,diagrams}};return client2}async function chooseServerWorkspace(post){const[{folders,managed},panel]=await Promise.
-all([post("serverFolders"),post("controlPanel")]);const dialog=document.createElement("dialog");dialog.id="server-worksp\
-ace-picker";dialog.setAttribute("aria-labelledby","server-workspace-title");dialog.innerHTML=`<h2 id="server-workspace-t\
-itle">Server workspaces</h2><p>${managed?"Open a workspace selected by the desktop server controller.":"Open a folder on\
- this server, or create a new workspace."}</p>
+state.open||(panel.managedWorkspaces?defaults3:[])).filter(id2=>known.has(id2));state.selection=selection;freshTab=false;
+const catalogs=[],errors=[];state.open=[];for(const id2 of wanted){try{catalogs.push(adopt(await post("reopen",{id:id2})))}catch(error){
+errors.push(error.message)}}persist();if(!catalogs.length)return errors.length?{restoreError:errors.join("\n")}:null;const{
+tree,...first}=catalogs[0];return{...first,workspaces:catalogs,layout:state.layout,restoreErrors:errors}}if(op==="contro\
+lPanel"){const panel=await post(op,args);panel.workspaces=panel.workspaces.map(w=>({...w,open:(state.open||[]).includes(
+w.id)}));panel.open=state.open||[];return panel}if(op==="searchKnowledge"&&args.searchChannel)args={...args,searchChannel:channel+
+":"+args.searchChannel};const result=await post(op,args);if(op==="reopen")return adopt(result);if(result?.workspace)result.
+session=state.sessions[result.workspace.id]||{};return result}class Channel{onmessage(){}}const client2=await createNativeClient(
+{Channel,invoke:async(command2,input={})=>{if(command2==="weave_request")return call(input.op,input.args||{});if(command2===
+"choose_workspace")return adopt(await choose2(post));if(command2==="create_workspace")return adopt(await post("serverOpe\
+n",{name:input.name,create:true}));if(command2==="weave_graph_neighborhood"){const result=await post("graphNeighborhood",
+input.args);for(const chunk of result.chunks)input.onChunk.onmessage(chunk);return result.summary}if(command2==="editor_\
+state")return;if(command2==="open_resource"){const url=new URL(input.url);if(!["http:","https:"].includes(url.protocol)||
+url.username||url.password)throw new Error("Only HTTP(S) resources without credentials can be opened.");window.open(url.
+href,"_blank","noopener,noreferrer");return}throw new Error("This desktop operation is unavailable in a browser.")}});delete client2.
+chooseDirectory;delete client2.chooseMarkdownFile;delete client2.readExternal;delete client2.saveExternal;client2.serverAccount=
+()=>window.open("/account","_blank","noopener,noreferrer");client2.serverFolders=async()=>(await post("serverFolders")).
+folders;client2.openServerFolder=async name2=>adopt(await post("serverOpen",{name:name2}));client2.exportWorkspace=async(scope,{
+name:name2="workspace",...options}={})=>{const{blob,documents,relationships,diagrams}=await post("export",{scope,...options},
+"/api/export");const filename2=name2.replace(/[<>:"/\\|?*\x00-\x1f]/g,"-").replace(/\s+/g,"_")+".html";const url=URL.createObjectURL(
+blob),anchor=document.createElement("a");anchor.href=url;anchor.download=filename2;anchor.click();setTimeout(()=>URL.revokeObjectURL(
+url),3e4);return{path:filename2,bytes:blob.size,documents,relationships,diagrams}};return client2}async function chooseServerWorkspace(post){
+const[{folders,managed},panel]=await Promise.all([post("serverFolders"),post("controlPanel")]);const dialog=document.createElement(
+"dialog");dialog.id="server-workspace-picker";dialog.setAttribute("aria-labelledby","server-workspace-title");dialog.innerHTML=
+`<h2 id="server-workspace-title">Server workspaces</h2><p>${managed?"Open a workspace selected by the desktop server con\
+troller.":"Open a folder on this server, or create a new workspace."}</p>
     <div class="server-folders"></div><form><label>New workspace folder<input name="name" aria-label="New workspace fold\
 er" maxlength="120" required autocomplete="off"></label>
     <p class="hint" role="status"></p><div class="dialog-actions"><button type="button" data-cancel>Cancel</button><butt\
@@ -13481,43 +13495,49 @@ anchor:current2.start+insert2.length},userEvent:"input.complete"});view.focus();
 0 0 0 13 3l3-3m0 5v-5h-5"/>',commit:'<path d="m5 12 4 4L19 6"/>',stageAll:'<path d="M12 5v14M5 12h14"/>',unstageAll:'<pa\
 th d="M5 12h14"/>',push:'<path d="m7 10 5-5 5 5M12 5v12M5 19h14"/>',pull:'<path d="m7 12 5 5 5-5M12 4v13M5 20h14"/>',fetch:'\
 <path d="M5 4h14M12 7v13m-5-5 5 5 5-5"/>',refresh:'<path d="M20 10a8 8 0 1 0-2 8M20 4v6h-6"/>'};var iconButton=(action,label,extra="")=>button(
-action,`<svg viewBox="0 0 24 24" aria-hidden="true">${icons[action]}</svg>`,label,extra);var statusLabel=file=>file.conflict?
-"Conflict":file.untracked?"Untracked":{A:"Added",M:"Modified",D:"Deleted",R:"Renamed",C:"Copied",T:"Type changed"}[file.
-index!=="."?file.index:file.worktree]||"Changed";function conflictHunks(text){const lines=[...text.matchAll(/.*(?:\r\n|\n|$)/g)].
-filter(match=>match[0]);const hunks=[];for(let index2=0;index2<lines.length;index2++){const start=lines[index2],marker2=start[0].
-match(/^(<{7,})(?: |\r?\n|$)/);if(!marker2)continue;const length=marker2[1].length;let base2=-1,separator=-1,end=-1;for(let next=index2+
-1;next<lines.length;next++){const line=lines[next][0];if(new RegExp("^\\|{"+length+"}(?: |\\r?\\n|$)").test(line))base2=
-next;if(new RegExp("^={"+length+"}(?:\\r?\\n|$)").test(line))separator=next;if(new RegExp("^>{"+length+"}(?: |\\r?\\n|$)").
-test(line)){end=next;break}}if(separator<0||end<separator)continue;hunks.push({from:start.index,to:lines[end].index+lines[end][0].
-length,ours:lines.slice(index2+1,base2>index2&&base2<separator?base2:separator).map(line=>line[0]).join(""),theirs:lines.
-slice(separator+1,end).map(line=>line[0]).join("")});index2=end}return hunks}function diffRows(text){let old=0,next=0,insideHunk=false;
-return text.replace(/\r\n/g,"\n").split("\n").map(line=>{const hunk=line.match(/^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
-if(hunk){old=Number(hunk[1]);next=Number(hunk[2]);insideHunk=true;return{kind:"hunk",text:line}}if(line.startsWith("diff\
- --git "))insideHunk=false;if(!insideHunk)return{kind:"meta",text:line};if(line[0]==="+")return{kind:"add",next:next++,text:line.
-slice(1)};if(line[0]==="-")return{kind:"remove",old:old++,text:line.slice(1)};if(line[0]===" ")return{kind:"context",old:old++,
-next:next++,text:line.slice(1)};return{kind:"meta",text:line}})}function renderDiff(text,split2=false){const rows=diffRows(
-text);if(!split2)return rows.map(row=>`<div class="git-diff-row git-diff-${row.kind}"><span class="git-line-number">${row.
-old??""}</span><span class="git-line-number">${row.next??""}</span><span class="git-diff-sign" aria-hidden="true">${row.
-kind==="add"?"+":row.kind==="remove"?"\u2212":""}</span><span class="git-diff-code">${esc2(row.text)||" "}</span></div>`).
-join("");let html2="";const half=(row,kind2=row?.kind||"empty",number2=row?.old??row?.next)=>`<div class="git-diff-half \
-git-diff-${kind2}"><span class="git-line-number">${number2??""}</span><span class="git-diff-code">${esc2(row?.text||"")||
-" "}</span></div>`;for(let i2=0;i2<rows.length;i2++){const row=rows[i2];if(row.kind==="meta"||row.kind==="hunk"){html2+=
-`<div class="git-diff-row git-diff-${row.kind}"><span class="git-diff-code">${esc2(row.text)||" "}</span></div>`;continue}
-if(row.kind==="context"){html2+=`<div class="git-diff-pair">${half(row,"context",row.old)}${half(row,"context",row.next)}\
-</div>`;continue}const removed=[],added=[];while(rows[i2]?.kind==="remove")removed.push(rows[i2++]);while(rows[i2]?.kind===
-"add")added.push(rows[i2++]);i2--;for(let j=0;j<Math.max(removed.length,added.length);j++)html2+=`<div class="git-diff-p\
-air">${half(removed[j])}${half(added[j])}</div>`}return html2}function createGitPanel({client:client2,container,beforeAction=async()=>{},
-afterMutation=async()=>{},openFile=async()=>{},idSuffix="",onPendingCount,onBusy,onStatus,onSetup}){let state=null,busy=false,
-generation=0,refreshing=false,refreshedAt=0,refreshCost=0,selectedRemote="",pushRemotes=[],defaultMessage="",historyLoaded=false,
-diff=null,split2=true,conflict=null,conflictChoice="manual";const dialog=document.createElement("dialog");dialog.id="git\
--diff-dialog"+idSuffix;dialog.className="git-diff-dialog";dialog.setAttribute("aria-labelledby","git-diff-title");document.
-body.append(dialog);const conflictDialog=document.createElement("dialog");conflictDialog.id="git-conflict-dialog"+idSuffix;
-conflictDialog.className="git-diff-dialog git-conflict-dialog";conflictDialog.setAttribute("aria-labelledby","git-confli\
-ct-title");document.body.append(conflictDialog);container.innerHTML=`<div class="git-toolbar" role="toolbar" aria-label=\
-"Source control actions">${iconButton("sync","Commit all & sync",'id="git-commit-sync"')}${iconButton("commit","Commit s\
-taged changes",'id="git-commit"')}${iconButton("stageAll","Stage all changes")}${iconButton("unstageAll","Unstage all ch\
-anges")}${iconButton("push","Push branch to selected remotes")}${iconButton("pull","Pull (fast-forward only)")}${iconButton(
-"fetch","Fetch remote updates")}${iconButton("refresh","Refresh source control")}</div>
+action,`<svg viewBox="0 0 24 24" aria-hidden="true">${icons[action]}</svg>`,label,extra);var minutesText=n=>n%60===0&&n>=
+60?n===60?"1 hour":n/60+" hours":n===1?"1 minute":n+" minutes";function ago(value){const seconds=(Date.now()-new Date(value))/
+1e3;if(!(seconds>=0))return new Date(value).toLocaleString();if(seconds<60)return"just now";if(seconds<3600)return Math.
+floor(seconds/60)+(seconds<120?" minute ago":" minutes ago");if(seconds<86400)return Math.floor(seconds/3600)+(seconds<7200?
+" hour ago":" hours ago");return new Date(value).toLocaleString()}var snapshotKinds={automatic:"Automatic snapshot",close:"\
+Snapshot on close",manual:"Snapshot",restore:"Before a restore",restored:"Restore"};var fileStatus={A:"Added",M:"Modifie\
+d",D:"Deleted",T:"Type changed"};var statusLabel=file=>file.conflict?"Conflict":file.untracked?"Untracked":{A:"Added",M:"\
+Modified",D:"Deleted",R:"Renamed",C:"Copied",T:"Type changed"}[file.index!=="."?file.index:file.worktree]||"Changed";function conflictHunks(text){
+const lines=[...text.matchAll(/.*(?:\r\n|\n|$)/g)].filter(match=>match[0]);const hunks=[];for(let index2=0;index2<lines.
+length;index2++){const start=lines[index2],marker2=start[0].match(/^(<{7,})(?: |\r?\n|$)/);if(!marker2)continue;const length=marker2[1].
+length;let base2=-1,separator=-1,end=-1;for(let next=index2+1;next<lines.length;next++){const line=lines[next][0];if(new RegExp(
+"^\\|{"+length+"}(?: |\\r?\\n|$)").test(line))base2=next;if(new RegExp("^={"+length+"}(?:\\r?\\n|$)").test(line))separator=
+next;if(new RegExp("^>{"+length+"}(?: |\\r?\\n|$)").test(line)){end=next;break}}if(separator<0||end<separator)continue;hunks.
+push({from:start.index,to:lines[end].index+lines[end][0].length,ours:lines.slice(index2+1,base2>index2&&base2<separator?
+base2:separator).map(line=>line[0]).join(""),theirs:lines.slice(separator+1,end).map(line=>line[0]).join("")});index2=end}
+return hunks}function diffRows(text){let old=0,next=0,insideHunk=false;return text.replace(/\r\n/g,"\n").split("\n").map(
+line=>{const hunk=line.match(/^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/);if(hunk){old=Number(hunk[1]);next=Number(hunk[2]);
+insideHunk=true;return{kind:"hunk",text:line}}if(line.startsWith("diff --git "))insideHunk=false;if(!insideHunk)return{kind:"\
+meta",text:line};if(line[0]==="+")return{kind:"add",next:next++,text:line.slice(1)};if(line[0]==="-")return{kind:"remove",
+old:old++,text:line.slice(1)};if(line[0]===" ")return{kind:"context",old:old++,next:next++,text:line.slice(1)};return{kind:"\
+meta",text:line}})}function renderDiff(text,split2=false){const rows=diffRows(text);if(!split2)return rows.map(row=>`<di\
+v class="git-diff-row git-diff-${row.kind}"><span class="git-line-number">${row.old??""}</span><span class="git-line-num\
+ber">${row.next??""}</span><span class="git-diff-sign" aria-hidden="true">${row.kind==="add"?"+":row.kind==="remove"?"\u2212":
+""}</span><span class="git-diff-code">${esc2(row.text)||" "}</span></div>`).join("");let html2="";const half=(row,kind2=row?.
+kind||"empty",number2=row?.old??row?.next)=>`<div class="git-diff-half git-diff-${kind2}"><span class="git-line-number">${number2??
+""}</span><span class="git-diff-code">${esc2(row?.text||"")||" "}</span></div>`;for(let i2=0;i2<rows.length;i2++){const row=rows[i2];
+if(row.kind==="meta"||row.kind==="hunk"){html2+=`<div class="git-diff-row git-diff-${row.kind}"><span class="git-diff-co\
+de">${esc2(row.text)||" "}</span></div>`;continue}if(row.kind==="context"){html2+=`<div class="git-diff-pair">${half(row,
+"context",row.old)}${half(row,"context",row.next)}</div>`;continue}const removed=[],added=[];while(rows[i2]?.kind==="rem\
+ove")removed.push(rows[i2++]);while(rows[i2]?.kind==="add")added.push(rows[i2++]);i2--;for(let j=0;j<Math.max(removed.length,
+added.length);j++)html2+=`<div class="git-diff-pair">${half(removed[j])}${half(added[j])}</div>`}return html2}function createGitPanel({
+client:client2,container,beforeAction=async()=>{},afterMutation=async()=>{},openFile=async()=>{},currentPath=()=>null,idSuffix="",
+onPendingCount,onBusy,onStatus,onSetup}){let state=null,busy=false,generation=0,refreshing=false,refreshedAt=0,refreshCost=0,
+selectedRemote="",pushRemotes=[],defaultMessage="",historyLoaded=false,diff=null,split2=true,conflict=null,conflictChoice="\
+manual";const dialog=document.createElement("dialog");dialog.id="git-diff-dialog"+idSuffix;dialog.className="git-diff-di\
+alog";dialog.setAttribute("aria-labelledby","git-diff-title");document.body.append(dialog);const conflictDialog=document.
+createElement("dialog");conflictDialog.id="git-conflict-dialog"+idSuffix;conflictDialog.className="git-diff-dialog git-c\
+onflict-dialog";conflictDialog.setAttribute("aria-labelledby","git-conflict-title");document.body.append(conflictDialog);
+container.innerHTML=`<div class="git-toolbar" role="toolbar" aria-label="Source control actions">${iconButton("sync","Co\
+mmit all & sync",'id="git-commit-sync"')}${iconButton("commit","Commit staged changes",'id="git-commit"')}${iconButton("\
+stageAll","Stage all changes")}${iconButton("unstageAll","Unstage all changes")}${iconButton("push","Push branch to sele\
+cted remotes")}${iconButton("pull","Pull (fast-forward only)")}${iconButton("fetch","Fetch remote updates")}${iconButton(
+"refresh","Refresh source control")}</div>
     <div class="git-summary"><strong id="git-branch">Source control</strong></div><p id="git-repository-note" class="hin\
 t"></p><div id="git-notice" class="git-notice" role="status" aria-live="polite"></div><div id="git-setup" hidden></div><\
 div id="git-connect" class="git-connect" hidden><p>This repository is not connected to GitHub or another remote yet.</p>${button(
@@ -13526,6 +13546,21 @@ div id="git-connect" class="git-connect" hidden><p>This repository is not connec
 n">Commit message</label><input id="git-commit-message" type="text" maxlength="10000" placeholder="Commit message (Ctrl+\
 Enter)" aria-label="Commit message" title="Current UTC timestamp by default. Enter your own message to replace it." auto\
 complete="off"></form><p id="git-sync-status" class="hint"></p><div id="git-changes"></div>
+    <details id="git-snapshots" class="git-snapshots"><summary>Automatic snapshots <span id="git-snapshot-badge" class="\
+git-snapshot-badge"></span></summary><p id="git-snapshot-state" class="hint"></p><p id="git-snapshot-warning" class="git\
+-snapshot-warning" role="status"></p>
+    <label class="git-check"><input type="checkbox" id="git-snapshot-enabled"> Commit changes automatically</label><div \
+id="git-snapshot-options"><div class="git-snapshot-timing"><label for="git-snapshot-trigger">Snapshot</label><select id=\
+"git-snapshot-trigger" aria-label="When snapshots are taken"><option value="idle">after a quiet period of</option><optio\
+n value="interval">at intervals of</option></select><input id="git-snapshot-minutes" type="number" min="1" max="1440" st\
+ep="1" aria-label="Snapshot minutes"><span>min</span></div>
+    <label class="git-check"><input type="checkbox" id="git-snapshot-close"> Snapshot when Weave closes</label><label cl\
+ass="git-check" id="git-snapshot-push-label"><input type="checkbox" id="git-snapshot-push"> Push snapshots to the remote\
+</label><p class="hint">Snapshots respect .gitignore and wait while you stage a commit, merge or switch branches.</p></d\
+iv>
+    <div class="git-snapshot-actions">${button("snapshot","Snapshot now","Commit every change now as a snapshot")}${button(
+"browseSnapshots","Browse snapshots\u2026","Inspect earlier versions and restore files or a whole snapshot")}</div></det\
+ails>
     <div class="git-repository-controls"><div class="git-branch-control"><label for="git-branches">Branch</label><select\
  id="git-branches" aria-label="Current Git branch"></select>${button("newBranch","+","Create branch")}</div></div>
     ${button("editIgnore","Edit .gitignore")}<details id="git-remote-management"><summary>Remote management</summary>${button(
@@ -13547,8 +13582,11 @@ on" data-ignore-close aria-label="Close .gitignore editor">\xD7</button></div><p
 repository root. Saving does not stage or commit the file.</p><label for="git-ignore-text">Ignored files and folders</la\
 bel><textarea id="git-ignore-text" spellcheck="false"></textarea><p data-ignore-error role="alert"></p><div class="git-d\
 iff-footer"><button type="button" data-ignore-close>Cancel</button><button type="submit">Save .gitignore</button></div><\
-/form>';document.body.append(ignoreDialog);let ignoreRevision=null;for(const node of ignoreDialog.querySelectorAll("[dat\
-a-ignore-close]"))node.onclick=()=>ignoreDialog.close();ignoreDialog.querySelector("form").onsubmit=async event=>{event.
+/form>';document.body.append(ignoreDialog);let ignoreRevision=null;const snapshotDialog=document.createElement("dialog");
+snapshotDialog.id="git-snapshot-dialog"+idSuffix;snapshotDialog.className="git-diff-dialog git-snapshot-dialog";snapshotDialog.
+setAttribute("aria-labelledby","git-snapshot-title"+idSuffix);document.body.append(snapshotDialog);const snapshotView={list:[],
+more:false,selected:null,detail:null,path:null,note:"",working:false};for(const node of ignoreDialog.querySelectorAll("[\
+data-ignore-close]"))node.onclick=()=>ignoreDialog.close();ignoreDialog.querySelector("form").onsubmit=async event=>{event.
 preventDefault();if(busy)return;const serial=generation;lock(true);const controls=[...ignoreDialog.querySelectorAll("but\
 ton,textarea")];controls.forEach(node=>node.disabled=true);try{await beforeAction("saveIgnore");if(serial!==generation)return;
 const result=await client2.call("gitAction",{action:"saveIgnore",text:ignoreDialog.querySelector("textarea").value,revision:ignoreRevision});
@@ -13583,25 +13621,28 @@ it-action="${action2}"]`).disabled=busy||!repo||!remote;container.querySelector(
 length||state?.unborn||state?.detached;container.querySelector('[data-git-action="stageAll"]').disabled=busy||!repo||!changes.
 some(file=>file.untracked||file.worktree!=="."||file.conflict);container.querySelector('[data-git-action="unstageAll"]').
 disabled=busy||!repo||!changes.some(file=>!file.untracked&&file.index!==".");container.querySelector('[data-git-action="\
-stash"]').disabled=busy||!repo||state?.unborn||!changes.length}function fileGroup(title,files,staged){if(!files.length)return"";
-const action2=staged?"unstage":"stage";return`<section class="git-change-group"><div class="git-group-heading"><h3>${title}\
- <span>${files.length}</span></h3></div>${files.map(file=>`<div class="git-file" data-path="${esc2(file.path)}" data-sta\
-ged="${staged}" data-untracked="${!!file.untracked}"><button type="button" class="git-file-diff" ${file.conflict?"data-g\
-it-conflict":"data-git-diff"} title="${esc2(file.previousPath?file.previousPath+" \u2192 "+file.path:file.path)}"><span \
-class="git-file-label">${esc2(file.path.split("/").at(-1))}<small>${esc2(file.path.includes("/")?file.path.split("/").slice(
-0,-1).join("/"):"")}</small></span><span class="git-file-status ${file.conflict?"git-conflict":""}" aria-label="${statusLabel(
-file)}">${file.conflict?"!":file.untracked?"U":staged?file.index:file.worktree}</span></button>${!staged&&!file.conflict?
-button("discard","\u21B6",(file.untracked?"Discard untracked file ":"Discard unstaged changes to ")+file.path):""}${file.
-conflict?`<button type="button" data-git-conflict aria-label="Resolve ${esc2(file.path)}">Resolve</button>`:button(action2,
-staged?"\u2212":"+",(staged?"Unstage ":"Stage ")+file.path)}</div>`).join("")}</section>`}function render2(){const count3=state?.
-repository?state.pendingFileCount??new Set((state.files||[]).map(file=>file.path)).size:0;const badge=document.getElementById(
-"git-pending-badge");if(onPendingCount)onPendingCount(count3);else if(badge){badge.textContent=String(count3);badge.hidden=
-!count3;badge.parentElement.title=count3?"Source control \xB7 "+count3+" pending "+(count3===1?"file":"files"):"Source c\
-ontrol"}find2("git-repository").hidden=!state?.repository;find2("git-setup").hidden=!!state?.repository;find2("git-branc\
-h").textContent=state?.repository?state.detached?"Detached HEAD \xB7 "+state.oid.slice(0,8):"\u2442 "+state.branch:"Sour\
-ce control";if(!state?.repository){find2("git-repository-note").textContent=!client2.capabilities.git?"Source control is\
- available in the desktop application.":state?.parentRepository?"Open the repository root to manage every change togethe\
-r: "+state.parentRepository:state?.error||"This workspace is not a Git repository.";find2("git-setup").innerHTML=client2.
+stash"]').disabled=busy||!repo||state?.unborn||!changes.length;container.querySelector('[data-git-action="snapshot"]').disabled=
+busy||!repo||!changes.length||state?.merging||state?.detached||state?.privateStaged||changes.some(file=>file.conflict||!file.
+untracked&&file.index!==".");container.querySelector('[data-git-action="browseSnapshots"]').disabled=busy||!repo||state?.
+unborn;find2("git-snapshot-push").disabled=busy||!repo||!remote}function fileGroup(title,files,staged){if(!files.length)
+return"";const action2=staged?"unstage":"stage";return`<section class="git-change-group"><div class="git-group-heading">\
+<h3>${title} <span>${files.length}</span></h3></div>${files.map(file=>`<div class="git-file" data-path="${esc2(file.path)}\
+" data-staged="${staged}" data-untracked="${!!file.untracked}"><button type="button" class="git-file-diff" ${file.conflict?
+"data-git-conflict":"data-git-diff"} title="${esc2(file.previousPath?file.previousPath+" \u2192 "+file.path:file.path)}"\
+><span class="git-file-label">${esc2(file.path.split("/").at(-1))}<small>${esc2(file.path.includes("/")?file.path.split(
+"/").slice(0,-1).join("/"):"")}</small></span><span class="git-file-status ${file.conflict?"git-conflict":""}" aria-labe\
+l="${statusLabel(file)}">${file.conflict?"!":file.untracked?"U":staged?file.index:file.worktree}</span></button>${!staged&&
+!file.conflict?button("discard","\u21B6",(file.untracked?"Discard untracked file ":"Discard unstaged changes to ")+file.
+path):""}${file.conflict?`<button type="button" data-git-conflict aria-label="Resolve ${esc2(file.path)}">Resolve</butto\
+n>`:button(action2,staged?"\u2212":"+",(staged?"Unstage ":"Stage ")+file.path)}</div>`).join("")}</section>`}function render2(){
+const count3=state?.repository?state.pendingFileCount??new Set((state.files||[]).map(file=>file.path)).size:0;const badge=document.
+getElementById("git-pending-badge");if(onPendingCount)onPendingCount(count3);else if(badge){badge.textContent=String(count3);
+badge.hidden=!count3;badge.parentElement.title=count3?"Source control \xB7 "+count3+" pending "+(count3===1?"file":"file\
+s"):"Source control"}find2("git-repository").hidden=!state?.repository;find2("git-setup").hidden=!!state?.repository;find2(
+"git-branch").textContent=state?.repository?state.detached?"Detached HEAD \xB7 "+state.oid.slice(0,8):"\u2442 "+state.branch:
+"Source control";if(!state?.repository){find2("git-repository-note").textContent=!client2.capabilities.git?"Source contr\
+ol is available in the desktop application.":state?.parentRepository?"Open the repository root to manage every change to\
+gether: "+state.parentRepository:state?.error||"This workspace is not a Git repository.";find2("git-setup").innerHTML=client2.
 capabilities.git&&state?.available&&!state.parentRepository?(onSetup?`<p>Keep a history of this workspace and share it t\
 hrough GitHub.</p>${button("setup","Set up Git\u2026","Set up Git for this workspace")} `:"")+button("init",ui("Initiali\
 se repository")):"";find2("git-connect").hidden=true;updateControls();onStatus?.(state);return}find2("git-repository-not\
@@ -13634,89 +13675,158 @@ e changes",conflicts,false)+fileGroup("Staged changes",staged,true)+fileGroup("C
 git-stashes").innerHTML=state.stashes.map(stash=>`<div class="git-stash"><span>${esc2(stash.message)}</span>${button("ap\
 plyStash","Apply","Apply "+stash.ref+" (keep stash)",`data-ref="${esc2(stash.ref)}"`)}</div>`).join("")||'<p class="hint\
 ">No saved stashes.</p>';if(state.privateStaged)announce("Private Weave data is staged. Unstage it in an external Git cl\
-ient before committing.",true);find2("git-connect").hidden=!onSetup||state.remotes.length>0;updateControls();onStatus?.(
-state)}async function refresh({quiet=false}={}){if(refreshing||busy||!client2.capabilities.git){if(!client2.capabilities.
-git)render2();return}if(quiet&&Date.now()-refreshedAt<Math.max(1e3,refreshCost*5))return;refreshing=true;refreshedAt=Date.
-now();const serial=generation;try{const next=await client2.call("gitStatus");if(serial!==generation)return;const changed=JSON.
-stringify(next)!==JSON.stringify(state);state=next;if(changed)render2();if(!quiet&&state.error)announce(state.error,true)}catch(error){
-if(serial===generation&&!quiet)announce(error.message,true)}finally{refreshing=false;refreshCost=Date.now()-refreshedAt}}
-async function ask(title,description,{input,confirm="Continue"}={}){const prompt=document.createElement("dialog");prompt.
-className="git-prompt";prompt.innerHTML=`<form method="dialog"><h2>${esc2(title)}</h2><p>${esc2(description)}</p>${input!==
-void 0?`<label>${esc2(title)}<input name="value" value="${esc2(input)}" autocomplete="off" required></label>`:""}<div cl\
-ass="dialog-actions"><button value="cancel" formnovalidate>Cancel</button><button value="ok">${esc2(confirm)}</button></\
-div></form>`;document.body.append(prompt);prompt.showModal();prompt.querySelector("input")?.select();return new Promise(
-resolve=>{prompt.onclose=()=>{const value=prompt.returnValue==="ok"?prompt.querySelector("input")?.value.trim()??true:null;
-prompt.remove();resolve(value)}})}async function action(name2,args={}){if(busy)return;const serial=generation;lock(true);
-announce({fetch:"Fetching remote updates\u2026",pull:"Pulling changes\u2026",push:"Pushing branch\u2026",sync:"Committin\
-g all changes and syncing\u2026",commit:"Committing staged changes\u2026"}[name2]||"Updating repository\u2026");try{if(name2!==
-"configureRemotes")await beforeAction(name2);if(serial!==generation)return;const result=await client2.call("gitAction",{
-action:name2,remote:selectedRemote,...["push","sync"].includes(name2)?{pushRemotes}:{},...args});if(serial!==generation)
-return;state=result.status;if(name2==="commit"||name2==="sync"&&result.committed)timestampMessage(true);if(name2==="addR\
-emote"){find2("git-remote-name").value="";find2("git-remote-url").value=""}historyLoaded=false;render2();announce(result.
-message||"Done.");if(name2!=="configureRemotes")await afterMutation(name2);if(find2("git-history").open)await loadHistory()}catch(error){
-if(serial===generation){announce(error.message,true);try{state=await client2.call("gitStatus");render2();if(name2!=="con\
-figureRemotes")await afterMutation(name2)}catch{}}}finally{lock(false)}}function renderDiffDialog(){const rows=diffRows(
-diff.text),additions=rows.filter(row=>row.kind==="add").length,deletions=rows.filter(row=>row.kind==="remove").length;dialog.
-innerHTML=`<div class="git-diff-heading"><div><p class="eyebrow">${diff.pulled?"PULLED CHANGES":diff.commit?"COMMIT":diff.
-staged?"INDEX \xB7 STAGED CHANGES":"WORKING TREE \xB7 CHANGES"}</p><h2 id="git-diff-title">${esc2(diff.path)}</h2></div>\
-<span class="git-diff-count"><span>+${additions}</span> <span>\u2212${deletions}</span></span><button type="button" data\
--diff-close aria-label="Close diff" title="Close diff (Esc)">\xD7</button></div><div class="git-diff-toolbar"><div role="gr\
-oup" aria-label="Diff layout"><button data-diff-layout="unified" aria-pressed="${!split2}">Unified</button><button data-\
-diff-layout="split" aria-pressed="${split2}">Side by side</button></div><div class="spacer"></div>${!diff.commit&&!diff.
-deleted&&/\.md$/i.test(diff.path)?"<button data-diff-open>Open article</button>":""}${!diff.commit&&!diff.pulled?`<butto\
-n data-diff-stage>${diff.staged?"\u2212 Unstage file":"+ Stage file"}</button>`:""}</div><div class="git-diff-body ${split2?
-"git-diff-split":""}" tabindex="0" aria-label="${esc2(diff.path)} diff">${diff.text?renderDiff(diff.text,split2):'<p cla\
-ss="hint">No changes in this version.</p>'}</div><div class="git-diff-footer">${diff.binary?"Binary content cannot be sh\
-own as text.":diff.pulled?"Workspace changes brought in by this pull.":diff.commit?"Commit details and file changes":diff.
-staged?"HEAD \u2192 Index \xB7 These changes will be committed.":"Index \u2192 Working tree \xB7 Stage this version to include i\
-t in a commit."}<span>Esc to close</span></div>`;dialog.querySelector("[data-diff-close]").onclick=()=>dialog.close();dialog.
-querySelectorAll("[data-diff-layout]").forEach(node=>node.onclick=()=>{split2=node.dataset.diffLayout==="split";renderDiffDialog()});
-const stage=dialog.querySelector("[data-diff-stage]");if(stage)stage.onclick=async()=>{dialog.close();await action(diff.
-staged?"unstage":"stage",{path:diff.path})};const open=dialog.querySelector("[data-diff-open]");if(open)open.onclick=async()=>{
-dialog.close();try{await openFile(diff.path)}catch(error){announce(error.message,true)}}}async function openDiff(file,staged){
-if(busy)return;const serial=generation;try{await beforeAction("diff");if(serial!==generation)return;const result=await client2.
-call("gitDiff",{path:file,staged});if(serial!==generation)return;diff=result;split2=true;renderDiffDialog();dialog.showModal();
-dialog.querySelector("[data-diff-close]").focus()}catch(error){announce(error.message,true)}}function renderConflictHunks(){
-const editor=conflictDialog.querySelector("#git-conflict-result"),body=conflictDialog.querySelector(".git-conflict-hunks");
-if(!editor||!body)return;const hunks=conflictHunks(editor.value);body.innerHTML=hunks.map((hunk,index2)=>`<section class\
-="git-conflict-hunk"><div class="git-conflict-hunk-heading"><strong>Conflict ${index2+1}</strong><button data-hunk="${index2}\
-" data-choice="ours">Use current</button><button data-hunk="${index2}" data-choice="theirs">Use incoming</button><button\
- data-hunk="${index2}" data-choice="both">Use both</button></div><div class="git-conflict-versions"><div><h3>Current \xB7 o\
-urs</h3><pre>${esc2(hunk.ours)||"(empty)"}</pre></div><div><h3>Incoming \xB7 theirs</h3><pre>${esc2(hunk.theirs)||"(empt\
-y)"}</pre></div></div></section>`).join("")||'<p class="hint">No remaining conflict blocks. Review the result before sta\
-ging.</p>';conflictDialog.querySelector("[data-conflict-count]").textContent=hunks.length+(hunks.length===1?" conflict b\
-lock":" conflict blocks");for(const node of body.querySelectorAll("[data-hunk]"))node.onclick=()=>{const hunk=conflictHunks(
-editor.value)[Number(node.dataset.hunk)];if(!hunk)return;const replacement=node.dataset.choice==="both"?hunk.ours+hunk.theirs:
-hunk[node.dataset.choice];editor.value=editor.value.slice(0,hunk.from)+replacement+editor.value.slice(hunk.to);conflictChoice=
-"manual";conflictDialog.querySelector("[data-conflict-error]").textContent="";renderConflictHunks();editor.focus();editor.
-setSelectionRange(hunk.from,hunk.from+replacement.length)}}function renderConflictDialog(){const version=(side,label)=>`\
-<section><h3>${label}</h3><pre>${esc2(side.deleted?"(deleted)":side.binary?"(binary content)":side.text)||"(empty file)"}\
-</pre></section>`;conflictChoice="manual";conflictDialog.innerHTML=`<div class="git-diff-heading"><div><p class="eyebrow\
-">RESOLVE MERGE CONFLICT</p><h2 id="git-conflict-title">${esc2(conflict.path)}</h2></div><button type="button" data-conf\
-lict-close aria-label="Close conflict resolver">\xD7</button></div>${conflict.unsupported?`<div class="git-conflict-cont\
-ent"><p>${esc2(conflict.reason)}</p></div>`:`<div class="git-diff-toolbar"><button data-conflict-choice="ours">${conflict.
-ours.deleted?"Accept current deletion":"Use entire current file"}</button><button data-conflict-choice="theirs">${conflict.
-theirs.deleted?"Accept incoming deletion":"Use entire incoming file"}</button><span class="spacer"></span><span data-con\
-flict-count></span></div><div class="git-conflict-content"><p class="hint">Current is Git\u2019s \u201Cours\u201D; incoming is \u201Ctheirs\u201D\
-. During a rebase these describe the rebased branch and replayed commit. Whole-file choices replace the complete result.\
-</p><div class="git-notice git-error" data-conflict-error role="alert"></div>${conflict.binary||conflict.ours.deleted||conflict.
-theirs.deleted?`<div class="git-conflict-versions">${version(conflict.ours,"Current \xB7 ours")}${version(conflict.theirs,
-"Incoming \xB7 theirs")}</div>`:""}${conflict.binary?'<p class="hint">Binary content is preserved exactly. Choose which \
-complete version to keep.</p>':`<div class="git-conflict-hunks"></div><label class="git-conflict-result-label" for="git-\
-conflict-result">Result \xB7 edit freely</label><textarea id="git-conflict-result" spellcheck="false" aria-label="Conflict \
-resolution result"></textarea>`}<p class="hint" data-conflict-selection></p></div><div class="git-diff-footer"><span>Sav\
-e a draft to continue later, or stage the reviewed resolution.</span><div><button data-conflict-save="draft">Save draft<\
-/button><button data-conflict-save="stage">Save &amp; stage</button></div></div>`}`;conflictDialog.querySelector("[data-\
-conflict-close]").onclick=()=>conflictDialog.close();if(conflict.unsupported)return;const editor=conflictDialog.querySelector(
-"#git-conflict-result");if(editor){editor.value=conflict.text;editor.oninput=()=>{conflictChoice="manual";editor.disabled=
-false;conflictDialog.querySelector("[data-conflict-selection]").textContent="";conflictDialog.querySelector("[data-confl\
-ict-error]").textContent="";renderConflictHunks()};renderConflictHunks()}for(const node of conflictDialog.querySelectorAll(
-"[data-conflict-choice]"))node.onclick=()=>{const side=conflict[node.dataset.conflictChoice];conflictChoice=node.dataset.
-conflictChoice;if(editor){editor.value=side.text;editor.disabled=side.deleted;renderConflictHunks()}conflictDialog.querySelector(
-"[data-conflict-selection]").textContent=side.deleted?"The selected version deletes this file.":"The complete "+(conflictChoice===
-"ours"?"current":"incoming")+" version is selected. Review before saving.";conflictDialog.querySelector("[data-conflict-\
-error]").textContent=""};for(const node of conflictDialog.querySelectorAll("[data-conflict-save]"))node.onclick=async()=>{
-if(busy)return;const serial=generation,error=conflictDialog.querySelector("[data-conflict-error]");if(conflict.binary&&conflictChoice===
+ient before committing.",true);find2("git-connect").hidden=!onSetup||state.remotes.length>0;renderSnapshotSettings();updateControls();
+onStatus?.(state)}function renderSnapshotSettings(){const snap=state.snapshots||{},set2=(id2,property,value)=>{const node=find2(
+id2);if(document.activeElement!==node)node[property]=value};set2("git-snapshot-enabled","checked",!!snap.enabled);set2("\
+git-snapshot-trigger","value",snap.trigger||"idle");set2("git-snapshot-minutes","value",String(snap.minutes||15));set2("\
+git-snapshot-push","checked",!!snap.push);set2("git-snapshot-close","checked",snap.onClose!==false);find2("git-snapshot-\
+options").hidden=!snap.enabled;find2("git-snapshot-badge").textContent=snap.enabled?"On":"Off";find2("git-snapshot-badge").
+classList.toggle("on",!!snap.enabled);find2("git-snapshot-push-label").title=state.remotes.length?"After each snapshot, \
+push to the remotes checked under Remote management.":"Add a remote to push snapshots.";const last2=snap.last?` Last sna\
+pshot ${ago(snap.last.at)} (${snap.last.files} ${snap.last.files===1?"file":"files"}).`:" No snapshot yet.";find2("git-s\
+napshot-state").textContent=snap.enabled?(snap.trigger==="interval"?`Every ${minutesText(snap.minutes)} when there are c\
+hanges.`:`After ${minutesText(snap.minutes)} without changes.`)+last2:"Off. Weave can commit your changes for you, keepi\
+ng every earlier version one click away."+(snap.last?last2:"");const warning=snap.enabled?snap.error||snap.skipped||(snap.
+pushError?"The last push failed: "+snap.pushError:""):"";find2("git-snapshot-warning").textContent=warning||"";find2("gi\
+t-snapshot-warning").hidden=!warning}const snapshotSettings=()=>({enabled:find2("git-snapshot-enabled").checked,trigger:find2(
+"git-snapshot-trigger").value,minutes:Math.min(1440,Math.max(1,Math.round(Number(find2("git-snapshot-minutes").value))||
+15)),push:find2("git-snapshot-push").checked,onClose:find2("git-snapshot-close").checked});const snapshotsOn=()=>state?.
+snapshots?.enabled===true;function renderSnapshotDialog(){const v=snapshotView,path=currentPath(),detail=v.detail;const when=item2=>new Date(
+item2.date).toLocaleString();const item=entry=>`<button type="button" class="git-snapshot-item${entry.snapshot?" snapsho\
+t":""}" data-snapshot-id="${esc2(entry.id)}" aria-pressed="${entry.id===v.selected}"><strong>${esc2(entry.subject)}</str\
+ong><small>${esc2(when(entry))} \xB7 ${esc2(snapshotKinds[entry.snapshot]||"Commit")}${entry.snapshot?"":" \xB7 "+esc2(entry.
+author)}</small></button>`;const files=detail?detail.files.map(file=>`<li><span class="git-snapshot-file-status" data-st\
+atus="${esc2(file.status)}" title="${esc2(fileStatus[file.status]||"Changed")}">${esc2(file.status)}</span><span class="\
+git-snapshot-file-path" title="${esc2(file.path)}">${esc2(file.path)}</span><button type="button" data-snapshot-diff="${esc2(
+file.path)}" title="Show what this commit changed in ${esc2(file.path)}">Changes</button><button type="button" data-snap\
+shot-restore="${esc2(file.path)}" data-before="${file.status==="D"}" title="${file.status==="D"?"Bring back the version \
+deleted here":"Make this the current version of the file"}">${file.status==="D"?"Restore deleted file":"Restore this ver\
+sion"}</button></li>`).join(""):"";const selected3=v.list.find(entry=>entry.id===v.selected);snapshotDialog.innerHTML=`<\
+div class="git-diff-heading"><div><p class="eyebrow">SNAPSHOTS &amp; HISTORY</p><h2 id="git-snapshot-title${idSuffix}">E\
+arlier versions</h2></div><button type="button" data-snapshot-close aria-label="Close snapshots" title="Close (Esc)">\xD7</\
+button></div>
+      <div class="git-diff-toolbar">${path?`<label class="git-check"><input type="checkbox" data-snapshot-only ${v.path?
+"checked":""}> Only versions of ${esc2(path)}</label>`:""}<span class="git-snapshot-note" role="status">${esc2(v.note)}<\
+/span></div>
+      <div class="git-snapshot-body"><div class="git-snapshot-list">${v.list.map(item).join("")||`<p class="hint">${v.path?
+"No commits changed this file yet.":"Your first snapshot or commit will appear here."}</p>`}${v.more?'<button type="butt\
+on" data-snapshot-more>Show older versions</button>':""}</div>
+      <div class="git-snapshot-detail">${selected3&&detail?`<div class="git-snapshot-detail-heading"><div><strong>${esc2(
+selected3.subject)}</strong><small>${esc2(when(selected3))} \xB7 ${esc2(selected3.short)} \xB7 ${esc2(selected3.author)}\
+</small></div><button type="button" data-snapshot-restore-all title="Return every tracked file to this version">Restore \
+entire snapshot</button></div><ul class="git-snapshot-files">${files||'<li class="hint">No file changes to show.</li>'}<\
+/ul>`:'<p class="hint">Choose a snapshot or commit to see the files it changed and restore them.</p>'}</div></div>`;for(const node of snapshotDialog.
+querySelectorAll("button,input"))node.disabled=v.working}async function loadSnapshots({more=false}={}){const v=snapshotView,
+serial=generation,skip=more?v.list.length:0;const page=await client2.call("gitHistory",{limit:50,skip,...v.path?{path:v.
+path}:{}});if(serial!==generation)return;v.list=more?[...v.list,...page]:page;v.more=page.length===50;if(!v.list.some(entry=>entry.
+id===v.selected)){v.selected=null;v.detail=null}if(!v.selected&&v.list.length)await selectSnapshot(v.list[0].id,false);renderSnapshotDialog()}
+async function selectSnapshot(id2,render3=true){const serial=generation,detail=await client2.call("gitCommitDiff",{id:id2});
+if(serial!==generation)return;snapshotView.selected=id2;snapshotView.detail=detail;if(render3)renderSnapshotDialog()}async function openSnapshots(){
+if(busy||!state?.repository)return;Object.assign(snapshotView,{list:[],more:false,selected:null,detail:null,path:null,note:""});
+try{await loadSnapshots();snapshotDialog.showModal();snapshotDialog.querySelector("[data-snapshot-close]").focus()}catch(error){
+announce(error.message,true)}}async function restoreFromSnapshots(name2,args){snapshotView.working=true;renderSnapshotDialog();
+try{await action(name2,{...args,confirmed:true});snapshotView.note=find2("git-notice").textContent}finally{snapshotView.
+working=false}try{await loadSnapshots()}catch(error){snapshotView.note=error.message;renderSnapshotDialog()}}snapshotDialog.
+addEventListener("click",async event=>{const target=event.target.closest("button"),v=snapshotView;if(!target||target.disabled)
+return;try{if(target.hasAttribute("data-snapshot-close"))return snapshotDialog.close();if(target.hasAttribute("data-snap\
+shot-more"))return await loadSnapshots({more:true});if(target.dataset.snapshotId)return await selectSnapshot(target.dataset.
+snapshotId);const selected3=v.list.find(entry=>entry.id===v.selected);if(!selected3)return;const date=new Date(selected3.
+date).toLocaleString();if(target.dataset.snapshotDiff){const result=await client2.call("gitCommitDiff",{id:selected3.id,
+path:target.dataset.snapshotDiff});diff={...result,commit:true};split2=true;renderDiffDialog();dialog.showModal();return}
+if(target.dataset.snapshotRestore){const file=target.dataset.snapshotRestore,before=target.dataset.before==="true";if(!await ask(
+"Restore this version?",`${file} returns to its version ${before?"from just before":"from"} ${date}.`+(snapshotsOn()?" Y\
+our current changes are kept in a snapshot first, so you can switch back.":" Changes to it that are not committed will b\
+e lost."),{confirm:"Restore file"}))return;return await restoreFromSnapshots("restoreFile",{id:selected3.id,path:file,before})}
+if(target.hasAttribute("data-snapshot-restore-all")){if(!await ask("Restore entire snapshot?",`Every tracked file return\
+s to its version from ${date}: changed files are replaced and files added since are removed. Files Git does not track st\
+ay as they are.`+(snapshotsOn()?" Current changes are kept in a snapshot first and the restore is recorded as a new snap\
+shot, so nothing is lost.":" Changes that are not committed will be lost."),{confirm:"Restore snapshot"}))return;return await restoreFromSnapshots(
+"restoreSnapshot",{id:selected3.id})}}catch(error){v.note=error.message;renderSnapshotDialog()}});snapshotDialog.addEventListener(
+"change",async event=>{if(!event.target.matches("[data-snapshot-only]"))return;snapshotView.path=event.target.checked?currentPath():
+null;snapshotView.selected=null;try{await loadSnapshots()}catch(error){snapshotView.note=error.message;renderSnapshotDialog()}});
+async function refresh({quiet=false}={}){if(refreshing||busy||!client2.capabilities.git){if(!client2.capabilities.git)render2();
+return}if(quiet&&Date.now()-refreshedAt<Math.max(1e3,refreshCost*5))return;refreshing=true;refreshedAt=Date.now();const serial=generation;
+try{const next=await client2.call("gitStatus");if(serial!==generation)return;const changed=JSON.stringify(next)!==JSON.stringify(
+state);state=next;if(changed)render2();if(!quiet&&state.error)announce(state.error,true)}catch(error){if(serial===generation&&
+!quiet)announce(error.message,true)}finally{refreshing=false;refreshCost=Date.now()-refreshedAt}}async function ask(title,description,{
+input,confirm="Continue"}={}){const prompt=document.createElement("dialog");prompt.className="git-prompt";prompt.innerHTML=
+`<form method="dialog"><h2>${esc2(title)}</h2><p>${esc2(description)}</p>${input!==void 0?`<label>${esc2(title)}<input n\
+ame="value" value="${esc2(input)}" autocomplete="off" required></label>`:""}<div class="dialog-actions"><button value="c\
+ancel" formnovalidate>Cancel</button><button value="ok">${esc2(confirm)}</button></div></form>`;document.body.append(prompt);
+prompt.showModal();prompt.querySelector("input")?.select();return new Promise(resolve=>{prompt.onclose=()=>{const value=prompt.
+returnValue==="ok"?prompt.querySelector("input")?.value.trim()??true:null;prompt.remove();resolve(value)}})}async function action(name2,args={}){
+if(busy)return;const serial=generation;lock(true);announce({fetch:"Fetching remote updates\u2026",pull:"Pulling changes\u2026",
+push:"Pushing branch\u2026",sync:"Committing all changes and syncing\u2026",commit:"Committing staged changes\u2026",snapshot:"\
+Taking a snapshot\u2026",restoreFile:"Restoring file\u2026",restoreSnapshot:"Restoring snapshot\u2026"}[name2]||"Updatin\
+g repository\u2026");try{const settings=["configureRemotes","configureSnapshots"].includes(name2);if(!settings)await beforeAction(
+name2);if(serial!==generation)return;const result=await client2.call("gitAction",{action:name2,remote:selectedRemote,...[
+"push","sync"].includes(name2)?{pushRemotes}:{},...args});if(serial!==generation)return;state=result.status;if(name2==="\
+commit"||name2==="sync"&&result.committed)timestampMessage(true);if(name2==="addRemote"){find2("git-remote-name").value=
+"";find2("git-remote-url").value=""}historyLoaded=false;render2();announce(result.message||"Done.");if(!settings)await afterMutation(
+name2);if(find2("git-history").open)await loadHistory()}catch(error){if(serial===generation){announce(error.message,true);
+try{state=await client2.call("gitStatus");render2();if(!["configureRemotes","configureSnapshots"].includes(name2))await afterMutation(
+name2)}catch{}}}finally{lock(false)}}function renderDiffDialog(){const rows=diffRows(diff.text),additions=rows.filter(row=>row.
+kind==="add").length,deletions=rows.filter(row=>row.kind==="remove").length;dialog.innerHTML=`<div class="git-diff-headi\
+ng"><div><p class="eyebrow">${diff.pulled?"PULLED CHANGES":diff.commit?"COMMIT":diff.staged?"INDEX \xB7 STAGED CHANGES":
+"WORKING TREE \xB7 CHANGES"}</p><h2 id="git-diff-title">${esc2(diff.path)}</h2></div><span class="git-diff-count"><span>\
++${additions}</span> <span>\u2212${deletions}</span></span><button type="button" data-diff-close aria-label="Close diff"\
+ title="Close diff (Esc)">\xD7</button></div><div class="git-diff-toolbar"><div role="group" aria-label="Diff layout"><butt\
+on data-diff-layout="unified" aria-pressed="${!split2}">Unified</button><button data-diff-layout="split" aria-pressed="${split2}\
+">Side by side</button></div><div class="spacer"></div>${!diff.commit&&!diff.deleted&&/\.md$/i.test(diff.path)?"<button \
+data-diff-open>Open article</button>":""}${!diff.commit&&!diff.pulled?`<button data-diff-stage>${diff.staged?"\u2212 Unstage \
+file":"+ Stage file"}</button>`:""}</div><div class="git-diff-body ${split2?"git-diff-split":""}" tabindex="0" aria-labe\
+l="${esc2(diff.path)} diff">${diff.text?renderDiff(diff.text,split2):'<p class="hint">No changes in this version.</p>'}<\
+/div><div class="git-diff-footer">${diff.binary?"Binary content cannot be shown as text.":diff.pulled?"Workspace changes\
+ brought in by this pull.":diff.commit?"Commit details and file changes":diff.staged?"HEAD \u2192 Index \xB7 These changes will \
+be committed.":"Index \u2192 Working tree \xB7 Stage this version to include it in a commit."}<span>Esc to close</span><\
+/div>`;dialog.querySelector("[data-diff-close]").onclick=()=>dialog.close();dialog.querySelectorAll("[data-diff-layout]").
+forEach(node=>node.onclick=()=>{split2=node.dataset.diffLayout==="split";renderDiffDialog()});const stage=dialog.querySelector(
+"[data-diff-stage]");if(stage)stage.onclick=async()=>{dialog.close();await action(diff.staged?"unstage":"stage",{path:diff.
+path})};const open=dialog.querySelector("[data-diff-open]");if(open)open.onclick=async()=>{dialog.close();try{await openFile(
+diff.path)}catch(error){announce(error.message,true)}}}async function openDiff(file,staged){if(busy)return;const serial=generation;
+try{await beforeAction("diff");if(serial!==generation)return;const result=await client2.call("gitDiff",{path:file,staged});
+if(serial!==generation)return;diff=result;split2=true;renderDiffDialog();dialog.showModal();dialog.querySelector("[data-\
+diff-close]").focus()}catch(error){announce(error.message,true)}}function renderConflictHunks(){const editor=conflictDialog.
+querySelector("#git-conflict-result"),body=conflictDialog.querySelector(".git-conflict-hunks");if(!editor||!body)return;
+const hunks=conflictHunks(editor.value);body.innerHTML=hunks.map((hunk,index2)=>`<section class="git-conflict-hunk"><div\
+ class="git-conflict-hunk-heading"><strong>Conflict ${index2+1}</strong><button data-hunk="${index2}" data-choice="ours"\
+>Use current</button><button data-hunk="${index2}" data-choice="theirs">Use incoming</button><button data-hunk="${index2}\
+" data-choice="both">Use both</button></div><div class="git-conflict-versions"><div><h3>Current \xB7 ours</h3><pre>${esc2(
+hunk.ours)||"(empty)"}</pre></div><div><h3>Incoming \xB7 theirs</h3><pre>${esc2(hunk.theirs)||"(empty)"}</pre></div></di\
+v></section>`).join("")||'<p class="hint">No remaining conflict blocks. Review the result before staging.</p>';conflictDialog.
+querySelector("[data-conflict-count]").textContent=hunks.length+(hunks.length===1?" conflict block":" conflict blocks");
+for(const node of body.querySelectorAll("[data-hunk]"))node.onclick=()=>{const hunk=conflictHunks(editor.value)[Number(node.
+dataset.hunk)];if(!hunk)return;const replacement=node.dataset.choice==="both"?hunk.ours+hunk.theirs:hunk[node.dataset.choice];
+editor.value=editor.value.slice(0,hunk.from)+replacement+editor.value.slice(hunk.to);conflictChoice="manual";conflictDialog.
+querySelector("[data-conflict-error]").textContent="";renderConflictHunks();editor.focus();editor.setSelectionRange(hunk.
+from,hunk.from+replacement.length)}}function renderConflictDialog(){const version=(side,label)=>`<section><h3>${label}</\
+h3><pre>${esc2(side.deleted?"(deleted)":side.binary?"(binary content)":side.text)||"(empty file)"}</pre></section>`;conflictChoice=
+"manual";conflictDialog.innerHTML=`<div class="git-diff-heading"><div><p class="eyebrow">RESOLVE MERGE CONFLICT</p><h2 i\
+d="git-conflict-title">${esc2(conflict.path)}</h2></div><button type="button" data-conflict-close aria-label="Close conf\
+lict resolver">\xD7</button></div>${conflict.unsupported?`<div class="git-conflict-content"><p>${esc2(conflict.reason)}<\
+/p></div>`:`<div class="git-diff-toolbar"><button data-conflict-choice="ours">${conflict.ours.deleted?"Accept current de\
+letion":"Use entire current file"}</button><button data-conflict-choice="theirs">${conflict.theirs.deleted?"Accept incom\
+ing deletion":"Use entire incoming file"}</button><span class="spacer"></span><span data-conflict-count></span></div><di\
+v class="git-conflict-content"><p class="hint">Current is Git\u2019s \u201Cours\u201D; incoming is \u201Ctheirs\u201D. During a rebase these desc\
+ribe the rebased branch and replayed commit. Whole-file choices replace the complete result.</p><div class="git-notice g\
+it-error" data-conflict-error role="alert"></div>${conflict.binary||conflict.ours.deleted||conflict.theirs.deleted?`<div\
+ class="git-conflict-versions">${version(conflict.ours,"Current \xB7 ours")}${version(conflict.theirs,"Incoming \xB7 theirs")}\
+</div>`:""}${conflict.binary?'<p class="hint">Binary content is preserved exactly. Choose which complete version to keep\
+.</p>':`<div class="git-conflict-hunks"></div><label class="git-conflict-result-label" for="git-conflict-result">Result \
+\xB7 edit freely</label><textarea id="git-conflict-result" spellcheck="false" aria-label="Conflict resolution result"></tex\
+tarea>`}<p class="hint" data-conflict-selection></p></div><div class="git-diff-footer"><span>Save a draft to continue la\
+ter, or stage the reviewed resolution.</span><div><button data-conflict-save="draft">Save draft</button><button data-con\
+flict-save="stage">Save &amp; stage</button></div></div>`}`;conflictDialog.querySelector("[data-conflict-close]").onclick=
+()=>conflictDialog.close();if(conflict.unsupported)return;const editor=conflictDialog.querySelector("#git-conflict-resul\
+t");if(editor){editor.value=conflict.text;editor.oninput=()=>{conflictChoice="manual";editor.disabled=false;conflictDialog.
+querySelector("[data-conflict-selection]").textContent="";conflictDialog.querySelector("[data-conflict-error]").textContent=
+"";renderConflictHunks()};renderConflictHunks()}for(const node of conflictDialog.querySelectorAll("[data-conflict-choice\
+]"))node.onclick=()=>{const side=conflict[node.dataset.conflictChoice];conflictChoice=node.dataset.conflictChoice;if(editor){
+editor.value=side.text;editor.disabled=side.deleted;renderConflictHunks()}conflictDialog.querySelector("[data-conflict-s\
+election]").textContent=side.deleted?"The selected version deletes this file.":"The complete "+(conflictChoice==="ours"?
+"current":"incoming")+" version is selected. Review before saving.";conflictDialog.querySelector("[data-conflict-error]").
+textContent=""};for(const node of conflictDialog.querySelectorAll("[data-conflict-save]"))node.onclick=async()=>{if(busy)
+return;const serial=generation,error=conflictDialog.querySelector("[data-conflict-error]");if(conflict.binary&&conflictChoice===
 "manual"){error.textContent="Choose the current or incoming version first.";return}const args={action:"resolveConflict",
 path:conflict.path,revision:conflict.revision,choice:conflictChoice,text:editor?.value,stage:node.dataset.conflictSave===
 "stage"};lock(true);for(const control of conflictDialog.querySelectorAll("button,textarea"))control.disabled=true;try{await beforeAction(
@@ -13749,28 +13859,30 @@ dataset.untracked==="true";if(await ask(untracked?"Delete untracked file?":"Disc
 ete "+file+" from this workspace? Git has no staged version to restore. Its current contents will be lost.":"Restore "+file+
 " to its staged version. Unstaged edits will be lost.",{confirm:untracked?"Delete file":"Discard changes"})){if(serial===
 generation)await action(name2,{path:file,confirmed:true,untracked})}return}if(name2==="editIgnore")return editIgnore();if(name2===
-"setup")return onSetup?.();if(name2==="init"&&!await ask(ui("Initialise repository?"),"Create Git history for this works\
-pace. Stage and commit selected files to record your first version.",{confirm:ui("Initialise")}))return;if(serial!==generation)
-return;await action(name2,{path:target.closest(".git-file")?.dataset.path,ref:target.dataset.ref})});find2("git-branches").
-onchange=()=>action("switch",{branch:find2("git-branches").value});find2("git-remotes").onchange=()=>action("configureRe\
-motes",{remote:find2("git-remotes").value,pushRemotes});find2("git-push-remotes").onchange=()=>action("configureRemotes",
-{pushRemotes:[...container.querySelectorAll("[data-push-remote]:checked")].map(input=>input.dataset.pushRemote)});find2(
-"git-add-remote-form").onsubmit=event=>{event.preventDefault();action("addRemote",{name:find2("git-remote-name").value.trim(),
-url:find2("git-remote-url").value.trim()})};find2("git-commit-form").onsubmit=event=>{event.preventDefault();if(!find2("\
-git-commit").disabled)action("commit",{message:commitMessage()})};find2("git-commit-message").onkeydown=event=>{if((event.
+"browseSnapshots")return openSnapshots();if(name2==="setup")return onSetup?.();if(name2==="init"&&!await ask(ui("Initial\
+ise repository?"),"Create Git history for this workspace. Stage and commit selected files to record your first version.",
+{confirm:ui("Initialise")}))return;if(serial!==generation)return;await action(name2,{path:target.closest(".git-file")?.dataset.
+path,ref:target.dataset.ref})});find2("git-branches").onchange=()=>action("switch",{branch:find2("git-branches").value});
+for(const id2 of["git-snapshot-enabled","git-snapshot-trigger","git-snapshot-minutes","git-snapshot-push","git-snapshot-\
+close"])find2(id2).onchange=()=>action("configureSnapshots",snapshotSettings());find2("git-remotes").onchange=()=>action(
+"configureRemotes",{remote:find2("git-remotes").value,pushRemotes});find2("git-push-remotes").onchange=()=>action("confi\
+gureRemotes",{pushRemotes:[...container.querySelectorAll("[data-push-remote]:checked")].map(input=>input.dataset.pushRemote)});
+find2("git-add-remote-form").onsubmit=event=>{event.preventDefault();action("addRemote",{name:find2("git-remote-name").value.
+trim(),url:find2("git-remote-url").value.trim()})};find2("git-commit-form").onsubmit=event=>{event.preventDefault();if(!find2(
+"git-commit").disabled)action("commit",{message:commitMessage()})};find2("git-commit-message").onkeydown=event=>{if((event.
 ctrlKey||event.metaKey)&&event.key==="Enter"){event.preventDefault();if(!find2("git-commit").disabled)action("commit",{message:commitMessage()})}};
 find2("git-history").ontoggle=()=>{if(find2("git-history").open)loadHistory()};dialog.addEventListener("click",event=>{if(event.
 target===dialog){const rect=dialog.getBoundingClientRect();if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<
 rect.top||event.clientY>rect.bottom)dialog.close()}});const timer=setInterval(()=>{if(!document.hidden){if(!busy)timestampMessage();
-refresh({quiet:true})}},6e3);async function perform(name2,args={}){if(busy)throw new Error("Source control is busy. Try \
-again in a moment.");const serial=generation;lock(true);try{await beforeAction(name2);const result=await client2.call("g\
-itAction",{action:name2,...args});if(serial===generation){state=result.status;historyLoaded=false;render2();announce(result.
-message||"Done.")}await afterMutation(name2);return result}finally{lock(false)}}render2();return{refresh,perform,get status(){
-return state},reset(){generation++;state=null;historyLoaded=false;selectedRemote="";pushRemotes=[];timestampMessage(true);
-find2("git-remote-name").value="";find2("git-remote-url").value="";find2("git-history-list").innerHTML="";announce("");dialog.
-close();conflictDialog.close();ignoreDialog.close();fileMenu.hidden=true;render2()},destroy(){clearInterval(timer);dialog.
-remove();conflictDialog.remove();ignoreDialog.remove();fileMenu.remove();document.removeEventListener("click",closeMenu);
-document.removeEventListener("keydown",closeMenu)}}}function sshRemote(input){const text=String(input||"").trim().replace(/\/+$/,"");if(!text)return null;const short=text.match(
+if(state?.repository)renderSnapshotSettings();refresh({quiet:true})}},6e3);async function perform(name2,args={}){if(busy)
+throw new Error("Source control is busy. Try again in a moment.");const serial=generation;lock(true);try{await beforeAction(
+name2);const result=await client2.call("gitAction",{action:name2,...args});if(serial===generation){state=result.status;historyLoaded=
+false;render2();announce(result.message||"Done.")}await afterMutation(name2);return result}finally{lock(false)}}render2();
+return{refresh,perform,get status(){return state},reset(){generation++;state=null;historyLoaded=false;selectedRemote="";
+pushRemotes=[];timestampMessage(true);find2("git-remote-name").value="";find2("git-remote-url").value="";find2("git-hist\
+ory-list").innerHTML="";announce("");dialog.close();conflictDialog.close();ignoreDialog.close();snapshotDialog.close();fileMenu.
+hidden=true;render2()},destroy(){clearInterval(timer);dialog.remove();conflictDialog.remove();ignoreDialog.remove();snapshotDialog.
+remove();fileMenu.remove();document.removeEventListener("click",closeMenu);document.removeEventListener("keydown",closeMenu)}}}function sshRemote(input){const text=String(input||"").trim().replace(/\/+$/,"");if(!text)return null;const short=text.match(
 /^([\w.-]+)\/([\w.-]+?)(?:\.git)?$/);if(short)return{url:`git@github.com:${short[1]}/${short[2]}.git`,host:"github.com",
 path:`${short[1]}/${short[2]}`};const scp=text.match(/^([\w.-]+)@([\w.-]+):([\w./-]+?)(?:\.git)?$/);if(scp)return{url:`${scp[1]}\
 @${scp[2]}:${scp[3]}.git`,host:scp[2].toLowerCase(),path:scp[3]};let url;try{url=new URL(text)}catch{return null}if(!["h\
@@ -14915,14 +15027,14 @@ schedule();return{refresh:schedule}}var $=id2=>document.getElementById(id2);var 
 var pageData=JSON.parse($("weave-data").textContent||"{}");var portable=pageData.portable===true;var graphFeature=pageData.
 features?.graph!==false;{const group=document.createElement("div");group.className="editor-group";group.id="editor-right";
 group.dataset.pane="1";group.hidden=true;for(const id2 of["tab-bar","welcome","note-panel"]){const copy=$(id2).cloneNode(
-true);for(const node of copy.querySelectorAll("#welcome-open, #welcome-recent"))node.remove();for(const node of[copy,...copy.
-querySelectorAll("[id]")])if(PANE_IDS.includes(node.id))node.id=paneId(node.id,1);else node.removeAttribute("id");group.
-append(copy)}const divider=document.createElement("div");divider.id="split-resize";divider.hidden=true;divider.tabIndex=
-0;divider.setAttribute("role","separator");divider.setAttribute("aria-orientation","vertical");divider.setAttribute("ari\
-a-label","Resize split view");$("editor-left").after(divider,group)}for(const element of document.querySelectorAll("[dat\
-a-capability]"))element.hidden=!client.capabilities[element.dataset.capability];document.querySelector('[data-panel="git\
-"]').hidden=!client.capabilities.git;if(pageData.mode==="server")$("choose-workspace").textContent="Open server workspac\
-e\u2026";if(portable)$("choose-workspace").hidden=true;$("create-workspace").hidden=portable||!client.writable||!client.
+true);for(const node of copy.querySelectorAll("#welcome-open, #welcome-recent, #welcome-available"))node.remove();for(const node of[
+copy,...copy.querySelectorAll("[id]")])if(PANE_IDS.includes(node.id))node.id=paneId(node.id,1);else node.removeAttribute(
+"id");group.append(copy)}const divider=document.createElement("div");divider.id="split-resize";divider.hidden=true;divider.
+tabIndex=0;divider.setAttribute("role","separator");divider.setAttribute("aria-orientation","vertical");divider.setAttribute(
+"aria-label","Resize split view");$("editor-left").after(divider,group)}for(const element of document.querySelectorAll("\
+[data-capability]"))element.hidden=!client.capabilities[element.dataset.capability];document.querySelector('[data-panel=\
+"git"]').hidden=!client.capabilities.git;if(pageData.mode==="server")$("choose-workspace").textContent="Open server work\
+space\u2026";if(portable)$("choose-workspace").hidden=true;$("create-workspace").hidden=portable||!client.writable||!client.
 createWorkspace;$("menu-git-setup").hidden=portable||!client.writable||!client.capabilities.git;if(!graphFeature){for(const id2 of[
 "toggle-graph","view-graph"])$(id2).hidden=true;for(const index2 of[0,1])$(paneId("connections",index2)).hidden=true}if(portable&&
 pageData.root)document.title=pageData.root+" \xB7 Weave";if(portable)document.documentElement.style.setProperty("--sideb\
@@ -14992,29 +15104,30 @@ const section2=document.createElement("details");section2.className="git-workspa
 innerHTML='<summary><span class="workspace-dot" aria-hidden="true"></span><span class="git-workspace-name"></span><span \
 class="git-workspace-count" hidden></span></summary><div class="git-workspace-body"></div>';ws.gitSection=section2;ws.gitCount=
 0;ws.gitBusy=false;ws.git=createGitPanel({client:ws.api,container:section2.querySelector(".git-workspace-body"),idSuffix:gitPanelCount++?
-"-"+gitPanelCount:"",openFile:file=>openNote(file,null,{ws}),onPendingCount:count3=>{ws.gitCount=count3;renderGitSections()},
-onBusy:busy=>{ws.gitBusy=busy;$("git-panel").setAttribute("aria-busy",String(workspaces.some(w=>w.gitBusy)))},onStatus:()=>renderWelcome(),
-onSetup:()=>run(setupGit)(ws),beforeAction:async()=>{if(!workspaces.includes(ws))throw new Error("This workspace is inac\
-tive.");if(!await ensureDraftsSaved(key=>key.startsWith(ws.key+"\n"),"using Git"))throw new Error("Save or discard unsav\
-ed articles before using Git.");if(dirty||saving)throw new Error("Finish saving the current article before continuing.")},
-afterMutation:async name2=>{await applyCatalog(ws,await ws.api.call("catalog"));if(active?.ws===ws.key&&["pull","sync","\
-switch","createBranch","stash","applyStash","discard","resolveConflict"].includes(name2)){if(dirty||saving){$p("note-war\
-ning").textContent="Git changed this workspace. Your draft is retained; save or reload after reviewing the changes.";return}
-if(ws.index.has(active.path))await openNote(active.path,void 0,{record:false,ws});else $p("note-warning").textContent="T\
-his article is absent from the current Git version. Its open text is retained."}await reloadChangedPanes(ws)}});section2.
-addEventListener("toggle",()=>{if(section2.open)void ws.git.refresh({quiet:true})})}function renderGitSections(){let total=0;
-for(const ws of workspaces){gitList.append(ws.gitSection);total+=ws.gitCount;ws.gitSection.style.setProperty("--workspac\
-e-color",workspaceColor(ws));ws.gitSection.querySelector(".git-workspace-name").textContent=workspaceName(ws);ws.gitSection.
-querySelector("summary").title=ws.catalog.root;const count3=ws.gitSection.querySelector(".git-workspace-count");count3.hidden=
-!ws.gitCount;count3.textContent=String(ws.gitCount);count3.title=ws.gitCount+" pending "+(ws.gitCount===1?"file":"files")}
-if(workspaces.length===1&&gitSectionsShown!==1)workspaces[0].gitSection.open=true;gitSectionsShown=workspaces.length;let hint=gitList.
-querySelector(":scope > .hint");if(!workspaces.length&&!hint){hint=document.createElement("p");hint.className="hint";hint.
-textContent=client.capabilities.git?"Open a workspace to manage its Git repository.":"Source control is available in the\
- desktop application.";gitList.append(hint)}if(workspaces.length)hint?.remove();const badge=$("git-pending-badge");if(badge){
-badge.textContent=String(total);badge.hidden=!total;badge.parentElement.title=total?"Source control \xB7 "+total+" pendi\
-ng "+(total===1?"file":"files"):"Source control"}}function focusGitSection(ws){if(!ws||!multi())return;for(const other of workspaces)
-other.gitSection.open=other===ws}function addWorkspace(next){const key=workspaceKey(next);let ws=wsByKey(key);if(!ws){ws=
-{key,catalog:next,status:next.status,api:client.bind?client.bind(next):client,graphData:{entities:[],relationships:[]},expanded:new Set,
+"-"+gitPanelCount:"",openFile:file=>openNote(file,null,{ws}),currentPath:()=>active?.ws===ws.key&&active.path?active.path:
+null,onPendingCount:count3=>{ws.gitCount=count3;renderGitSections()},onBusy:busy=>{ws.gitBusy=busy;$("git-panel").setAttribute(
+"aria-busy",String(workspaces.some(w=>w.gitBusy)))},onStatus:()=>renderWelcome(),onSetup:()=>run(setupGit)(ws),beforeAction:async()=>{
+if(!workspaces.includes(ws))throw new Error("This workspace is inactive.");if(!await ensureDraftsSaved(key=>key.startsWith(
+ws.key+"\n"),"using Git"))throw new Error("Save or discard unsaved articles before using Git.");if(dirty||saving)throw new Error(
+"Finish saving the current article before continuing.")},afterMutation:async name2=>{await applyCatalog(ws,await ws.api.
+call("catalog"));if(active?.ws===ws.key&&["pull","sync","switch","createBranch","stash","applyStash","discard","resolveC\
+onflict","restoreFile","restoreSnapshot"].includes(name2)){if(dirty||saving){$p("note-warning").textContent="Git changed\
+ this workspace. Your draft is retained; save or reload after reviewing the changes.";return}if(ws.index.has(active.path))
+await openNote(active.path,void 0,{record:false,ws});else $p("note-warning").textContent="This article is absent from th\
+e current Git version. Its open text is retained."}await reloadChangedPanes(ws)}});section2.addEventListener("toggle",()=>{
+if(section2.open)void ws.git.refresh({quiet:true})})}function renderGitSections(){let total=0;for(const ws of workspaces){
+gitList.append(ws.gitSection);total+=ws.gitCount;ws.gitSection.style.setProperty("--workspace-color",workspaceColor(ws));
+ws.gitSection.querySelector(".git-workspace-name").textContent=workspaceName(ws);ws.gitSection.querySelector("summary").
+title=ws.catalog.root;const count3=ws.gitSection.querySelector(".git-workspace-count");count3.hidden=!ws.gitCount;count3.
+textContent=String(ws.gitCount);count3.title=ws.gitCount+" pending "+(ws.gitCount===1?"file":"files")}if(workspaces.length===
+1&&gitSectionsShown!==1)workspaces[0].gitSection.open=true;gitSectionsShown=workspaces.length;let hint=gitList.querySelector(
+":scope > .hint");if(!workspaces.length&&!hint){hint=document.createElement("p");hint.className="hint";hint.textContent=
+client.capabilities.git?"Open a workspace to manage its Git repository.":"Source control is available in the desktop app\
+lication.";gitList.append(hint)}if(workspaces.length)hint?.remove();const badge=$("git-pending-badge");if(badge){badge.textContent=
+String(total);badge.hidden=!total;badge.parentElement.title=total?"Source control \xB7 "+total+" pending "+(total===1?"f\
+ile":"files"):"Source control"}}function focusGitSection(ws){if(!ws||!multi())return;for(const other of workspaces)other.
+gitSection.open=other===ws}function addWorkspace(next){const key=workspaceKey(next);let ws=wsByKey(key);if(!ws){ws={key,
+catalog:next,status:next.status,api:client.bind?client.bind(next):client,graphData:{entities:[],relationships:[]},expanded:new Set,
 treeLimit:1e3,persisted:"",lastTab:null};workspaces.push(ws);createWorkspaceGit(ws);if(portable){const paths=next.tree.files.
 map(f=>f.path.split("/").slice(0,-1));for(let i2=1;paths.length&&paths.every(parts=>parts.length>=i2&&parts[i2-1]===paths[0][i2-
 1]);i2++)ws.expanded.add(paths[0].slice(0,i2).join("/"))}}setCatalog(ws,next);return ws}function setCatalog(ws,next){if(next.
@@ -15297,122 +15410,135 @@ if(!client.capabilities.workspaces)resetWorkspaces();await adoptWorkspace(next);
 wsByKey(workspaceKey(next)))+" is open.":"Workspace open.":"Read-only browser view.")}async function createWorkspace(){if(!client.
 createWorkspace||!client.writable)throw new Error("This host cannot create workspaces.");if(panelInfo?.managedWorkspaces)
 throw new Error("This server shows workspaces chosen in the desktop app. Create workspaces there.");const server=pageData.
-mode==="server";const answer=await promptUser("Create workspace",server?"Name the new workspace. Weave creates an empty \
-folder with this name on the server.":"Name the new workspace. Next, choose the folder to create it in.",{value:"Notes",
-ok:server?"Create workspace":"Choose location\u2026"});if(answer.action!=="ok")return;if(!answer.value)throw new Error("\
-Enter a workspace name.");await persistSession();const next=await client.createWorkspace(answer.value);if(!next)return;if(!client.
-capabilities.workspaces)resetWorkspaces();const ws=await adoptWorkspace(next);message(workspaceName(ws)+" created. Add y\
-our first article.")}async function randomArticle(ws){const paths=ws.index.paths;if(!paths.length)throw new Error(workspaceName(
-ws)+" has no articles yet.");const others=paths.length>1?paths.filter(path=>path!==paneActive(P)?.path):paths;await openNote(
-others[Math.floor(Math.random()*others.length)],null,{ws})}async function setupGit(ws){if(!ws)throw new Error("Open a wo\
-rkspace to set up Git.");if(!client.capabilities.git)throw new Error("Git is unavailable on this host.");if(!ws.git.status)
-await ws.git.refresh();if(ws.git.status&&ws.git.status.available===false)throw new Error(ws.git.status.error||"Git is un\
-available. Install Git and reopen Weave.");openGitSetup({git:ws.git,name:workspaceName(ws),server:pageData.mode==="serve\
-r",openResource:url=>client.openResource(url),showSourceControl:()=>{sidebars.select("right","git");focusGitSection(ws);
-ws.gitSection.open=true},ask:async(title,text,ok)=>(await promptUser(title,text,{ok})).action==="ok"})}var needsGitSetup=ws=>{
+mode==="server";const answer=await promptUser("Create workspace",(server?"Name the new workspace. Weave creates an empty\
+ folder with this name on the server":"Name the new workspace. Next, choose the folder to create it in. Weave creates an\
+ empty folder with this name")+" and keeps its history with Git, taking automatic snapshots.",{value:"",ok:server?"Creat\
+e workspace":"Choose location\u2026"});if(answer.action!=="ok")return;if(!answer.value)throw new Error("Enter a workspac\
+e name.");await persistSession();const next=await client.createWorkspace(answer.value);if(!next)return;if(!client.capabilities.
+workspaces)resetWorkspaces();const ws=await adoptWorkspace(next);message(workspaceName(ws)+" created. Add your first art\
+icle."+(next.historyError?" Git history is unavailable: "+next.historyError:""))}async function openServerFolder(name2){
+await persistSession();const next=await client.openServerFolder(name2);if(!next)return;const ws=await adoptWorkspace(next);
+message(workspaceName(ws)+" is open.")}var serverFolders=null;var listsServerFolders=()=>pageData.mode==="server"&&!panelInfo?.
+managedWorkspaces&&Array.isArray(serverFolders);async function randomArticle(ws){const paths=ws.index.paths;if(!paths.length)
+throw new Error(workspaceName(ws)+" has no articles yet.");const others=paths.length>1?paths.filter(path=>path!==paneActive(
+P)?.path):paths;await openNote(others[Math.floor(Math.random()*others.length)],null,{ws})}async function setupGit(ws){if(!ws)
+throw new Error("Open a workspace to set up Git.");if(!client.capabilities.git)throw new Error("Git is unavailable on th\
+is host.");if(!ws.git.status)await ws.git.refresh();if(ws.git.status&&ws.git.status.available===false)throw new Error(ws.
+git.status.error||"Git is unavailable. Install Git and reopen Weave.");openGitSetup({git:ws.git,name:workspaceName(ws),server:pageData.
+mode==="server",openResource:url=>client.openResource(url),showSourceControl:()=>{sidebars.select("right","git");focusGitSection(
+ws);ws.gitSection.open=true},ask:async(title,text,ok)=>(await promptUser(title,text,{ok})).action==="ok"})}var needsGitSetup=ws=>{
 const s=ws?.git?.status;return!!(client.capabilities.git&&client.writable&&s&&s.available!==false&&!s.parentRepository&&
-(!s.repository||!s.remotes?.length))};var welcomeRendered=["",""];function renderWelcome(){for(const pane of panes){const box=pane.
-el.welcome.querySelector(".welcome-actions"),lead=pane.el.welcome.querySelector("p");if(!box)continue;const ws=portable?
-null:wsByKey(paneTabs(pane).find(tab=>tab.id===paneTabId(pane))?.ws)||current();const server=pageData.mode==="server",managed=!!panelInfo?.
-managedWorkspaces,writable=client.writable&&!portable;const items=[];if(ws){if(writable)items.push({action:"new-article",
-title:"New article",text:"Start writing in "+workspaceName(ws),primary:true});items.push({action:"random-article",title:"\
-Random article",text:ws.index?.size?"Rediscover one of "+count2(ws.index.size,"article"):"No articles yet",disabled:!ws.
-index?.size});if(needsGitSetup(ws))items.push({action:"setup-git",title:"Set up Git",text:"Keep history and sync with Gi\
-tHub"});if(document.documentElement.dataset.layout==="mobile")items.push({action:"browse",title:"Browse files",text:"Sho\
-w the articles of "+workspaceName(ws)})}if(writable&&client.createWorkspace&&!managed)items.push({action:"create-workspa\
-ce",title:"Create new workspace",text:server?"An empty folder on this server":"An empty folder for new articles",primary:!ws,
-secondary:!!ws});if(!portable)items.push({action:"open-workspace",title:"Open existing workspace",text:managed?"One shar\
-ed by the desktop app":server?"A folder on this server":"A folder of Markdown files",primary:!ws&&!writable,secondary:!!ws,
-id:pane.index===0?"welcome-open":""});lead.textContent=portable?"Select an article from Files or Search to open it.":ws?
-"Select an article from Files or Search, or start here.":"Create a workspace for new articles, or open one you already h\
-ave.";const html2=items.map(item=>`<button type="button" class="welcome-action${item.primary?" primary":""}${item.secondary?
-" secondary":""}" data-welcome="${item.action}"${ws?` data-ws="${esc2(ws.key)}"`:""}${item.id?` id="${item.id}"`:""}${item.
-disabled?" disabled":""}><strong>${esc2(item.title)}</strong><small>${esc2(item.text)}</small></button>`).join("");if(html2!==
-welcomeRendered[pane.index]){box.innerHTML=html2;welcomeRendered[pane.index]=html2}}}async function adoptWorkspace(next){
-const existing=wsByKey(workspaceKey(next));if(existing){await applyCatalog(existing,next);await showWorkspace(existing);
-return existing}const ws=addWorkspace(next);focusKey=selectedWs=ws.key;selected2="";renderGitSections();await applyCatalog(
-ws,next);void run(loadPartialTrees)();const known=allTabs().filter(t2=>t2.ws===ws.key||t2.history.some(entry=>entryParts(
-entry).ws===ws.key));const{list,saved,pick}=known.length?{list:[],pick:allTabs().findLast(t2=>t2.ws===ws.key&&tabVisible(
-t2))}:savedTabs(ws);tabs.push(...list);if(pick){if(workspaces.length===1)source2=saved?.source===true;await selectTab(pick.
-id)}else{const tab=currentTab();if(tab&&!tab.path&&!tab.history.length){tab.ws=ws.key;ws.lastTab=tab.id}renderTabs();renderWelcome();
-updateStatus(ws.status);focusGitSection(ws)}await persistSession();void loadControlPanel();return ws}async function showWorkspace(ws){
-focusKey=selectedWs=ws.key;selected2="";const tab=allTabs().find(t2=>t2.id===ws.lastTab&&t2.ws===ws.key)||allTabs().findLast(
-t2=>t2.ws===ws.key),owner=tab&&paneOfTab(tab.id);if(tab&&owner!==P&&paneTabId(owner)===tab.id)focusPane(owner);else if(tab){
-if(tab.id!==activeTab)await selectTab(tab.id);else focusGitSection(ws)}else{if(!await leaveArticle())return;const created=makeTab(
-null,ws.key);tabs.push(created);activeTab=created.id;ws.lastTab=created.id;showEmptyTab();renderTabs();focusGitSection(ws);
-updateStatus(ws.status);await persistSession()}renderTree();updatePath();renderWorkspaceManager();message("Showing "+workspaceName(
-ws)+".")}async function closeWorkspace(ws){if(!await ensureDraftsSaved(key=>key.startsWith(ws.key+"\n"),"deactivating "+
-workspaceName(ws)))return;await persistSession();await sessionWrite;const showing=new Set(shownPanes().filter(pane=>{const doc2=paneActive(
-pane);return!!doc2&&!doc2.external&&doc2.ws===ws.key}));if(showing.has(P)){active=null;setDirty(false)}for(const pane of showing)
-if(pane!==P){pane.active=null;kanban?.update(pane)}workspaces=workspaces.filter(w=>w!==ws);ws.git.destroy();ws.gitSection.
-remove();kanban?.forget(ws);settleTabs();if(selectedWs===ws.key){selected2="";selectedWs=null}if(focusKey===ws.key)focusKey=
-null;if(client.capabilities.workspaces)await client.call("close",{scope:ws.api.scope});for(const pane of shownPanes())await inPane(
-pane,async()=>{const shown=visibleTabs();if(!shown.some(t2=>t2.id===activeTab)){activeTab=null;if(shown.length)await selectTab(
-shown.at(-1).id);else showEmptyTab()}else if(showing.has(pane))await selectTab(activeTab)});await collapseEmptyPane();renderTabs();
-renderTree();renderGitSections();updatePath();updateMode();if(current())updateStatus(current().status);else{$("index-sta\
-tus").textContent="Local Markdown workspace";renderOperation({})}await persistSession();await loadControlPanel();message(
-workspaceName(ws)+" deactivated. Reactivate it in Control panel \u203A Workspaces.")}async function moveWorkspace(ws,offset){
-const from=workspaces.indexOf(ws),to=from+offset;if(from<0||to<0||to>=workspaces.length)return;workspaces.splice(from,1);
-workspaces.splice(to,0,ws);renderTree();renderGitSections();renderWorkspaceManager();if(client.capabilities.workspaces)await client.
-call("workspaceLayout",{order:workspaces.map(w=>w.catalog.workspace.id)})}async function configureWorkspace(ws,change){const label=await client.
-call("configureWorkspace",{id:ws.catalog.workspace.id,...change});ws.catalog={...ws.catalog,workspace:{...ws.catalog.workspace,
-label:label.name,customName:label.customName,color:label.color}};renderTree();renderTabs();renderGitSections();updatePath();
-renderWorkspaceManager();await loadControlPanel()}function renderArticle(){updatePath();live.setText(active.text);live.setEnabled(
-canEdit());raw.setText(active.text);raw.setEnabled(canEdit());okfBar.render()}function readablePassage(text,file="",ws=activeWs()||
-current()){const clean=String(text).replace(/^@@\s+-\d+(?:,\d+)?\s+\+?\d*(?:,\d+)?\s*@@[^\r\n]*(?:\r?\n)?/gm,"").replace(
-/^@@\s+-\d+(?:,\d+)?\s+@@[^\r\n]*(?:\r?\n)?/gm,"");return renderNote(clean,ws?.index||[],ws?.catalog.caseSensitive,new Map,
-file,{titles:titles(ws),underline:underlineEnabled()})}function passageText(text,ws){const node=document.createElement("\
-div");node.innerHTML=readablePassage(text,"",ws);for(const block of node.querySelectorAll("p,li,h1,h2,h3,pre"))block.append(
-" ");return node.textContent.trim()}async function renderConnections(){if(!active)return;const at=active.path,ws=activeWs();
-if(active.external){$p("relationships").innerHTML='<span class="hint">This file is outside the workspace, so its links a\
-re not part of the graph.</span>';return}const[outgoing,incoming]=await Promise.all([ws.api.call("getOutgoingRelationshi\
-ps",{path:at}),ws.api.call("getIncomingRelationships",{path:at})]);if(active?.path!==at||activeWs()!==ws)return;const edge=(e,incoming2)=>{
-const target=incoming2?e.source_document_id:e.target_document_id||e.authored_target;return`<div class="relationship">${incoming2?
-"\u2190":"\u2192"} <strong>${esc2(e.relationship_type||e.type)}</strong> <button class="wiki-link ${e.resolved?"":"broke\
-n"}" title="${esc2(target)}" ${e.resolved?'data-open="'+esc2(target)+'"':'data-broken="'+esc2(e.authored_target)+'"'}>${esc2(
-titles(ws).get(target)||target)}</button>${e.resolved?"":" \xB7 unresolved"}</div>`};$p("relationships").innerHTML=outgoing.
-map(e=>edge(e,false)).join("")+incoming.map(e=>edge(e,true)).join("")||'<span class="hint">No article links yet.</span>'}
-async function openNote(file,line,{record=true,tabId=activeTab,searchTerm="",ws=null,at=null}={}){if(!await leaveArticle())
-return;const external2=isExternal(file),evidenceAtStart=evidenceSerial;ws=external2?null:ws||activeWs()||current();if(!external2&&
-!ws)throw new Error("Open a workspace first.");const serial=++openSerial,doc2=external2?await loadExternal(file):withWs(
-await ws.api.call("getDocument",{path:file}),ws);if(serial!==openSerial)return;if(ws?.partial&&!external2){ws.index.addFile(
-file);for(const link of doc2.links||[])if(link.resolvedPath)ws.index.addFile(link.resolvedPath)}let tab=tabs.find(t2=>t2.
-id===tabId);active=doc2;if(!external2){selected2=file;selectedWs=focusKey=ws.key}setDirty(false);updatePath();const entry=draftKey(
-external2?null:ws.key,file);if(!tab){tab=makeTab(null,ws?.key||null);tabs.push(tab)}activeTab=tab.id;tab.path=file;tab.ws=
-external2?null:ws.key;if(ws)ws.lastTab=tab.id;if(at!==null)tab.at=at;else if(record&&tab.history[tab.at]!==entry){tab.history=
-[...tab.history.slice(0,tab.at+1),entry];const dropped=Math.max(0,tab.history.length-200);tab.history=tab.history.slice(
-dropped);if(tab.scroll)tab.scroll=Object.fromEntries(Object.entries(tab.scroll).map(([i2,v])=>[Number(i2)-dropped,v]).filter(
-([i2])=>i2>=0&&i2<tab.history.length-1));tab.at=tab.history.length-1}const key=draftKey(external2?null:ws.key,file),draft=drafts.
-get(key);if(draft){drafts.delete(key);active={...doc2,text:draft.text,hash:draft.hash}}if(evidenceSerial===evidenceAtStart&&
-evidencePane===P){evidenceSerial++;$("evidence-panel").hidden=true}$p("welcome").hidden=true;$p("note-panel").hidden=false;
-mobileLayout.dismiss();$p("note-warning").textContent=[doc2.warning||"",...(doc2.diagnostics||[]).slice(0,10).map(d=>"Li\
-ne "+d.line+": "+d.message)].filter(Boolean).join(" ");if(ws){focusGitSection(ws);updateStatus(ws.status)}renderArticle();
-kanban?.update(P);live.setSearchTerm(searchTerm);raw.setSearchTerm(searchTerm);if(draft){setDirty(true);if(draft.hash!==
-doc2.hash)$p("note-warning").textContent="This article changed on disk after your unsaved edits. Saving will report a co\
-nflict; copy your changes or reload."}updateMode();renderTabs();renderTree();revealFile();updatePanes();if(!line)restoreScroll(
-tab);renderWorkspaceManager();await renderConnections();if(showGraph&&ws&&graphPane===P)graph.update(ws.graphData,file);
-if(!external2){history.replaceState(history.state,"","#note="+encodeURIComponent(file));mobileLayout.addressChanged()}if(line&&
-edit){const position2=doc2.text.split("\n").slice(0,Math.max(0,line-1)).join("\n").length+(line>1?1:0);(source2?raw:live).
-focusPosition(position2)}await persistSession();return true}async function loadExternal(key){let doc2=externalDocs.get(key);
-if(!doc2)throw new Error("This file is no longer open. Open it again with Ctrl+O.");if(doc2.osPath&&client.readExternal)
-doc2={...doc2,...await client.readExternal(doc2.osPath),path:key};doc2={...doc2,eol:doc2.text.includes("\r\n")?"\r\n":"\n",
-diagnostics:[]};externalDocs.set(key,doc2);return doc2}async function openExternal(file,{key=EXTERNAL+file.path,osPath=file.
-path,writable=!!client.saveExternal}={}){externalDocs.set(key,{...file,path:key,osPath,name:file.name,external:true,writable});
-const open=allTabs().find(tab=>tab.path===key);if(open){focusPane(paneOfTab(open.id));await openNote(key,null,{record:false,
-tabId:open.id});return}await openNote(key,null,{tabId:null});message("Opened outside the workspace: "+file.name+(writable?
-"":" (read-only)"))}async function openBrowserFile(file){if(portable){message("This is a read-only workspace export.");return}
-if(!/\.(md|markdown)$/i.test(file.name)){message("Only Markdown (.md) files can be opened.");return}await openExternal({
-path:file.name,name:file.name,text:await file.text(),hash:""},{key:EXTERNAL+"browser/"+file.lastModified+"/"+file.name,osPath:null,
-writable:false})}async function openFileDialog(){if(portable)return;if(client.chooseMarkdownFile){const file=await client.
-chooseMarkdownFile(current()?.catalog.root||null);if(!file)return;const norm=value=>value.replace(/[\\/]+/g,"/").replace(
-/\/$/,"");for(const ws of workspaces){const root2=norm(ws.catalog.root)+"/",chosen=norm(file.path),same=ws.catalog.caseSensitive?
-chosen.startsWith(root2):chosen.toLowerCase().startsWith(root2.toLowerCase());const relative=same?chosen.slice(root2.length):
-null;if(relative&&ws.index.has(relative)){await openNote(relative,null,{ws});return}}await openExternal(file);return}const input=document.
-createElement("input");input.type="file";input.accept=".md,.markdown,text/markdown";input.multiple=true;input.onchange=run(
-async()=>{for(const file of input.files)await openBrowserFile(file)});input.click()}async function create(folder,{atRoot=false}={}){
-const ws=atRoot?current():wsByKey(selectedWs)||current();if(!edit||!ws)return;const within=!atRoot&&selectedWs===ws.key?
-selected2:"";let base2=within&&ws.index.isFolder(within)?within+"/":within.split("/").slice(0,-1).join("/");if(base2&&!base2.
-endsWith("/"))base2+="/";const place=base2||(multi()?"Root of "+workspaceName(ws):"Workspace root");const answer=await promptUser(
+(!s.repository||!s.remotes?.length))};var welcomeRendered=["","",""];function renderWelcome(){const server=pageData.mode===
+"server",managed=!!panelInfo?.managedWorkspaces,writable=client.writable&&!portable;const listed2=listsServerFolders(),open=new Set(
+workspaces.map(ws=>ws.catalog.root));const available=listed2?serverFolders.filter(name2=>!open.has(name2)):[];for(const pane of panes){
+const box=pane.el.welcome.querySelector(".welcome-actions"),lead=pane.el.welcome.querySelector("p");if(!box)continue;const ws=portable?
+null:wsByKey(paneTabs(pane).find(tab=>tab.id===paneTabId(pane))?.ws)||current();const items=[],articles=ws?.index?.size||
+0,git=ws?.git?.status;if(ws){if(writable)items.push({action:"new-article",title:"New article",text:"Start writing in "+workspaceName(
+ws),primary:true});if(articles>1)items.push({action:"random-article",title:"Random article",text:"Rediscover one of "+count2(
+articles,"article")});if(needsGitSetup(ws))items.push(git.repository?{action:"setup-git",title:"Connect to GitHub",text:"\
+Back up and sync this workspace"}:{action:"setup-git",title:"Set up Git",text:"Keep history and sync with GitHub"});if(articles&&
+document.documentElement.dataset.layout==="mobile")items.push({action:"browse",title:"Browse files",text:"Show the artic\
+les of "+workspaceName(ws)})}if(writable&&client.createWorkspace&&!managed)items.push({action:"create-workspace",title:"\
+Create new workspace",text:server?"An empty folder on this server, with history":"An empty folder for new articles, with\
+ history",primary:!ws,secondary:!!ws});if(!portable&&!listed2)items.push({action:"open-workspace",title:"Open existing w\
+orkspace",text:managed?"One shared by the desktop app":server?"A folder on this server":"A folder of Markdown files",primary:!ws&&
+!writable,secondary:!!ws,id:pane.index===0?"welcome-open":""});lead.textContent=portable?"Select an article from Files o\
+r Search to open it.":ws?articles?"Select an article from Files or Search, or start here.":"This workspace is empty. Wri\
+te its first article.":available.length?"Create a workspace for new articles, or open one on this server.":listed2?"Crea\
+te your first workspace to start writing.":"Create a workspace for new articles, or open one you already have.";const html2=items.
+map(item=>`<button type="button" class="welcome-action${item.primary?" primary":""}${item.secondary?" secondary":""}" da\
+ta-welcome="${item.action}"${ws?` data-ws="${esc2(ws.key)}"`:""}${item.id?` id="${item.id}"`:""}><strong>${esc2(item.title)}\
+</strong><small>${esc2(item.text)}</small></button>`).join("");if(html2!==welcomeRendered[pane.index]){box.innerHTML=html2;
+welcomeRendered[pane.index]=html2}}const list=available.map(name2=>{const known=panelInfo?.workspaces?.find(w=>w.root===
+name2),color=/^#[0-9a-f]{6}$/i.test(known?.color||"")?known.color:"#7c8594";return`<li class="workspace-recent" data-wor\
+kspace-color="${color}"><span class="workspace-dot" aria-hidden="true"></span><span class="workspace-recent-label"><stro\
+ng>${esc2(known?.name||name2)}</strong><small>${esc2(known?"Used before on this server":"Folder on this server")}</small\
+></span><button type="button" data-welcome="open-folder" data-folder="${esc2(name2)}" title="Open ${esc2(known?.name||name2)}\
+">Open</button></li>`}).join("");if(list!==welcomeRendered[2]){$("welcome-available-list").innerHTML=list;welcomeRendered[2]=
+list}$("welcome-available").hidden=!available.length}async function adoptWorkspace(next){const existing=wsByKey(workspaceKey(
+next));if(existing){await applyCatalog(existing,next);await showWorkspace(existing);return existing}const ws=addWorkspace(
+next);focusKey=selectedWs=ws.key;selected2="";renderGitSections();await applyCatalog(ws,next);void run(loadPartialTrees)();
+const known=allTabs().filter(t2=>t2.ws===ws.key||t2.history.some(entry=>entryParts(entry).ws===ws.key));const{list,saved,
+pick}=known.length?{list:[],pick:allTabs().findLast(t2=>t2.ws===ws.key&&tabVisible(t2))}:savedTabs(ws);tabs.push(...list);
+if(pick){if(workspaces.length===1)source2=saved?.source===true;await selectTab(pick.id)}else{const tab=currentTab();if(tab&&
+!tab.path&&!tab.history.length){tab.ws=ws.key;ws.lastTab=tab.id}renderTabs();renderWelcome();updateStatus(ws.status);focusGitSection(
+ws)}await persistSession();void loadControlPanel();return ws}async function showWorkspace(ws){focusKey=selectedWs=ws.key;
+selected2="";const tab=allTabs().find(t2=>t2.id===ws.lastTab&&t2.ws===ws.key)||allTabs().findLast(t2=>t2.ws===ws.key),owner=tab&&
+paneOfTab(tab.id);if(tab&&owner!==P&&paneTabId(owner)===tab.id)focusPane(owner);else if(tab){if(tab.id!==activeTab)await selectTab(
+tab.id);else focusGitSection(ws)}else{if(!await leaveArticle())return;const created=makeTab(null,ws.key);tabs.push(created);
+activeTab=created.id;ws.lastTab=created.id;showEmptyTab();renderTabs();focusGitSection(ws);updateStatus(ws.status);await persistSession()}
+renderTree();updatePath();renderWorkspaceManager();message("Showing "+workspaceName(ws)+".")}async function closeWorkspace(ws){
+if(!await ensureDraftsSaved(key=>key.startsWith(ws.key+"\n"),"deactivating "+workspaceName(ws)))return;await persistSession();
+await sessionWrite;const showing=new Set(shownPanes().filter(pane=>{const doc2=paneActive(pane);return!!doc2&&!doc2.external&&
+doc2.ws===ws.key}));if(showing.has(P)){active=null;setDirty(false)}for(const pane of showing)if(pane!==P){pane.active=null;
+kanban?.update(pane)}workspaces=workspaces.filter(w=>w!==ws);ws.git.destroy();ws.gitSection.remove();kanban?.forget(ws);
+settleTabs();if(selectedWs===ws.key){selected2="";selectedWs=null}if(focusKey===ws.key)focusKey=null;if(client.capabilities.
+workspaces)await client.call("close",{scope:ws.api.scope});for(const pane of shownPanes())await inPane(pane,async()=>{const shown=visibleTabs();
+if(!shown.some(t2=>t2.id===activeTab)){activeTab=null;if(shown.length)await selectTab(shown.at(-1).id);else showEmptyTab()}else if(showing.
+has(pane))await selectTab(activeTab)});await collapseEmptyPane();renderTabs();renderTree();renderGitSections();updatePath();
+updateMode();if(current())updateStatus(current().status);else{$("index-status").textContent="Local Markdown workspace";renderOperation(
+{})}await persistSession();await loadControlPanel();message(workspaceName(ws)+" deactivated. Reactivate it in Control pa\
+nel \u203A Workspaces.")}async function moveWorkspace(ws,offset){const from=workspaces.indexOf(ws),to=from+offset;if(from<
+0||to<0||to>=workspaces.length)return;workspaces.splice(from,1);workspaces.splice(to,0,ws);renderTree();renderGitSections();
+renderWorkspaceManager();if(client.capabilities.workspaces)await client.call("workspaceLayout",{order:workspaces.map(w=>w.
+catalog.workspace.id)})}async function configureWorkspace(ws,change){const label=await client.call("configureWorkspace",
+{id:ws.catalog.workspace.id,...change});ws.catalog={...ws.catalog,workspace:{...ws.catalog.workspace,label:label.name,customName:label.
+customName,color:label.color}};renderTree();renderTabs();renderGitSections();updatePath();renderWorkspaceManager();await loadControlPanel()}
+function renderArticle(){updatePath();live.setText(active.text);live.setEnabled(canEdit());raw.setText(active.text);raw.
+setEnabled(canEdit());okfBar.render()}function readablePassage(text,file="",ws=activeWs()||current()){const clean=String(
+text).replace(/^@@\s+-\d+(?:,\d+)?\s+\+?\d*(?:,\d+)?\s*@@[^\r\n]*(?:\r?\n)?/gm,"").replace(/^@@\s+-\d+(?:,\d+)?\s+@@[^\r\n]*(?:\r?\n)?/gm,
+"");return renderNote(clean,ws?.index||[],ws?.catalog.caseSensitive,new Map,file,{titles:titles(ws),underline:underlineEnabled()})}
+function passageText(text,ws){const node=document.createElement("div");node.innerHTML=readablePassage(text,"",ws);for(const block of node.
+querySelectorAll("p,li,h1,h2,h3,pre"))block.append(" ");return node.textContent.trim()}async function renderConnections(){
+if(!active)return;const at=active.path,ws=activeWs();if(active.external){$p("relationships").innerHTML='<span class="hin\
+t">This file is outside the workspace, so its links are not part of the graph.</span>';return}const[outgoing,incoming]=await Promise.
+all([ws.api.call("getOutgoingRelationships",{path:at}),ws.api.call("getIncomingRelationships",{path:at})]);if(active?.path!==
+at||activeWs()!==ws)return;const edge=(e,incoming2)=>{const target=incoming2?e.source_document_id:e.target_document_id||
+e.authored_target;return`<div class="relationship">${incoming2?"\u2190":"\u2192"} <strong>${esc2(e.relationship_type||e.
+type)}</strong> <button class="wiki-link ${e.resolved?"":"broken"}" title="${esc2(target)}" ${e.resolved?'data-open="'+esc2(
+target)+'"':'data-broken="'+esc2(e.authored_target)+'"'}>${esc2(titles(ws).get(target)||target)}</button>${e.resolved?"":
+" \xB7 unresolved"}</div>`};$p("relationships").innerHTML=outgoing.map(e=>edge(e,false)).join("")+incoming.map(e=>edge(e,
+true)).join("")||'<span class="hint">No article links yet.</span>'}async function openNote(file,line,{record=true,tabId=activeTab,
+searchTerm="",ws=null,at=null}={}){if(!await leaveArticle())return;const external2=isExternal(file),evidenceAtStart=evidenceSerial;
+ws=external2?null:ws||activeWs()||current();if(!external2&&!ws)throw new Error("Open a workspace first.");const serial=++openSerial,
+doc2=external2?await loadExternal(file):withWs(await ws.api.call("getDocument",{path:file}),ws);if(serial!==openSerial)return;
+if(ws?.partial&&!external2){ws.index.addFile(file);for(const link of doc2.links||[])if(link.resolvedPath)ws.index.addFile(
+link.resolvedPath)}let tab=tabs.find(t2=>t2.id===tabId);active=doc2;if(!external2){selected2=file;selectedWs=focusKey=ws.
+key}setDirty(false);updatePath();const entry=draftKey(external2?null:ws.key,file);if(!tab){tab=makeTab(null,ws?.key||null);
+tabs.push(tab)}activeTab=tab.id;tab.path=file;tab.ws=external2?null:ws.key;if(ws)ws.lastTab=tab.id;if(at!==null)tab.at=at;else if(record&&
+tab.history[tab.at]!==entry){tab.history=[...tab.history.slice(0,tab.at+1),entry];const dropped=Math.max(0,tab.history.length-
+200);tab.history=tab.history.slice(dropped);if(tab.scroll)tab.scroll=Object.fromEntries(Object.entries(tab.scroll).map(([
+i2,v])=>[Number(i2)-dropped,v]).filter(([i2])=>i2>=0&&i2<tab.history.length-1));tab.at=tab.history.length-1}const key=draftKey(
+external2?null:ws.key,file),draft=drafts.get(key);if(draft){drafts.delete(key);active={...doc2,text:draft.text,hash:draft.
+hash}}if(evidenceSerial===evidenceAtStart&&evidencePane===P){evidenceSerial++;$("evidence-panel").hidden=true}$p("welcom\
+e").hidden=true;$p("note-panel").hidden=false;mobileLayout.dismiss();$p("note-warning").textContent=[doc2.warning||"",...(doc2.
+diagnostics||[]).slice(0,10).map(d=>"Line "+d.line+": "+d.message)].filter(Boolean).join(" ");if(ws){focusGitSection(ws);
+updateStatus(ws.status)}renderArticle();kanban?.update(P);live.setSearchTerm(searchTerm);raw.setSearchTerm(searchTerm);if(draft){
+setDirty(true);if(draft.hash!==doc2.hash)$p("note-warning").textContent="This article changed on disk after your unsaved\
+ edits. Saving will report a conflict; copy your changes or reload."}updateMode();renderTabs();renderTree();revealFile();
+updatePanes();if(!line)restoreScroll(tab);renderWorkspaceManager();await renderConnections();if(showGraph&&ws&&graphPane===
+P)graph.update(ws.graphData,file);if(!external2){history.replaceState(history.state,"","#note="+encodeURIComponent(file));
+mobileLayout.addressChanged()}if(line&&edit){const position2=doc2.text.split("\n").slice(0,Math.max(0,line-1)).join("\n").
+length+(line>1?1:0);(source2?raw:live).focusPosition(position2)}await persistSession();return true}async function loadExternal(key){
+let doc2=externalDocs.get(key);if(!doc2)throw new Error("This file is no longer open. Open it again with Ctrl+O.");if(doc2.
+osPath&&client.readExternal)doc2={...doc2,...await client.readExternal(doc2.osPath),path:key};doc2={...doc2,eol:doc2.text.
+includes("\r\n")?"\r\n":"\n",diagnostics:[]};externalDocs.set(key,doc2);return doc2}async function openExternal(file,{key=EXTERNAL+
+file.path,osPath=file.path,writable=!!client.saveExternal}={}){externalDocs.set(key,{...file,path:key,osPath,name:file.name,
+external:true,writable});const open=allTabs().find(tab=>tab.path===key);if(open){focusPane(paneOfTab(open.id));await openNote(
+key,null,{record:false,tabId:open.id});return}await openNote(key,null,{tabId:null});message("Opened outside the workspac\
+e: "+file.name+(writable?"":" (read-only)"))}async function openBrowserFile(file){if(portable){message("This is a read-o\
+nly workspace export.");return}if(!/\.(md|markdown)$/i.test(file.name)){message("Only Markdown (.md) files can be opened\
+.");return}await openExternal({path:file.name,name:file.name,text:await file.text(),hash:""},{key:EXTERNAL+"browser/"+file.
+lastModified+"/"+file.name,osPath:null,writable:false})}async function openFileDialog(){if(portable)return;if(client.chooseMarkdownFile){
+const file=await client.chooseMarkdownFile(current()?.catalog.root||null);if(!file)return;const norm=value=>value.replace(
+/[\\/]+/g,"/").replace(/\/$/,"");for(const ws of workspaces){const root2=norm(ws.catalog.root)+"/",chosen=norm(file.path),
+same=ws.catalog.caseSensitive?chosen.startsWith(root2):chosen.toLowerCase().startsWith(root2.toLowerCase());const relative=same?
+chosen.slice(root2.length):null;if(relative&&ws.index.has(relative)){await openNote(relative,null,{ws});return}}await openExternal(
+file);return}const input=document.createElement("input");input.type="file";input.accept=".md,.markdown,text/markdown";input.
+multiple=true;input.onchange=run(async()=>{for(const file of input.files)await openBrowserFile(file)});input.click()}async function create(folder,{
+atRoot=false}={}){const ws=atRoot?current():wsByKey(selectedWs)||current();if(!edit||!ws)return;const within=!atRoot&&selectedWs===
+ws.key?selected2:"";let base2=within&&ws.index.isFolder(within)?within+"/":within.split("/").slice(0,-1).join("/");if(base2&&
+!base2.endsWith("/"))base2+="/";const place=base2||(multi()?"Root of "+workspaceName(ws):"Workspace root");const answer=await promptUser(
 folder?"New folder":"New article",(folder?"Enter a folder name. ":"Enter an article name. Saved as Markdown (.md). ")+"L\
 ocation: "+place,{value:folder?"New folder":"Untitled",ok:"Create"});if(answer.action!=="ok")return;if(!answer.value||/[\\/]/.
 test(answer.value))throw new Error("Enter a filename without a folder path.");const name2=folder?answer.value:answer.value.
@@ -15672,21 +15798,21 @@ $("choose-workspace").onclick=run(choose);$("create-workspace").onclick=run(crea
 run(()=>setupGit(current()));for(const pane of panes)pane.el.welcome.addEventListener("click",run(async event=>{const button2=event.
 target.closest("[data-welcome]");if(!button2||button2.disabled)return;const ws=wsByKey(button2.dataset.ws),action=button2.
 dataset.welcome;if(pane!==P)focusPane(pane);if(action==="create-workspace")await createWorkspace();if(action==="open-wor\
-kspace")await choose();if(action==="browse")sidebars.select("left","files");if(!ws)return;if(action==="new-article"){if(!edit){
-edit=true;prefs.set("edit","true");updateMode()}focusKey=selectedWs=ws.key;selected2="";await create(false,{atRoot:true})}
-if(action==="random-article")await randomArticle(ws);if(action==="setup-git")await setupGit(ws)}));$("window-controls").
-hidden=!client.capabilities.nativeWindow;for(const action of["minimize","maximize","close"])$("window-"+action).onclick=
-run(async()=>{if(action==="close"){if(dirty||drafts.size){const answer=await promptUser("Save changes?",count2((dirty?1:
-0)+drafts.size,"article")+" "+((dirty?1:0)+drafts.size===1?"has":"have")+" unsaved changes. Save before closing Weave?",
-{ok:"Save all",secondary:"Don't save"});if(answer.action==="cancel")return;if(answer.action==="ok")await saveAll();else{
-drafts.clear();setDirty(false)}}await persistSession()}const state=await client.windowAction(action);if(action==="maximi\
-ze"){$("window-maximize").textContent=state?.maximized?"\u2750":"\u25A1";$("window-maximize").title=state?.maximized?"Re\
-store window":ui("Maximise")}});$("titlebar").onmousedown=run(async e=>{if(!client.capabilities.nativeWindow||e.button!==
-0||e.detail>1||e.target.closest("button,input"))return;await client.windowAction("drag")});$("titlebar").ondblclick=e=>{
-if(client.capabilities.nativeWindow&&!e.target.closest("button,input"))$("window-maximize").click()};var appMenu=$("app-\
-menu");var appMenuButton=$("app-menu-button");if(client.serverAccount){const account=document.createElement("button");account.
-id="server-account";account.setAttribute("role","menuitem");account.textContent="Server account\u2026";account.onclick=()=>client.
-serverAccount();appMenu.append(account)}var appMenuItems=()=>[...appMenu.querySelectorAll("button")].filter(item=>!item.
+kspace")await choose();if(action==="browse")sidebars.select("left","files");if(action==="open-folder")await openServerFolder(
+button2.dataset.folder);if(!ws)return;if(action==="new-article"){if(!edit){edit=true;prefs.set("edit","true");updateMode()}
+focusKey=selectedWs=ws.key;selected2="";await create(false,{atRoot:true})}if(action==="random-article")await randomArticle(
+ws);if(action==="setup-git")await setupGit(ws)}));$("window-controls").hidden=!client.capabilities.nativeWindow;for(const action of[
+"minimize","maximize","close"])$("window-"+action).onclick=run(async()=>{if(action==="close"){if(dirty||drafts.size){const answer=await promptUser(
+"Save changes?",count2((dirty?1:0)+drafts.size,"article")+" "+((dirty?1:0)+drafts.size===1?"has":"have")+" unsaved chang\
+es. Save before closing Weave?",{ok:"Save all",secondary:"Don't save"});if(answer.action==="cancel")return;if(answer.action===
+"ok")await saveAll();else{drafts.clear();setDirty(false)}}await persistSession()}const state=await client.windowAction(action);
+if(action==="maximize"){$("window-maximize").textContent=state?.maximized?"\u2750":"\u25A1";$("window-maximize").title=state?.
+maximized?"Restore window":ui("Maximise")}});$("titlebar").onmousedown=run(async e=>{if(!client.capabilities.nativeWindow||
+e.button!==0||e.detail>1||e.target.closest("button,input"))return;await client.windowAction("drag")});$("titlebar").ondblclick=
+e=>{if(client.capabilities.nativeWindow&&!e.target.closest("button,input"))$("window-maximize").click()};var appMenu=$("\
+app-menu");var appMenuButton=$("app-menu-button");if(client.serverAccount){const account=document.createElement("button");
+account.id="server-account";account.setAttribute("role","menuitem");account.textContent="Server account\u2026";account.onclick=
+()=>client.serverAccount();appMenu.append(account)}var appMenuItems=()=>[...appMenu.querySelectorAll("button")].filter(item=>!item.
 hidden&&!item.disabled);function closeAppMenu(focusButton=false){if(appMenu.hidden)return;appMenu.hidden=true;appMenuButton.
 setAttribute("aria-expanded","false");if(focusButton)appMenuButton.focus()}function openAppMenu(){let seen=false,pending=null;
 for(const child of appMenu.children){if(child.matches(".context-separator")){child.hidden=true;if(seen)pending=child}else if(!child.
@@ -15964,10 +16090,10 @@ map(w=>`<li class="workspace-recent" data-workspace-color="${/^#[0-9a-f]{6}$/i.t
 an class="workspace-dot" aria-hidden="true"></span><span class="workspace-recent-label"><strong>${esc2(w.name)}</strong>\
 <small title="${esc2(w.root)}">${esc2(w.root)}</small></span><button data-ws-reopen="${esc2(w.id)}" title="Show ${esc2(w.
 name)} and restore its tabs">Activate</button></li>`).join("");$("recent-workspaces").hidden=!recent.length;$("recent-wo\
-rkspace-list").innerHTML=recentHtml;$("welcome-recent").hidden=!recent.length;$("welcome-recent-list").innerHTML=recentHtml;
-renderWelcome();$("workspace-refresh-target-label").hidden=!multi();const target=$("workspace-refresh-target").value;$("\
-workspace-refresh-target").innerHTML=workspaces.map(ws=>`<option value="${esc2(ws.key)}">${esc2(workspaceName(ws))}</opt\
-ion>`).join("");$("workspace-refresh-target").value=wsByKey(target)?.key||here?.key||""}var workspaceFromCard=node=>wsByKey(
+rkspace-list").innerHTML=recentHtml;$("welcome-recent").hidden=!recent.length||listsServerFolders();$("welcome-recent-li\
+st").innerHTML=recentHtml;renderWelcome();$("workspace-refresh-target-label").hidden=!multi();const target=$("workspace-\
+refresh-target").value;$("workspace-refresh-target").innerHTML=workspaces.map(ws=>`<option value="${esc2(ws.key)}">${esc2(
+workspaceName(ws))}</option>`).join("");$("workspace-refresh-target").value=wsByKey(target)?.key||here?.key||""}var workspaceFromCard=node=>wsByKey(
 node.closest("[data-ws]")?.dataset.ws);$("workspace-manager").addEventListener("click",run(async event=>{const button2=event.
 target.closest("button");if(!button2||button2.disabled)return;const ws=workspaceFromCard(button2);if(button2.matches("[d\
 ata-ws-move]")&&ws)await moveWorkspace(ws,Number(button2.dataset.wsMove));if(button2.matches("[data-ws-close]")&&ws)await closeWorkspace(
@@ -15995,19 +16121,20 @@ if(!result){$("export-status").textContent="";return}$("export-status").textCont
 eveal").hidden=!client.capabilities.nativeWindow;message((folder?"Folder":"Workspace")+" exported to "+result.path)}catch(error){
 $("export-status").textContent=error.message;throw error}finally{renderExport()}}$("export-run").onclick=run(async()=>{const ws=wsByKey(
 $("export-workspace").value)||current();if(ws)await exportHtml(ws)});$("export-reveal").onclick=run(()=>client.revealExport());
-async function loadControlPanel(){await serverControls.refresh();for(const button2 of document.querySelectorAll("[data-s\
-torage]"))button2.disabled=!client.capabilities.storage||!client.chooseDirectory;if(client.capabilities.storage){const info=await client.
-call("controlPanel",{scope:monitorWs()?.api.scope});panelInfo=info;renderOperation(info.status||{});$("delete-backups").
-checked=info.deleteBackups===true;$("trash-directory").textContent=info.trashDirectory||"";$("database-directory").textContent=
-info.pendingDataDirectory?`${info.dataDirectory} \u2192 ${info.pendingDataDirectory} (after restart)`:info.dataDirectory}
-renderWorkspaceManager()}$("add-workspace").onclick=run(async()=>{await choose();await loadControlPanel()});$("delete-ba\
-ckups").onchange=run(async()=>{panelInfo=await client.call("configureDeletion",{backups:$("delete-backups").checked});await loadControlPanel();
-message($("delete-backups").checked?"Files deleted in Weave will be backed up first.":"Files deleted in Weave are remove\
-d from disk without a backup.")});$("storage-form").onclick=run(async e=>{const button2=e.target.closest("[data-storage]");
-if(!button2||!await ensureDraftsSaved(()=>true,"changing the data folder"))return;const directory=await client.chooseDirectory();
-if(!directory)return;await persistSession();button2.disabled=true;try{const result=await client.call("configureStorage",
-{[button2.dataset.storage]:directory});await loadControlPanel();message(result.restartRequired?"Storage location saved. \
-Restart Weave to move the data folder.":"Storage location is unchanged.")}finally{button2.disabled=false}});var appearance=initAppearance(
+async function loadControlPanel(){await serverControls.refresh();if(client.serverFolders&&client.writable)serverFolders=
+await client.serverFolders().catch(()=>serverFolders);for(const button2 of document.querySelectorAll("[data-storage]"))button2.
+disabled=!client.capabilities.storage||!client.chooseDirectory;if(client.capabilities.storage){const info=await client.call(
+"controlPanel",{scope:monitorWs()?.api.scope});panelInfo=info;renderOperation(info.status||{});$("delete-backups").checked=
+info.deleteBackups===true;$("trash-directory").textContent=info.trashDirectory||"";$("database-directory").textContent=info.
+pendingDataDirectory?`${info.dataDirectory} \u2192 ${info.pendingDataDirectory} (after restart)`:info.dataDirectory}renderWorkspaceManager()}
+$("add-workspace").onclick=run(async()=>{await choose();await loadControlPanel()});$("delete-backups").onchange=run(async()=>{
+panelInfo=await client.call("configureDeletion",{backups:$("delete-backups").checked});await loadControlPanel();message(
+$("delete-backups").checked?"Files deleted in Weave will be backed up first.":"Files deleted in Weave are removed from d\
+isk without a backup.")});$("storage-form").onclick=run(async e=>{const button2=e.target.closest("[data-storage]");if(!button2||
+!await ensureDraftsSaved(()=>true,"changing the data folder"))return;const directory=await client.chooseDirectory();if(!directory)
+return;await persistSession();button2.disabled=true;try{const result=await client.call("configureStorage",{[button2.dataset.
+storage]:directory});await loadControlPanel();message(result.restartRequired?"Storage location saved. Restart Weave to m\
+ove the data folder.":"Storage location is unchanged.")}finally{button2.disabled=false}});var appearance=initAppearance(
 {prefs,onChange:()=>{for(const editor of paneEditors())editor.requestMeasure()},onFileLabelsChange:renderTree});$("tab-w\
 orkspace-names").checked=prefs.get("tab-workspace-names")!=="false";$("tab-workspace-names").onchange=()=>{prefs.set("ta\
 b-workspace-names",String($("tab-workspace-names").checked));renderTabs()};for(const element of panes.flatMap(pane=>[pane.

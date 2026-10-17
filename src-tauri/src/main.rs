@@ -176,9 +176,17 @@ async fn create_workspace(app: AppHandle, name: String) -> Result<Option<Value>,
             ));
         }
         std::fs::create_dir(&root).map_err(|e| e.to_string())?;
-        app.state::<weave::Service>()
-            .request(&app, "open", json!({"root": root}))
-            .map(Some)
+        let service = app.state::<weave::Service>();
+        let mut catalog = service.request(&app, "open", json!({"root": root}))?;
+        // New workspaces keep history from the start; without Git they
+        // remain plain folders.
+        if let Err(error) = service
+            .backend(&app)?
+            .start_history(catalog["scope"].as_u64().unwrap_or(0), &json!({}))
+        {
+            catalog["historyError"] = json!(error);
+        }
+        Ok(Some(catalog))
     })
     .await
     .map_err(|e| e.to_string())?

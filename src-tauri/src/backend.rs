@@ -110,6 +110,51 @@ struct ChangeLog {
     /// Changes before this revision are no longer listed: older clients reload.
     floor: u64,
 }
+/// When a workspace's automatic snapshots are next due. The monitor checks
+/// this every tick without touching Git; Git runs only when a snapshot (or a
+/// lease renewal) is due, on the monitor's job threads.
+pub(crate) struct SnapshotClock {
+    pub(crate) settings: Value,
+    /// The last content change (any new revision).
+    pub(crate) changed: Instant,
+    /// The revision when Git was last checked for changes; 0 before the first check.
+    pub(crate) checked: u64,
+    pub(crate) attempted: Instant,
+    /// Set when Git was busy: try again then.
+    pub(crate) retry: Option<Instant>,
+    pub(crate) leased: Option<Instant>,
+}
+impl SnapshotClock {
+    fn new(settings: Value) -> Self {
+        Self {
+            settings,
+            changed: Instant::now(),
+            checked: 0,
+            attempted: Instant::now(),
+            retry: None,
+            leased: None,
+        }
+    }
+    /// True when a snapshot should be attempted now.
+    fn snapshot_due(&self, revision: u64) -> bool {
+        let wait = Duration::from_secs(self.settings["minutes"].as_u64().unwrap_or(15) * 60);
+        if self.retry.is_some() {
+            return self.retry.is_some_and(|at| Instant::now() >= at);
+        }
+        if self.settings["trigger"] == "interval" {
+            self.attempted.elapsed() >= wait
+        } else {
+            revision != self.checked && self.changed.elapsed() >= wait
+        }
+    }
+    fn due(&self, revision: u64) -> bool {
+        self.settings["enabled"] == true
+            && (self.snapshot_due(revision)
+                || self
+                    .leased
+                    .is_none_or(|at| at.elapsed() >= Duration::from_secs(60)))
+    }
+}
 struct State {
     monitoring: Value,
     ready: bool,
@@ -168,6 +213,7 @@ pub struct Workspace {
     scanning: Mutex<()>,
     plan: Mutex<Option<Rename>>,
     git: Mutex<Git>,
+    pub(crate) snapshots: Mutex<SnapshotClock>,
     pending: Arc<Mutex<Pending>>,
     log: Mutex<ChangeLog>,
     closed: AtomicBool,
@@ -265,6 +311,11 @@ pub struct Backend {
     _runtime_lock: fs::File,
     _database_lock: Option<fs::File>,
     pub stopping: Arc<AtomicBool>,
+    /// Identifies this process in repositories' snapshot leases.
+    instance: String,
+    /// How background Git (automatic snapshots) runs: the standalone server
+    /// sets the same hardening (`hardened`, `gitHosts`) as its requests.
+    pub background_git: Mutex<Value>,
 }
 impl Backend {
     pub fn new(runtime: PathBuf, stopping: Arc<AtomicBool>) -> Result<Self> {
@@ -365,6 +416,8 @@ impl Backend {
             _runtime_lock: runtime_lock,
             _database_lock: database_lock,
             stopping,
+            instance: files::id(),
+            background_git: Mutex::new(json!({})),
         })
     }
     pub fn health(&self) -> Value {
@@ -548,11 +601,11 @@ impl Backend {
         }
         let known = self.database.has_entries(&id)?;
         let scope = self.next_scope.fetch_add(1, Ordering::AcqRel) + 1;
+        let git = Git::new(&root, git_state, self.stopping.clone())
+            .with_keys(self.runtime.join("git-keys"), &id);
         let workspace = Arc::new(Workspace {
-            git: Mutex::new(
-                Git::new(&root, git_state, self.stopping.clone())
-                    .with_keys(self.runtime.join("git-keys"), &id),
-            ),
+            snapshots: Mutex::new(SnapshotClock::new(git.snapshots.clone())),
+            git: Mutex::new(git),
             sensitive: detect_case(&root),
             id,
             name,
@@ -708,6 +761,7 @@ impl Backend {
     }
     /// Records a committed change: a new revision and the catalog paths it touched.
     fn record(&self, w: &Workspace, touched: Vec<String>) {
+        guard(&w.snapshots).changed = Instant::now();
         let mut log = guard(&w.log);
         let revision = w.revision.fetch_add(1, Ordering::AcqRel) + 1;
         if touched.len() > LOG_CAP {
@@ -1821,7 +1875,7 @@ impl Backend {
             "gitStatus" => git_for(&w.git, &args).status(),
             "gitIgnore" => git_for(&w.git, &args).ignore(),
             "gitDiff" => git_for(&w.git, &args).diff(&args),
-            "gitHistory" => git_for(&w.git, &args).history(),
+            "gitHistory" => git_for(&w.git, &args).history(&args),
             "gitCommitDiff" => git_for(&w.git, &args).commit_diff(&args),
             "gitAction" => {
                 // Git runs under this workspace's Git lock only: reading,
@@ -1829,6 +1883,12 @@ impl Backend {
                 let (result, saved) = {
                     let mut git = git_for(&w.git, &args);
                     let result = git.action(&args);
+                    let mut clock = guard(&w.snapshots);
+                    if clock.settings["enabled"] != true && git.snapshots["enabled"] == true {
+                        // Newly enabled: start timing from now.
+                        *clock = SnapshotClock::new(Value::Null);
+                    }
+                    clock.settings = git.snapshots.clone();
                     (result, git.saved())
                 };
                 self.database.save_workspace_value(&w.id, true, &saved)?;
@@ -1851,15 +1911,30 @@ impl Backend {
                     "fetch",
                     "push",
                     "createBranch",
+                    "configureSnapshots",
+                    "snapshot",
                 ];
+                // Restores name the files they rewrote: only those are reindexed.
+                let restored = result.as_ref().ok().and_then(|v| {
+                    v["restoredPaths"].as_array().filter(|p| p.len() <= 1000).map(|p| {
+                        p.iter()
+                            .filter_map(|p| p.as_str().map(String::from))
+                            .collect::<BTreeSet<_>>()
+                    })
+                });
                 let refresh = if index_only.contains(&s(&args, "action")) {
                     Ok(false)
+                } else if let Some(paths) = restored {
+                    self.reconcile_paths(w, paths)
                 } else {
                     self.reconcile_full(w, false)
                 };
                 match result {
-                    Ok(v) => {
+                    Ok(mut v) => {
                         refresh?;
+                        if let Some(map) = v.as_object_mut() {
+                            map.remove("restoredPaths");
+                        }
                         Ok(v)
                     }
                     Err(e) => Err(e),
@@ -2443,6 +2518,110 @@ impl Backend {
             json!({"path":display(&target),"bytes":html.len(),"documents":documents.len(),"diagrams":diagrams,"relationships":data["graph"]["relationships"].as_array().map_or(0,|r|r.len()),"name":name}),
         )
     }
+    /// Starts a workspace Weave just created as a Git repository with
+    /// automatic snapshots on. `host` hardens Git as for the requesting host.
+    pub fn start_history(&self, scope: u64, host: &Value) -> Result<Value> {
+        let w = self.workspace(Some(scope))?;
+        let mut git = guard(&w.git);
+        git.hardened = host["hardened"] == true;
+        let result = git.action(&json!({"action":"init"})).and_then(|_| {
+            git.action(&json!({"action":"configureSnapshots","enabled":true}))
+        });
+        *guard(&w.snapshots) = SnapshotClock::new(git.snapshots.clone());
+        self.database.save_workspace_value(&w.id, true, &git.saved())?;
+        result
+    }
+    /// True when this workspace's automatic snapshot or lease renewal is due.
+    pub(crate) fn snapshot_due(&self, w: &Workspace) -> bool {
+        guard(&w.snapshots).due(w.revision())
+    }
+    /// The monitor's snapshot work for one workspace: renews this process's
+    /// lease on the repository and, when due, commits its changes. Never
+    /// waits for Git: a manual Git operation in progress postpones it.
+    pub(crate) fn snapshot_tick(&self, w: &Workspace) {
+        let (wanted, push) = {
+            let clock = guard(&w.snapshots);
+            (
+                clock.snapshot_due(w.revision()),
+                clock.settings["push"] == true,
+            )
+        };
+        let mut git = match w.git.try_lock() {
+            Ok(git) => git,
+            Err(std::sync::TryLockError::Poisoned(p)) => p.into_inner(),
+            Err(std::sync::TryLockError::WouldBlock) => {
+                guard(&w.snapshots).retry = Some(Instant::now() + Duration::from_secs(30));
+                return;
+            }
+        };
+        let host = guard(&self.background_git).clone();
+        git.hardened = host["hardened"] == true;
+        git.hosts = host["gitHosts"]
+            .as_array()
+            .map(|a| a.iter().filter_map(|h| h.as_str().map(String::from)).collect())
+            .unwrap_or_default();
+        let revision = w.revision();
+        let repository = git.repository().is_ok_and(|s| s["repository"] == true);
+        let mut waiting = false;
+        if wanted {
+            if repository {
+                match git.snapshot("automatic", None, push, Some(&self.instance)) {
+                    Ok(result) => waiting = result["waiting"] == true,
+                    Err(e) => git.snapshot_state["error"] = json!(e),
+                }
+            } else {
+                git.snapshot_state["skipped"] =
+                    json!("Initialise a Git repository to take snapshots.");
+            }
+            let _ = self
+                .database
+                .save_workspace_value(&w.id, true, &git.saved());
+        } else if repository {
+            let _ = git.lease(&self.instance);
+        }
+        drop(git);
+        let mut clock = guard(&w.snapshots);
+        clock.leased = Some(Instant::now());
+        if waiting {
+            // Staged changes, a merge or another Git program: check again
+            // shortly rather than only after the next edit.
+            clock.retry = Some(Instant::now() + Duration::from_secs(60));
+        } else if wanted {
+            clock.checked = revision;
+            clock.attempted = Instant::now();
+            clock.retry = None;
+        }
+    }
+    /// Before Weave exits: takes the snapshots of workspaces set to snapshot
+    /// on close (without pushing, so exiting never waits for the network)
+    /// and releases this process's leases. Call before `stopping` is set.
+    pub fn snapshot_on_exit(&self) {
+        for w in self.workspaces() {
+            let settings = guard(&w.snapshots).settings.clone();
+            if settings["enabled"] != true {
+                continue;
+            }
+            let started = Instant::now();
+            let mut git = loop {
+                match w.git.try_lock() {
+                    Ok(git) => break Some(git),
+                    Err(std::sync::TryLockError::Poisoned(p)) => break Some(p.into_inner()),
+                    Err(_) if started.elapsed() > Duration::from_secs(10) => break None,
+                    Err(_) => std::thread::sleep(Duration::from_millis(50)),
+                }
+            };
+            let Some(git) = git.as_mut() else {
+                continue;
+            };
+            if settings["onClose"] == true && git.repository().is_ok_and(|s| s["repository"] == true) {
+                if let Err(e) = git.snapshot("close", None, false, Some(&self.instance)) {
+                    git.snapshot_state["error"] = json!(e);
+                }
+                let _ = self.database.save_workspace_value(&w.id, true, &git.saved());
+            }
+            git.release_lease(&self.instance);
+        }
+    }
     fn control(&self, scope: Option<u64>) -> Result<Value> {
         let open = self.workspaces();
         let mut workspaces = self.database.workspaces()?;
@@ -2502,6 +2681,9 @@ impl Monitor {
         let flag = stop.clone();
         let thread = std::thread::spawn(move || {
             let mut jobs: HashMap<u64, JoinHandle<()>> = HashMap::new();
+            // Automatic snapshots: one job per workspace at a time, apart
+            // from indexing so neither delays the other.
+            let mut snapshots: HashMap<u64, JoinHandle<()>> = HashMap::new();
             let mut reported: HashMap<u64, u64> = HashMap::new();
             let mut checkpointed = Instant::now();
             while !flag.load(Ordering::Relaxed) && !backend.stopping.load(Ordering::Relaxed) {
@@ -2513,8 +2695,16 @@ impl Monitor {
                     checkpointed = Instant::now();
                 }
                 jobs.retain(|_, job| !job.is_finished());
+                snapshots.retain(|_, job| !job.is_finished());
                 let open = backend.workspaces();
                 for w in &open {
+                    if !snapshots.contains_key(&w.scope) && backend.snapshot_due(w) {
+                        let (b, w) = (backend.clone(), w.clone());
+                        snapshots.insert(
+                            w.scope,
+                            std::thread::spawn(move || b.snapshot_tick(&w)),
+                        );
+                    }
                     if !jobs.contains_key(&w.scope) && w.due() {
                         let (b, w) = (backend.clone(), w.clone());
                         jobs.insert(
@@ -2533,7 +2723,7 @@ impl Monitor {
                 }
                 reported.retain(|scope, _| open.iter().any(|w| w.scope == *scope));
             }
-            for (_, job) in jobs {
+            for (_, job) in jobs.into_iter().chain(snapshots) {
                 let _ = job.join();
             }
         });

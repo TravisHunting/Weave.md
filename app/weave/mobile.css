@@ -125,3 +125,5 @@
 }
 :root[data-layout=mobile][data-skin] .welcome-actions{grid-template-columns:1fr;gap:8px}:root[data-layout=mobile][data-skin] .welcome-action{min-height:48px}:root[data-layout=mobile][data-skin] .git-setup-dialog{width:100vw;max-width:none;max-height:100dvh;height:100dvh;margin:0;border-radius:0;padding:16px}:root[data-layout=mobile][data-skin] .git-setup-dialog button{min-height:40px}:root[data-layout=mobile][data-skin] .git-setup-body{padding-left:0}
 :root[data-layout=mobile][data-skin] .git-setup-summary{margin-left:0}
+/* Snapshot controls and the start page's workspace lists. */
+:root[data-layout=mobile][data-skin] :is(.git-snapshot-dialog button,.git-snapshot-actions button,#welcome-available button,#welcome-recent button){min-height:var(--mobile-touch)}:root[data-layout=mobile][data-skin] .git-check{min-height:var(--mobile-touch)}

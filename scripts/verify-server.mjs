@@ -158,9 +158,16 @@ try {
   await page.locator('#login [name=password]').fill(password);
   await page.screenshot({path:path.join(output,'server-login.png')});
   await page.locator('#login [type=submit]').click();
+  // A new browser opens no workspace by surprise: the start page offers to
+  // create one and lists the server's workspace folders to open.
+  await page.locator('#welcome [data-welcome="create-workspace"].primary').waitFor();
+  assert.equal(await page.locator('#welcome [data-welcome="open-workspace"]').count(),0,'listed folders replace the picker');
+  assert.equal(await page.locator('[data-tree-path]').count(),0);
+  for (const name of ['Alpha','Beta']) await page.locator(`#welcome-available [data-folder="${name}"]`).click();
   await page.locator('[data-tree-path="Overview.md"]').waitFor();
+  await until(async()=>await page.locator('#welcome-available').isHidden(),'open workspaces leave the list');
   await page.locator('[data-tree-path="Overview.md"]').click();
-  await page.waitForFunction(()=>document.getElementById('note-path').dataset.path==='Overview.md');
+  await page.waitForFunction(()=>document.getElementById('note-path')?.dataset.path==='Overview.md');
   await page.locator('#edit-mode').click();
   await menuItem(page,'source-mode');
   const editor = page.locator('#source-editor .cm-content'); await editor.click();
@@ -170,12 +177,12 @@ try {
   // A second page can select and deactivate workspaces independently.
   const second = await context.newPage(); await second.goto(base);
   await second.locator('[data-tree-path="Plan.md"]').click();
-  await second.waitForFunction(()=>document.getElementById('note-path').dataset.path==='Plan.md');
+  await second.waitForFunction(()=>document.getElementById('note-path')?.dataset.path==='Plan.md');
   await second.locator('[data-panel="settings"]').click();
   await second.locator(`#open-workspaces [data-ws="${a.workspace.id}"] [data-ws-close]`).click();
   await until(async()=>await second.locator('[data-tree-path="Overview.md"]').count()===0,'tab-local deactivation');
   assert(await page.locator('[data-tree-path="Overview.md"]').count());
-  await page.reload(); await page.waitForFunction(()=>document.getElementById('note-path').dataset.path==='Overview.md');
+  await page.reload(); await page.waitForFunction(()=>document.getElementById('note-path')?.dataset.path==='Overview.md');
   assert(await page.locator('[data-tree-path="Overview.md"]').count());
   await menuItem(page,'source-mode');
   await page.locator('#view-graph').click();
@@ -192,12 +199,19 @@ try {
   await page.getByRole('button',{name:'Create workspace',exact:true}).click();
   await page.locator('#server-workspace-picker').waitFor({state:'detached'});
   assert((await fs.stat(path.join(root,'Gamma'))).isDirectory());
-  // The start page offers the next steps, and Set up Git guides a workspace to GitHub with a deploy key.
+  // Created workspaces start as Git repositories with automatic snapshots on.
+  assert((await fs.stat(path.join(root,'Gamma','.git'))).isDirectory(),'a created workspace is a Git repository');
+  const gamma = await call('serverOpen',{name:'Gamma'}), gammaGit = await call('gitStatus',{scope:gamma.scope});
+  assert.equal(gammaGit.branch,'main'); assert.equal(gammaGit.snapshots.enabled,true); assert.equal(gammaGit.snapshots.push,false);
+  await page.locator('[data-panel="git"]').click();
+  await page.locator('.git-workspace', {hasText: 'Gamma'}).locator('.git-snapshot-badge.on').waitFor();
+  // The start page offers the next steps that apply; server folders are listed rather than picked.
   await page.locator('#new-tab').click();
-  for (const action of ['new-article','random-article','setup-git','create-workspace','open-workspace']) await page.locator(`#welcome [data-welcome="${action}"]`).waitFor();
+  for (const action of ['new-article','random-article','setup-git','create-workspace']) await page.locator(`#welcome [data-welcome="${action}"]`).waitFor();
+  assert.equal(await page.locator('#welcome [data-welcome="open-workspace"]').count(),0);
   await page.locator('#welcome [data-welcome="setup-git"]').click();
   const guide = page.locator('.git-setup-dialog');
-  await guide.getByRole('button',{name:'Create repository'}).click();
+  if (await guide.getByRole('button',{name:'Create repository'}).count()) await guide.getByRole('button',{name:'Create repository'}).click();
   // A global Git author on this machine already completes the step; Change reopens it.
   await guide.locator('.git-setup-step.done').first().waitFor();
   if (!await guide.getByLabel('Name',{exact:true}).count()) await guide.locator('[data-expand="2"]').click();

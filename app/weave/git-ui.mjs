@@ -9,6 +9,18 @@ const icons = {
   fetch:'<path d="M5 4h14M12 7v13m-5-5 5 5 5-5"/>', refresh:'<path d="M20 10a8 8 0 1 0-2 8M20 4v6h-6"/>',
 };
 const iconButton = (action,label,extra = '') => button(action,`<svg viewBox="0 0 24 24" aria-hidden="true">${icons[action]}</svg>`,label,extra);
+const minutesText = n => n % 60 === 0 && n >= 60 ? (n === 60 ? '1 hour' : n / 60 + ' hours') : n === 1 ? '1 minute' : n + ' minutes';
+/** "3 minutes ago" for recent times, else the local date and time. */
+function ago(value) {
+  const seconds = (Date.now() - new Date(value)) / 1000;
+  if (!(seconds >= 0)) return new Date(value).toLocaleString();
+  if (seconds < 60) return 'just now';
+  if (seconds < 3600) return Math.floor(seconds / 60) + (seconds < 120 ? ' minute ago' : ' minutes ago');
+  if (seconds < 86400) return Math.floor(seconds / 3600) + (seconds < 7200 ? ' hour ago' : ' hours ago');
+  return new Date(value).toLocaleString();
+}
+const snapshotKinds = {automatic: 'Automatic snapshot', close: 'Snapshot on close', manual: 'Snapshot', restore: 'Before a restore', restored: 'Restore'};
+const fileStatus = {A: 'Added', M: 'Modified', D: 'Deleted', T: 'Type changed'};
 const statusLabel = file => file.conflict ? 'Conflict' : file.untracked ? 'Untracked' : ({A: 'Added', M: 'Modified', D: 'Deleted', R: 'Renamed', C: 'Copied', T: 'Type changed'}[file.index !== '.' ? file.index : file.worktree] || 'Changed');
 /** Preserve exact text/line endings around merge and diff3 conflict blocks. */
 export function conflictHunks(text) {
@@ -65,13 +77,17 @@ function renderDiff(text, split = false) {
 }
 
 // Several panels can exist, one per open workspace; `idSuffix` keeps their element IDs unique.
-export function createGitPanel({client, container, beforeAction = async () => {}, afterMutation = async () => {}, openFile = async () => {}, idSuffix = '', onPendingCount, onBusy, onStatus, onSetup}) {
+export function createGitPanel({client, container, beforeAction = async () => {}, afterMutation = async () => {}, openFile = async () => {}, currentPath = () => null, idSuffix = '', onPendingCount, onBusy, onStatus, onSetup}) {
   let state = null, busy = false, generation = 0, refreshing = false, refreshedAt = 0, refreshCost = 0, selectedRemote = '', pushRemotes = [], defaultMessage = '', historyLoaded = false, diff = null, split = true, conflict = null, conflictChoice = 'manual';
   const dialog = document.createElement('dialog'); dialog.id = 'git-diff-dialog' + idSuffix; dialog.className = 'git-diff-dialog'; dialog.setAttribute('aria-labelledby', 'git-diff-title'); document.body.append(dialog);
   const conflictDialog = document.createElement('dialog'); conflictDialog.id = 'git-conflict-dialog' + idSuffix; conflictDialog.className = 'git-diff-dialog git-conflict-dialog'; conflictDialog.setAttribute('aria-labelledby', 'git-conflict-title'); document.body.append(conflictDialog);
   container.innerHTML = `<div class="git-toolbar" role="toolbar" aria-label="Source control actions">${iconButton('sync','Commit all & sync','id="git-commit-sync"')}${iconButton('commit','Commit staged changes','id="git-commit"')}${iconButton('stageAll','Stage all changes')}${iconButton('unstageAll','Unstage all changes')}${iconButton('push','Push branch to selected remotes')}${iconButton('pull','Pull (fast-forward only)')}${iconButton('fetch','Fetch remote updates')}${iconButton('refresh','Refresh source control')}</div>
     <div class="git-summary"><strong id="git-branch">Source control</strong></div><p id="git-repository-note" class="hint"></p><div id="git-notice" class="git-notice" role="status" aria-live="polite"></div><div id="git-setup" hidden></div><div id="git-connect" class="git-connect" hidden><p>This repository is not connected to GitHub or another remote yet.</p>${button('setup', 'Set up Git…', 'Connect this workspace to GitHub with a deploy key')}</div>
     <div id="git-repository" hidden><form id="git-commit-form"><label for="git-commit-message" class="git-visually-hidden">Commit message</label><input id="git-commit-message" type="text" maxlength="10000" placeholder="Commit message (Ctrl+Enter)" aria-label="Commit message" title="Current UTC timestamp by default. Enter your own message to replace it." autocomplete="off"></form><p id="git-sync-status" class="hint"></p><div id="git-changes"></div>
+    <details id="git-snapshots" class="git-snapshots"><summary>Automatic snapshots <span id="git-snapshot-badge" class="git-snapshot-badge"></span></summary><p id="git-snapshot-state" class="hint"></p><p id="git-snapshot-warning" class="git-snapshot-warning" role="status"></p>
+    <label class="git-check"><input type="checkbox" id="git-snapshot-enabled"> Commit changes automatically</label><div id="git-snapshot-options"><div class="git-snapshot-timing"><label for="git-snapshot-trigger">Snapshot</label><select id="git-snapshot-trigger" aria-label="When snapshots are taken"><option value="idle">after a quiet period of</option><option value="interval">at intervals of</option></select><input id="git-snapshot-minutes" type="number" min="1" max="1440" step="1" aria-label="Snapshot minutes"><span>min</span></div>
+    <label class="git-check"><input type="checkbox" id="git-snapshot-close"> Snapshot when Weave closes</label><label class="git-check" id="git-snapshot-push-label"><input type="checkbox" id="git-snapshot-push"> Push snapshots to the remote</label><p class="hint">Snapshots respect .gitignore and wait while you stage a commit, merge or switch branches.</p></div>
+    <div class="git-snapshot-actions">${button('snapshot', 'Snapshot now', 'Commit every change now as a snapshot')}${button('browseSnapshots', 'Browse snapshots…', 'Inspect earlier versions and restore files or a whole snapshot')}</div></details>
     <div class="git-repository-controls"><div class="git-branch-control"><label for="git-branches">Branch</label><select id="git-branches" aria-label="Current Git branch"></select>${button('newBranch', '+', 'Create branch')}</div></div>
     ${button('editIgnore','Edit .gitignore')}<details id="git-remote-management"><summary>Remote management</summary>${button('setup', 'Git setup & deploy key…', 'Open the Git setup guide: commit author, remote and deploy key')}<div class="git-remote-control"><label for="git-remotes">Fetch / pull</label><select id="git-remotes" aria-label="Git fetch and pull remote"></select></div><p class="hint">Sync fetches and merges from this remote, then pushes to every checked remote. Only this remote can set the branch upstream.</p><fieldset class="git-push-remotes"><legend>Push to</legend><div id="git-push-remotes"></div></fieldset><form id="git-add-remote-form"><label for="git-remote-name">Remote name</label><input id="git-remote-name" maxlength="100" placeholder="origin" required autocomplete="off"><label for="git-remote-url">Clone URL (HTTPS or SSH)</label><input id="git-remote-url" maxlength="2000" placeholder="https://host/repository.git" required autocomplete="off"><button type="submit">Add remote</button></form></details>
     <details id="git-recent-pulls"><summary>Recently pulled files</summary><div id="git-recent-pull-list"></div></details><details id="git-more"><summary>Branches &amp; stashes</summary><p class="hint">Save tracked changes in a stash before switching branches. Stage new files to include them.</p>${button('stash', 'Stash tracked changes')}<div id="git-stashes"></div></details><details id="git-history"><summary>Recent commits</summary><div id="git-history-list"></div></details></div>`;
@@ -79,6 +95,9 @@ export function createGitPanel({client, container, beforeAction = async () => {}
   ignoreDialog.innerHTML='<form><div class="git-diff-heading"><h2>Edit .gitignore</h2><button type="button" data-ignore-close aria-label="Close .gitignore editor">×</button></div><p class="hint">Patterns are relative to the repository root. Saving does not stage or commit the file.</p><label for="git-ignore-text">Ignored files and folders</label><textarea id="git-ignore-text" spellcheck="false"></textarea><p data-ignore-error role="alert"></p><div class="git-diff-footer"><button type="button" data-ignore-close>Cancel</button><button type="submit">Save .gitignore</button></div></form>';
   document.body.append(ignoreDialog);
   let ignoreRevision=null;
+  // Snapshot browser: history (snapshots marked), a commit's files, and restores.
+  const snapshotDialog = document.createElement('dialog'); snapshotDialog.id = 'git-snapshot-dialog' + idSuffix; snapshotDialog.className = 'git-diff-dialog git-snapshot-dialog'; snapshotDialog.setAttribute('aria-labelledby', 'git-snapshot-title' + idSuffix); document.body.append(snapshotDialog);
+  const snapshotView = {list: [], more: false, selected: null, detail: null, path: null, note: '', working: false};
   for(const node of ignoreDialog.querySelectorAll('[data-ignore-close]'))node.onclick=()=>ignoreDialog.close();
   ignoreDialog.querySelector('form').onsubmit=async event=>{
     event.preventDefault();if(busy)return;const serial=generation;lock(true);
@@ -134,6 +153,9 @@ export function createGitPanel({client, container, beforeAction = async () => {}
     container.querySelector('[data-git-action="stageAll"]').disabled = busy || !repo || !changes.some(file=>file.untracked || file.worktree !== '.' || file.conflict);
     container.querySelector('[data-git-action="unstageAll"]').disabled = busy || !repo || !changes.some(file=>!file.untracked && file.index !== '.');
     container.querySelector('[data-git-action="stash"]').disabled = busy || !repo || state?.unborn || !changes.length;
+    container.querySelector('[data-git-action="snapshot"]').disabled = busy || !repo || !changes.length || state?.merging || state?.detached || state?.privateStaged || changes.some(file => file.conflict || !file.untracked && file.index !== '.');
+    container.querySelector('[data-git-action="browseSnapshots"]').disabled = busy || !repo || state?.unborn;
+    find('git-snapshot-push').disabled = busy || !repo || !remote;
   }
   function fileGroup(title, files, staged) {
     if (!files.length) return '';
@@ -171,8 +193,88 @@ export function createGitPanel({client, container, beforeAction = async () => {}
     find('git-stashes').innerHTML = state.stashes.map(stash => `<div class="git-stash"><span>${esc(stash.message)}</span>${button('applyStash', 'Apply', 'Apply ' + stash.ref + ' (keep stash)', `data-ref="${esc(stash.ref)}"`)}</div>`).join('') || '<p class="hint">No saved stashes.</p>';
     if (state.privateStaged) announce('Private Weave data is staged. Unstage it in an external Git client before committing.', true);
     find('git-connect').hidden = !onSetup || state.remotes.length > 0;
+    renderSnapshotSettings();
     updateControls(); onStatus?.(state);
   }
+  function renderSnapshotSettings() {
+    const snap = state.snapshots || {}, set = (id, property, value) => {const node = find(id); if (document.activeElement !== node) node[property] = value;};
+    set('git-snapshot-enabled', 'checked', !!snap.enabled); set('git-snapshot-trigger', 'value', snap.trigger || 'idle'); set('git-snapshot-minutes', 'value', String(snap.minutes || 15));
+    set('git-snapshot-push', 'checked', !!snap.push); set('git-snapshot-close', 'checked', snap.onClose !== false);
+    find('git-snapshot-options').hidden = !snap.enabled;
+    find('git-snapshot-badge').textContent = snap.enabled ? 'On' : 'Off'; find('git-snapshot-badge').classList.toggle('on', !!snap.enabled);
+    find('git-snapshot-push-label').title = state.remotes.length ? 'After each snapshot, push to the remotes checked under Remote management.' : 'Add a remote to push snapshots.';
+    const last = snap.last ? ` Last snapshot ${ago(snap.last.at)} (${snap.last.files} ${snap.last.files === 1 ? 'file' : 'files'}).` : ' No snapshot yet.';
+    find('git-snapshot-state').textContent = snap.enabled ? (snap.trigger === 'interval' ? `Every ${minutesText(snap.minutes)} when there are changes.` : `After ${minutesText(snap.minutes)} without changes.`) + last : 'Off. Weave can commit your changes for you, keeping every earlier version one click away.' + (snap.last ? last : '');
+    const warning = snap.enabled ? snap.error || snap.skipped || (snap.pushError ? 'The last push failed: ' + snap.pushError : '') : '';
+    find('git-snapshot-warning').textContent = warning || ''; find('git-snapshot-warning').hidden = !warning;
+  }
+  const snapshotSettings = () => ({enabled: find('git-snapshot-enabled').checked, trigger: find('git-snapshot-trigger').value, minutes: Math.min(1440, Math.max(1, Math.round(Number(find('git-snapshot-minutes').value)) || 15)), push: find('git-snapshot-push').checked, onClose: find('git-snapshot-close').checked});
+  const snapshotsOn = () => state?.snapshots?.enabled === true;
+  function renderSnapshotDialog() {
+    const v = snapshotView, path = currentPath(), detail = v.detail;
+    const when = item => new Date(item.date).toLocaleString();
+    const item = entry => `<button type="button" class="git-snapshot-item${entry.snapshot ? ' snapshot' : ''}" data-snapshot-id="${esc(entry.id)}" aria-pressed="${entry.id === v.selected}"><strong>${esc(entry.subject)}</strong><small>${esc(when(entry))} · ${esc(snapshotKinds[entry.snapshot] || 'Commit')}${entry.snapshot ? '' : ' · ' + esc(entry.author)}</small></button>`;
+    const files = detail ? detail.files.map(file => `<li><span class="git-snapshot-file-status" data-status="${esc(file.status)}" title="${esc(fileStatus[file.status] || 'Changed')}">${esc(file.status)}</span><span class="git-snapshot-file-path" title="${esc(file.path)}">${esc(file.path)}</span><button type="button" data-snapshot-diff="${esc(file.path)}" title="Show what this commit changed in ${esc(file.path)}">Changes</button><button type="button" data-snapshot-restore="${esc(file.path)}" data-before="${file.status === 'D'}" title="${file.status === 'D' ? 'Bring back the version deleted here' : 'Make this the current version of the file'}">${file.status === 'D' ? 'Restore deleted file' : 'Restore this version'}</button></li>`).join('') : '';
+    const selected = v.list.find(entry => entry.id === v.selected);
+    snapshotDialog.innerHTML = `<div class="git-diff-heading"><div><p class="eyebrow">SNAPSHOTS &amp; HISTORY</p><h2 id="git-snapshot-title${idSuffix}">Earlier versions</h2></div><button type="button" data-snapshot-close aria-label="Close snapshots" title="Close (Esc)">×</button></div>
+      <div class="git-diff-toolbar">${path ? `<label class="git-check"><input type="checkbox" data-snapshot-only ${v.path ? 'checked' : ''}> Only versions of ${esc(path)}</label>` : ''}<span class="git-snapshot-note" role="status">${esc(v.note)}</span></div>
+      <div class="git-snapshot-body"><div class="git-snapshot-list">${v.list.map(item).join('') || `<p class="hint">${v.path ? 'No commits changed this file yet.' : 'Your first snapshot or commit will appear here.'}</p>`}${v.more ? '<button type="button" data-snapshot-more>Show older versions</button>' : ''}</div>
+      <div class="git-snapshot-detail">${selected && detail ? `<div class="git-snapshot-detail-heading"><div><strong>${esc(selected.subject)}</strong><small>${esc(when(selected))} · ${esc(selected.short)} · ${esc(selected.author)}</small></div><button type="button" data-snapshot-restore-all title="Return every tracked file to this version">Restore entire snapshot</button></div><ul class="git-snapshot-files">${files || '<li class="hint">No file changes to show.</li>'}</ul>` : '<p class="hint">Choose a snapshot or commit to see the files it changed and restore them.</p>'}</div></div>`;
+    for (const node of snapshotDialog.querySelectorAll('button,input')) node.disabled = v.working;
+  }
+  async function loadSnapshots({more = false} = {}) {
+    const v = snapshotView, serial = generation, skip = more ? v.list.length : 0;
+    const page = await client.call('gitHistory', {limit: 50, skip, ...(v.path ? {path: v.path} : {})}); if (serial !== generation) return;
+    v.list = more ? [...v.list, ...page] : page; v.more = page.length === 50;
+    if (!v.list.some(entry => entry.id === v.selected)) {v.selected = null; v.detail = null;}
+    if (!v.selected && v.list.length) await selectSnapshot(v.list[0].id, false);
+    renderSnapshotDialog();
+  }
+  async function selectSnapshot(id, render = true) {
+    const serial = generation, detail = await client.call('gitCommitDiff', {id}); if (serial !== generation) return;
+    snapshotView.selected = id; snapshotView.detail = detail; if (render) renderSnapshotDialog();
+  }
+  async function openSnapshots() {
+    if (busy || !state?.repository) return;
+    Object.assign(snapshotView, {list: [], more: false, selected: null, detail: null, path: null, note: ''});
+    try {await loadSnapshots(); snapshotDialog.showModal(); snapshotDialog.querySelector('[data-snapshot-close]').focus();}
+    catch (error) {announce(error.message, true);}
+  }
+  /** Runs a restore from the snapshot browser and shows its outcome there. */
+  async function restoreFromSnapshots(name, args) {
+    snapshotView.working = true; renderSnapshotDialog();
+    try {await action(name, {...args, confirmed: true}); snapshotView.note = find('git-notice').textContent;}
+    finally {snapshotView.working = false;}
+    try {await loadSnapshots();} catch (error) {snapshotView.note = error.message; renderSnapshotDialog();}
+  }
+  snapshotDialog.addEventListener('click', async event => {
+    const target = event.target.closest('button'), v = snapshotView; if (!target || target.disabled) return;
+    try {
+      if (target.hasAttribute('data-snapshot-close')) return snapshotDialog.close();
+      if (target.hasAttribute('data-snapshot-more')) return await loadSnapshots({more: true});
+      if (target.dataset.snapshotId) return await selectSnapshot(target.dataset.snapshotId);
+      const selected = v.list.find(entry => entry.id === v.selected); if (!selected) return;
+      const date = new Date(selected.date).toLocaleString();
+      if (target.dataset.snapshotDiff) {
+        const result = await client.call('gitCommitDiff', {id: selected.id, path: target.dataset.snapshotDiff});
+        diff = {...result, commit: true}; split = true; renderDiffDialog(); dialog.showModal(); return;
+      }
+      if (target.dataset.snapshotRestore) {
+        const file = target.dataset.snapshotRestore, before = target.dataset.before === 'true';
+        if (!await ask('Restore this version?', `${file} returns to its version ${before ? 'from just before' : 'from'} ${date}.` + (snapshotsOn() ? ' Your current changes are kept in a snapshot first, so you can switch back.' : ' Changes to it that are not committed will be lost.'), {confirm: 'Restore file'})) return;
+        return await restoreFromSnapshots('restoreFile', {id: selected.id, path: file, before});
+      }
+      if (target.hasAttribute('data-snapshot-restore-all')) {
+        if (!await ask('Restore entire snapshot?', `Every tracked file returns to its version from ${date}: changed files are replaced and files added since are removed. Files Git does not track stay as they are.` + (snapshotsOn() ? ' Current changes are kept in a snapshot first and the restore is recorded as a new snapshot, so nothing is lost.' : ' Changes that are not committed will be lost.'), {confirm: 'Restore snapshot'})) return;
+        return await restoreFromSnapshots('restoreSnapshot', {id: selected.id});
+      }
+    } catch (error) {v.note = error.message; renderSnapshotDialog();}
+  });
+  snapshotDialog.addEventListener('change', async event => {
+    if (!event.target.matches('[data-snapshot-only]')) return;
+    snapshotView.path = event.target.checked ? currentPath() : null; snapshotView.selected = null;
+    try {await loadSnapshots();} catch (error) {snapshotView.note = error.message; renderSnapshotDialog();}
+  });
   async function refresh({quiet = false} = {}) {
     if (refreshing || busy || !client.capabilities.git) {if (!client.capabilities.git) render(); return;}
     // Background refreshes are spaced by what the last one cost, so Git status
@@ -190,14 +292,15 @@ export function createGitPanel({client, container, beforeAction = async () => {}
     return new Promise(resolve => {prompt.onclose = () => {const value = prompt.returnValue === 'ok' ? prompt.querySelector('input')?.value.trim() ?? true : null; prompt.remove(); resolve(value);};});
   }
   async function action(name, args = {}) {
-    if (busy) return; const serial = generation; lock(true); announce(({fetch: 'Fetching remote updates…', pull: 'Pulling changes…', push: 'Pushing branch…', sync: 'Committing all changes and syncing…', commit: 'Committing staged changes…'}[name]) || 'Updating repository…');
+    if (busy) return; const serial = generation; lock(true); announce(({fetch: 'Fetching remote updates…', pull: 'Pulling changes…', push: 'Pushing branch…', sync: 'Committing all changes and syncing…', commit: 'Committing staged changes…', snapshot: 'Taking a snapshot…', restoreFile: 'Restoring file…', restoreSnapshot: 'Restoring snapshot…'}[name]) || 'Updating repository…');
     try {
-      if (name !== 'configureRemotes') await beforeAction(name); if (serial !== generation) return; const result = await client.call('gitAction', {action: name, remote: selectedRemote, ...(['push', 'sync'].includes(name) ? {pushRemotes} : {}), ...args}); if (serial !== generation) return;
+      const settings = ['configureRemotes', 'configureSnapshots'].includes(name);
+      if (!settings) await beforeAction(name); if (serial !== generation) return; const result = await client.call('gitAction', {action: name, remote: selectedRemote, ...(['push', 'sync'].includes(name) ? {pushRemotes} : {}), ...args}); if (serial !== generation) return;
       state = result.status; if (name === 'commit' || name === 'sync' && result.committed) timestampMessage(true);
       if (name === 'addRemote') {find('git-remote-name').value = ''; find('git-remote-url').value = '';}
       historyLoaded = false; render(); announce(result.message || 'Done.');
-      if (name !== 'configureRemotes') await afterMutation(name); if (find('git-history').open) await loadHistory();
-    } catch (error) {if (serial === generation) {announce(error.message, true); try {state = await client.call('gitStatus'); render(); if (name !== 'configureRemotes') await afterMutation(name);} catch {}}}
+      if (!settings) await afterMutation(name); if (find('git-history').open) await loadHistory();
+    } catch (error) {if (serial === generation) {announce(error.message, true); try {state = await client.call('gitStatus'); render(); if (!['configureRemotes', 'configureSnapshots'].includes(name)) await afterMutation(name);} catch {}}}
     finally {lock(false);}
   }
   function renderDiffDialog() {
@@ -286,12 +389,14 @@ export function createGitPanel({client, container, beforeAction = async () => {}
       } return;
     }
     if (name === 'editIgnore') return editIgnore();
+    if (name === 'browseSnapshots') return openSnapshots();
     if (name === 'setup') return onSetup?.();
     if (name === 'init' && !await ask(ui('Initialise repository?'), 'Create Git history for this workspace. Stage and commit selected files to record your first version.', {confirm: ui('Initialise')})) return;
     if (serial !== generation) return;
     await action(name, {path: target.closest('.git-file')?.dataset.path, ref: target.dataset.ref});
   });
   find('git-branches').onchange = () => action('switch', {branch: find('git-branches').value});
+  for (const id of ['git-snapshot-enabled', 'git-snapshot-trigger', 'git-snapshot-minutes', 'git-snapshot-push', 'git-snapshot-close']) find(id).onchange = () => action('configureSnapshots', snapshotSettings());
   find('git-remotes').onchange = () => action('configureRemotes', {remote: find('git-remotes').value, pushRemotes});
   find('git-push-remotes').onchange = () => action('configureRemotes', {pushRemotes: [...container.querySelectorAll('[data-push-remote]:checked')].map(input => input.dataset.pushRemote)});
   find('git-add-remote-form').onsubmit = event => {event.preventDefault(); action('addRemote', {name: find('git-remote-name').value.trim(), url: find('git-remote-url').value.trim()});};
@@ -299,7 +404,7 @@ export function createGitPanel({client, container, beforeAction = async () => {}
   find('git-commit-message').onkeydown = event => {if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {event.preventDefault(); if (!find('git-commit').disabled) action('commit', {message: commitMessage()});}};
   find('git-history').ontoggle = () => {if (find('git-history').open) loadHistory();};
   dialog.addEventListener('click', event => {if (event.target === dialog) {const rect = dialog.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();}});
-  const timer = setInterval(() => {if (!document.hidden) {if (!busy) timestampMessage(); refresh({quiet: true});}}, 6000);
+  const timer = setInterval(() => {if (!document.hidden) {if (!busy) timestampMessage(); if (state?.repository) renderSnapshotSettings(); refresh({quiet: true});}}, 6000);
   /** Runs one Git action for the setup guide; errors are thrown to the caller. */
   async function perform(name, args = {}) {
     if (busy) throw new Error('Source control is busy. Try again in a moment.');
@@ -313,5 +418,5 @@ export function createGitPanel({client, container, beforeAction = async () => {}
     } finally {lock(false);}
   }
   render();
-  return {refresh, perform, get status() {return state;}, reset() {generation++; state = null; historyLoaded = false; selectedRemote = ''; pushRemotes = []; timestampMessage(true); find('git-remote-name').value = ''; find('git-remote-url').value = ''; find('git-history-list').innerHTML = ''; announce(''); dialog.close(); conflictDialog.close(); ignoreDialog.close();fileMenu.hidden=true;render();}, destroy() {clearInterval(timer); dialog.remove(); conflictDialog.remove();ignoreDialog.remove();fileMenu.remove();document.removeEventListener('click',closeMenu);document.removeEventListener('keydown',closeMenu);}};
+  return {refresh, perform, get status() {return state;}, reset() {generation++; state = null; historyLoaded = false; selectedRemote = ''; pushRemotes = []; timestampMessage(true); find('git-remote-name').value = ''; find('git-remote-url').value = ''; find('git-history-list').innerHTML = ''; announce(''); dialog.close(); conflictDialog.close(); ignoreDialog.close(); snapshotDialog.close();fileMenu.hidden=true;render();}, destroy() {clearInterval(timer); dialog.remove(); conflictDialog.remove();ignoreDialog.remove();snapshotDialog.remove();fileMenu.remove();document.removeEventListener('click',closeMenu);document.removeEventListener('keydown',closeMenu);}};
 }

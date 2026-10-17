@@ -105,6 +105,12 @@ impl Service {
         self.shutdown();
     }
     fn shutdown(&self) {
+        // Snapshots on close need Git, which stops once `stopping` is set.
+        if !self.stopping.load(Ordering::Relaxed) {
+            if let Some(backend) = self.backend.lock().ok().and_then(|b| b.clone()) {
+                backend.snapshot_on_exit();
+            }
+        }
         self.stopping.store(true, Ordering::Relaxed);
         if let Ok(mut monitor) = self.monitor.lock() {
             if let Some(monitor) = monitor.take() {

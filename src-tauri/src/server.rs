@@ -200,6 +200,9 @@ impl Server {
             );
         }
         let backend = Arc::new(Backend::new(data, stop)?);
+        // Automatic snapshots run with the same Git hardening as requests.
+        *backend.background_git.lock().map_err(files::err)? =
+            json!({"hardened":true,"gitHosts":config.git_hosts});
         Self::with_backend(config, port, backend, root, None)
     }
     /// Desktop uses the same backend and monitor; no second database or writer.
@@ -455,7 +458,17 @@ impl Server {
                     }
                     root
                 };
-                let catalog = self.backend.open_background(&display(&root))?;
+                let mut catalog = self.backend.open_background(&display(&root))?;
+                if op == "serverOpen" && args["create"] == true {
+                    // New workspaces keep history from the start; without Git
+                    // they remain plain folders.
+                    if let Err(error) = self.backend.start_history(
+                        catalog["scope"].as_u64().unwrap_or(0),
+                        &json!({"hardened":true,"gitHosts":self.git_hosts}),
+                    ) {
+                        catalog["historyError"] = json!(error);
+                    }
+                }
                 self.backend.database.set(
                     &format!(
                         "serverRemoved:{}",
@@ -1272,6 +1285,10 @@ pub async fn run(config: Config) -> Result<(), String> {
         println!("Open {origin}");
     }
     let result = serve(listener, server.clone(), shutdown_signal()).await;
+    let backend = server.backend.clone();
+    tokio::task::spawn_blocking(move || backend.snapshot_on_exit())
+        .await
+        .map_err(files::err)?;
     stop.store(true, Ordering::Release);
     tokio::task::spawn_blocking(move || monitor.stop())
         .await
@@ -1521,13 +1538,20 @@ mod tests {
         if status["available"] != true {
             return; // Git is not installed on this machine.
         }
-        assert_eq!(status["repository"], false);
+        // Created workspaces start as repositories with automatic snapshots on.
+        assert_eq!(status["repository"], true);
+        assert_eq!(status["snapshots"]["enabled"], true);
+        assert_eq!(status["snapshots"]["push"], false);
+        assert_eq!(
+            *server.backend.background_git.lock().unwrap(),
+            json!({"hardened":true,"gitHosts":["github.com"]})
+        );
         let git = |args: Value| {
             let mut args = args;
             args["scope"] = scope.clone();
             server.request("gitAction", args)
         };
-        git(json!({"action":"init"})).unwrap();
+        assert!(git(json!({"action":"init"})).is_err());
         // Callers can neither turn hardening off nor widen permitted hosts.
         let refused = git(json!({"action":"addRemote","name":"origin","url":"https://example.org/notes.git","_host":{"hardened":false,"gitHosts":[]}}));
         assert!(refused.unwrap_err().contains("github.com"));

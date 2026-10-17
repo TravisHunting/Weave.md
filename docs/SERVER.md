@@ -22,7 +22,7 @@ Open [localhost:8765](http://localhost:8765). The default listener is loopback o
 
 The workspace and data directories are created if absent and must not overlap. Use dedicated server data, separate from desktop data. An exclusive process lock prevents two servers from sharing one database.
 
-Each direct child folder of `--workspaces` can be a workspace. Use **Open workspace folder…** to register an existing folder or **Create workspace** to create one. For example, `/workspaces/Personal` and `/workspaces/Team` are independent. Nested workspace roots, absolute paths, symlinks and junctions cannot be registered. Files inside workspaces can have nested folders as usual. Administrators can mount existing libraries at separate direct child directories.
+Each direct child folder of `--workspaces` can be a workspace. The start page lists them under **Workspaces on this server**; **Open** registers one. **Create workspace** creates a folder, initialises a Git repository (branch `main`) and turns on automatic snapshots. A browser opens only the workspaces it opened before (a new browser opens none), so workspaces registered by others never appear uninvited. For example, `/workspaces/Personal` and `/workspaces/Team` are independent. Nested workspace roots, absolute paths, symlinks and junctions cannot be registered. Files inside workspaces can have nested folders as usual. Administrators can mount existing libraries at separate direct child directories.
 
 Up to 12 registered workspaces run concurrently, each with its existing `kb-…` identifier, scope, indexes and watcher. IDs derive from canonical roots as on desktop: retain mount paths and folder names when moving a deployment. Change display names in Settings without renaming folders.
 
@@ -94,7 +94,7 @@ Stop the server before copying both persistent volumes for a consistent backup. 
 
 ## Git and GitHub
 
-Browser users have the same **Source control** panel as the desktop: commit, stage, diff, branches, stashes, conflicts, pull, push and **Commit all & sync**. Weave authenticates to GitHub (or GitLab, or any SSH Git host) with a **deploy key**: an SSH key created by Weave for one workspace, whose public half you add to one repository. The private half stays in the server's data folder (`<data>/git-keys/<workspace id>/`) and is never sent to the browser.
+Browser users have the same **Source control** panel as the desktop: commit, stage, diff, branches, stashes, conflicts, pull, push, **Commit all & sync** and [automatic snapshots](USER_GUIDE.md#automatic-snapshots). The server schedules snapshots itself, with the same hardening as browser requests, so they continue while no browser is open, and on SIGTERM it snapshots workspaces set to snapshot on close before stopping (keep `stop_grace_period` generous). Weave authenticates to GitHub (or GitLab, or any SSH Git host) with a **deploy key**: an SSH key created by Weave for one workspace, whose public half you add to one repository. The private half stays in the server's data folder (`<data>/git-keys/<workspace id>/`) and is never sent to the browser.
 
 **Requirements.** The Docker image includes Git and OpenSSH. A server run directly needs `git` and `ssh`/`ssh-keygen` on its `PATH` (`sudo apt install git openssh-client` on Debian/Ubuntu; Git for Windows supplies both on Windows).
 

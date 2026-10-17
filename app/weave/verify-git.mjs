@@ -193,7 +193,35 @@ try {
   await page.locator('#git-add-remote-form button').click(); await page.locator('[data-push-remote="archive"]').waitFor();
   assert.equal(await page.locator('[data-push-remote="archive"]').isChecked(), false,'adding a remote does not silently enable pushing to it');
   assert.equal(await page.locator('#git-panel').evaluate(panel=>panel.scrollWidth>panel.clientWidth),false,'remote management fits the sidebar');
+  // Automatic snapshots: settings in the panel, Snapshot now, and restores from the snapshot browser.
+  const idle = () => page.waitForFunction(()=>document.querySelector('#git-panel').getAttribute('aria-busy')==='false');
+  await page.locator('#git-snapshots summary').click();
+  assert.equal(await page.locator('#git-snapshot-badge').innerText(),'Off'); assert(await page.locator('#git-snapshot-options').isHidden());
+  await page.locator('#git-snapshot-enabled').check(); await idle(); await page.locator('#git-snapshot-badge.on').waitFor();
+  await page.locator('#git-snapshot-minutes').fill('5'); await page.locator('#git-snapshot-minutes').dispatchEvent('change'); await idle();
+  assert.deepEqual((({enabled,trigger,minutes,push,onClose})=>({enabled,trigger,minutes,push,onClose}))((await git.status()).snapshots),{enabled:true,trigger:'idle',minutes:5,push:false,onClose:true});
+  assert.match(await page.locator('#git-snapshot-state').innerText(),/After 5 minutes without changes/);
+  await page.locator('#git-snapshots').screenshot({path:path.join(output,'weave-git-snapshot-settings.png')});
+  assert.equal(await page.locator('#git-panel').evaluate(panel=>panel.scrollWidth>panel.clientWidth),false,'snapshot settings fit the sidebar');
+  await fs.writeFile(path.join(root,'Architecture.md'),'# Architecture\n\nSnapshot draft.\n');
+  await page.locator('[aria-label="Refresh source control"]').click(); await page.locator('.git-file[data-path="Architecture.md"]').waitFor();
+  await page.locator('[data-git-action="snapshot"]').click(); await page.waitForFunction(()=>document.querySelector('#git-notice').textContent.startsWith('Snapshot · 1 file'));
+  assert.equal((await git.history())[0].snapshot,'manual');
+  await fs.writeFile(path.join(root,'Architecture.md'),'# Architecture\n\nAn idea worth keeping.\n');
+  await page.locator('[aria-label="Refresh source control"]').click(); await page.locator('.git-file[data-path="Architecture.md"]').waitFor();
+  await page.locator('[data-git-action="browseSnapshots"]').click(); await page.locator('#git-snapshot-dialog[open]').waitFor();
+  assert.equal(await page.locator('#git-snapshot-dialog .git-snapshot-item[aria-pressed="true"].snapshot').count(),1,'the newest snapshot is selected');
+  await page.locator('#git-snapshot-dialog [data-snapshot-diff="Architecture.md"]').click(); await page.locator('#git-diff-dialog[open]').waitFor();
+  assert.match(await page.locator('#git-diff-dialog').innerText(),/Snapshot draft/); await page.locator('#git-diff-dialog [data-diff-close]').click();
+  await page.screenshot({path:path.join(output,'weave-git-snapshots.png')});
+  await page.locator('#git-snapshot-dialog [data-snapshot-restore="Architecture.md"]').click();
+  await page.locator('.git-prompt button[value="ok"]').click();
+  await page.waitForFunction(()=>/Restored Architecture\.md/.test(document.querySelector('#git-snapshot-dialog .git-snapshot-note')?.textContent || ''));
+  assert.equal((await fs.readFile(path.join(root,'Architecture.md'),'utf8')).replace(/\r/g,''),'# Architecture\n\nSnapshot draft.\n');
+  const kept = (await git.history())[0]; assert.equal(kept.snapshot,'restore','the replaced version is kept in a snapshot first');
+  assert.match((await service.call('gitCommitDiff',{id:kept.id,path:'Architecture.md'})).text,/An idea worth keeping/);
+  await page.locator('#git-snapshot-dialog [data-snapshot-close]').click();
   assert.deepEqual(errors, []); for (const op of ['gitStatus', 'gitDiff', 'gitAction', 'gitHistory', 'gitCommitDiff']) assert(invocations.includes(op));
-  console.log('Verified Source control UI: remote management, multiple push targets, timestamp commit defaults without prompts, split diffs, stage/unstage, push/fetch/pull, sync, pulled file diffs, branches, history, stash, discard, conflict resolution and stale-save protection.');
+  console.log('Verified Source control UI: remote management, multiple push targets, timestamp commit defaults without prompts, split diffs, stage/unstage, push/fetch/pull, sync, pulled file diffs, branches, history, stash, discard, conflict resolution, stale-save protection, automatic snapshot settings and restoring from snapshots.');
 } catch (error) {await page.screenshot({path: path.join(output, 'weave-git-failure.png')}).catch(() => {}); console.error(await page.locator('#git-panel').innerText().catch(() => '')); throw error;}
 finally {await browser.close(); await service.close(); await fs.rm(temporary, {recursive: true, force: true});}

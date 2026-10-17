@@ -58,7 +58,10 @@ export async function createHttpClient({fetch: fetcher = globalThis.fetch.bind(g
       const defaults = panel.defaultWorkspaces || panel.workspaces.map(w => w.id);
       const selection = JSON.stringify(defaults);
       const reset = panel.managedWorkspaces && (freshTab || state.selection !== selection);
-      const wanted = (reset ? defaults : state.open || defaults).filter(id => known.has(id));
+      // A browser opens only the workspaces it had open (desktop-managed
+      // servers: the controller's selection). Every other workspace on the
+      // server is listed on the start page instead of opening by surprise.
+      const wanted = (reset ? defaults : state.open || (panel.managedWorkspaces ? defaults : [])).filter(id => known.has(id));
       state.selection = selection; freshTab = false;
       const catalogs = [], errors = []; state.open = [];
       for (const id of wanted) {
@@ -105,6 +108,10 @@ export async function createHttpClient({fetch: fetcher = globalThis.fetch.bind(g
   delete client.chooseMarkdownFile; // The existing read-only browser file picker applies.
   delete client.readExternal; delete client.saveExternal;
   client.serverAccount = () => window.open('/account', '_blank', 'noopener,noreferrer');
+  // Workspace folders on the server (direct children of its workspace
+  // directory), listed on the start page; empty when the desktop manages them.
+  client.serverFolders = async () => (await post('serverFolders')).folders;
+  client.openServerFolder = async name => adopt(await post('serverOpen', {name}));
   client.exportWorkspace = async (scope, {name = 'workspace', ...options} = {}) => {
     const {blob, documents, relationships, diagrams} = await post('export', {scope, ...options}, '/api/export');
     const filename = name.replace(/[<>:"/\\|?*\x00-\x1f]/g, '-').replace(/\s+/g, '_') + '.html';

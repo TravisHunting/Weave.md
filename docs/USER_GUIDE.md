@@ -18,12 +18,12 @@ A tour of what Weave does and where to find it. For the Markdown format itself, 
 
 ## Workspaces
 
-Each folder you open is a workspace. An empty tab shows the start page, whose buttons are the quickest way in:
+Each folder you open is a workspace. An empty tab shows the start page, whose buttons are the quickest way in. It offers only what you can do now:
 
-- **Create new workspace** asks for a name and makes an empty folder (on the desktop you then choose where; on Weave Server it is created in the server's workspace folder). **W › Create workspace…** does the same.
-- **Open existing workspace** opens a folder of Markdown files (**W › Open workspace folder…**).
+- **Create new workspace** asks for a name and makes an empty folder (on the desktop you then choose where; on Weave Server it is created in the server's workspace folder). The new workspace is a Git repository from the start, with [automatic snapshots](#automatic-snapshots) on. **W › Create workspace…** does the same.
+- **Open existing workspace** opens a folder of Markdown files (**W › Open workspace folder…**). On Weave Server the start page instead lists **Workspaces on this server**, every folder you have not opened, each with an **Open** button. A new browser opens no workspace until you choose one.
 - **Activate a deactivated workspace** lists workspaces you deactivated, when there are any.
-- With a workspace open: **New article**, **Random article**, and **Set up Git** while the workspace is not yet connected to a Git remote.
+- With a workspace open: **New article**; **Random article** once it has two or more articles; and **Set up Git** while it is not a Git repository, or **Connect to GitHub** while its repository has no remote.
 
 Up to 12 workspaces can be active at once, each watched, searched and shown in its own Files and Source control section, with its own name and colour. Weave restores open workspaces, their tabs and the window position on the next launch.
 
@@ -102,6 +102,19 @@ Source control has one section per workspace. It needs Git installed separately 
 - **Resolve** opens a visual conflict editor: choose current, incoming or both for each block, then **Save & stage**.
 - **Recently pulled files** keeps the last five pulls with their diffs.
 - **Edit .gitignore** opens the repository's ignore file.
+
+### Automatic snapshots
+
+**Automatic snapshots** (in each workspace's Source control section) commit your changes for you, so earlier versions are always available without learning Git. They are off for existing repositories and on for workspaces created in Weave.
+
+- **Snapshot after a quiet period of** (default 15 minutes without changes) or **at intervals of** a number of minutes. A snapshot is made only when something changed, and it includes every change Git would show, following `.gitignore` and never Weave's private data.
+- Snapshots never get in the way of manual Git work: they wait while changes are staged for a commit, during a merge, rebase or cherry-pick, on a detached HEAD, and while another Git program is busy. They run no Git hooks and are not signed; without a commit author they are made as *Weave*.
+- **Snapshot when Weave closes** (on by default) commits outstanding changes when the app or server exits; it does not push, so closing never waits for the network.
+- **Push snapshots to the remote** (off by default) pushes after each snapshot to the remotes checked under Remote management.
+- **Snapshot now** makes one immediately.
+- When the same repository is open in several Weave apps or servers, only one of them takes its snapshots.
+
+**Browse snapshots…** lists the history, snapshots marked with a dot (**Only versions of** narrows it to the open article). Choose an entry to see the files it changed, then **Changes** for a diff, **Restore this version** (or **Restore deleted file**) for one file, or **Restore entire snapshot** to return every tracked file to that point: changed files are replaced and files added since are removed, while files Git does not track stay. With snapshots on, your current changes are first kept in a snapshot and the restore is recorded as a new one, so a restore can itself be undone; with them off, uncommitted changes to the restored files are lost.
 
 ## Sharing and exporting
 

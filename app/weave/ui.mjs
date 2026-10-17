@@ -37,7 +37,7 @@ const pageData = JSON.parse($('weave-data').textContent || '{}'), portable = pag
   const group = document.createElement('div'); group.className = 'editor-group'; group.id = 'editor-right'; group.dataset.pane = '1'; group.hidden = true;
   for (const id of ['tab-bar', 'welcome', 'note-panel']) {
     const copy = $(id).cloneNode(true);
-    for (const node of copy.querySelectorAll('#welcome-open, #welcome-recent')) node.remove();
+    for (const node of copy.querySelectorAll('#welcome-open, #welcome-recent, #welcome-available')) node.remove();
     for (const node of [copy, ...copy.querySelectorAll('[id]')]) if (PANE_IDS.includes(node.id)) node.id = paneId(node.id, 1); else node.removeAttribute('id');
     group.append(copy);
   }
@@ -186,6 +186,7 @@ function createWorkspaceGit(ws) {
   ws.gitSection = section; ws.gitCount = 0; ws.gitBusy = false;
   ws.git = createGitPanel({client: ws.api, container: section.querySelector('.git-workspace-body'), idSuffix: gitPanelCount++ ? '-' + gitPanelCount : '',
     openFile: file => openNote(file, null, {ws}),
+    currentPath: () => active?.ws === ws.key && active.path ? active.path : null,
     onPendingCount: count => {ws.gitCount = count; renderGitSections();},
     onBusy: busy => {ws.gitBusy = busy; $('git-panel').setAttribute('aria-busy', String(workspaces.some(w => w.gitBusy)));},
     onStatus: () => renderWelcome(),
@@ -197,7 +198,7 @@ function createWorkspaceGit(ws) {
     },
     afterMutation: async name => {
       await applyCatalog(ws, await ws.api.call('catalog'));
-      if (active?.ws === ws.key && ['pull','sync','switch','createBranch','stash','applyStash','discard','resolveConflict'].includes(name)) {
+      if (active?.ws === ws.key && ['pull','sync','switch','createBranch','stash','applyStash','discard','resolveConflict','restoreFile','restoreSnapshot'].includes(name)) {
         if (dirty || saving) {$p('note-warning').textContent = 'Git changed this workspace. Your draft is retained; save or reload after reviewing the changes.'; return;}
         if (ws.index.has(active.path)) await openNote(active.path, undefined, {record:false, ws});
         else $p('note-warning').textContent = 'This article is absent from the current Git version. Its open text is retained.';
@@ -870,14 +871,24 @@ async function createWorkspace() {
   if (!client.createWorkspace || !client.writable) throw new Error('This host cannot create workspaces.');
   if (panelInfo?.managedWorkspaces) throw new Error('This server shows workspaces chosen in the desktop app. Create workspaces there.');
   const server = pageData.mode === 'server';
-  const answer = await promptUser('Create workspace', server ? 'Name the new workspace. Weave creates an empty folder with this name on the server.' : 'Name the new workspace. Next, choose the folder to create it in.', {value: 'Notes', ok: server ? 'Create workspace' : 'Choose location…'});
+  const answer = await promptUser('Create workspace', (server ? 'Name the new workspace. Weave creates an empty folder with this name on the server' : 'Name the new workspace. Next, choose the folder to create it in. Weave creates an empty folder with this name') + ' and keeps its history with Git, taking automatic snapshots.', {value: '', ok: server ? 'Create workspace' : 'Choose location…'});
   if (answer.action !== 'ok') return;
   if (!answer.value) throw new Error('Enter a workspace name.');
   await persistSession();
   const next = await client.createWorkspace(answer.value); if (!next) return;
   if (!client.capabilities.workspaces) resetWorkspaces();
-  const ws = await adoptWorkspace(next); message(workspaceName(ws) + ' created. Add your first article.');
+  const ws = await adoptWorkspace(next); message(workspaceName(ws) + ' created. Add your first article.' + (next.historyError ? ' Git history is unavailable: ' + next.historyError : ''));
 }
+/** Opens a workspace folder listed on a server's start page. */
+async function openServerFolder(name) {
+  await persistSession();
+  const next = await client.openServerFolder(name); if (!next) return;
+  const ws = await adoptWorkspace(next); message(workspaceName(ws) + ' is open.');
+}
+/** Workspace folders on the server (null on other hosts, when the desktop
+ * manages the server's workspaces, or before they are listed). */
+let serverFolders = null;
+const listsServerFolders = () => pageData.mode === 'server' && !panelInfo?.managedWorkspaces && Array.isArray(serverFolders);
 /** Opens an article of `ws` chosen at random. */
 async function randomArticle(ws) {
   const paths = ws.index.paths; if (!paths.length) throw new Error(workspaceName(ws) + ' has no articles yet.');
@@ -896,27 +907,38 @@ async function setupGit(ws) {
 }
 /** Git is set up when the workspace is a repository with a remote. */
 const needsGitSetup = ws => {const s = ws?.git?.status; return !!(client.capabilities.git && client.writable && s && s.available !== false && !s.parentRepository && (!s.repository || !s.remotes?.length));};
-const welcomeRendered = ['', ''];
-/** The empty tab's starting points: workspace actions, and with a workspace,
- * New article, Random article and Set up Git when it is not connected yet. */
+const welcomeRendered = ['', '', ''];
+/** The empty tab's starting points, showing only what can be done now: workspace
+ * actions; with a workspace New article, Random article (two or more articles),
+ * Set up Git when it is not connected yet and, on phones, Browse files. A server
+ * lists its other workspace folders to open with one click. */
 function renderWelcome() {
+  const server = pageData.mode === 'server', managed = !!panelInfo?.managedWorkspaces, writable = client.writable && !portable;
+  const listed = listsServerFolders(), open = new Set(workspaces.map(ws => ws.catalog.root));
+  const available = listed ? serverFolders.filter(name => !open.has(name)) : [];
   for (const pane of panes) {
     const box = pane.el.welcome.querySelector('.welcome-actions'), lead = pane.el.welcome.querySelector('p'); if (!box) continue;
     const ws = portable ? null : wsByKey(paneTabs(pane).find(tab => tab.id === paneTabId(pane))?.ws) || current();
-    const server = pageData.mode === 'server', managed = !!panelInfo?.managedWorkspaces, writable = client.writable && !portable;
-    const items = [];
+    const items = [], articles = ws?.index?.size || 0, git = ws?.git?.status;
     if (ws) {
       if (writable) items.push({action: 'new-article', title: 'New article', text: 'Start writing in ' + workspaceName(ws), primary: true});
-      items.push({action: 'random-article', title: 'Random article', text: ws.index?.size ? 'Rediscover one of ' + count(ws.index.size, 'article') : 'No articles yet', disabled: !ws.index?.size});
-      if (needsGitSetup(ws)) items.push({action: 'setup-git', title: 'Set up Git', text: 'Keep history and sync with GitHub'});
-      if (document.documentElement.dataset.layout === 'mobile') items.push({action: 'browse', title: 'Browse files', text: 'Show the articles of ' + workspaceName(ws)});
+      if (articles > 1) items.push({action: 'random-article', title: 'Random article', text: 'Rediscover one of ' + count(articles, 'article')});
+      if (needsGitSetup(ws)) items.push(git.repository ? {action: 'setup-git', title: 'Connect to GitHub', text: 'Back up and sync this workspace'} : {action: 'setup-git', title: 'Set up Git', text: 'Keep history and sync with GitHub'});
+      if (articles && document.documentElement.dataset.layout === 'mobile') items.push({action: 'browse', title: 'Browse files', text: 'Show the articles of ' + workspaceName(ws)});
     }
-    if (writable && client.createWorkspace && !managed) items.push({action: 'create-workspace', title: 'Create new workspace', text: server ? 'An empty folder on this server' : 'An empty folder for new articles', primary: !ws, secondary: !!ws});
-    if (!portable) items.push({action: 'open-workspace', title: 'Open existing workspace', text: managed ? 'One shared by the desktop app' : server ? 'A folder on this server' : 'A folder of Markdown files', primary: !ws && !writable, secondary: !!ws, id: pane.index === 0 ? 'welcome-open' : ''});
-    lead.textContent = portable ? 'Select an article from Files or Search to open it.' : ws ? 'Select an article from Files or Search, or start here.' : 'Create a workspace for new articles, or open one you already have.';
-    const html = items.map(item => `<button type="button" class="welcome-action${item.primary ? ' primary' : ''}${item.secondary ? ' secondary' : ''}" data-welcome="${item.action}"${ws ? ` data-ws="${esc(ws.key)}"` : ''}${item.id ? ` id="${item.id}"` : ''}${item.disabled ? ' disabled' : ''}><strong>${esc(item.title)}</strong><small>${esc(item.text)}</small></button>`).join('');
+    if (writable && client.createWorkspace && !managed) items.push({action: 'create-workspace', title: 'Create new workspace', text: server ? 'An empty folder on this server, with history' : 'An empty folder for new articles, with history', primary: !ws, secondary: !!ws});
+    // Listed server folders open from the list below; the picker would only repeat it.
+    if (!portable && !listed) items.push({action: 'open-workspace', title: 'Open existing workspace', text: managed ? 'One shared by the desktop app' : server ? 'A folder on this server' : 'A folder of Markdown files', primary: !ws && !writable, secondary: !!ws, id: pane.index === 0 ? 'welcome-open' : ''});
+    lead.textContent = portable ? 'Select an article from Files or Search to open it.' : ws ? (articles ? 'Select an article from Files or Search, or start here.' : 'This workspace is empty. Write its first article.') : available.length ? 'Create a workspace for new articles, or open one on this server.' : listed ? 'Create your first workspace to start writing.' : 'Create a workspace for new articles, or open one you already have.';
+    const html = items.map(item => `<button type="button" class="welcome-action${item.primary ? ' primary' : ''}${item.secondary ? ' secondary' : ''}" data-welcome="${item.action}"${ws ? ` data-ws="${esc(ws.key)}"` : ''}${item.id ? ` id="${item.id}"` : ''}><strong>${esc(item.title)}</strong><small>${esc(item.text)}</small></button>`).join('');
     if (html !== welcomeRendered[pane.index]) {box.innerHTML = html; welcomeRendered[pane.index] = html;}
   }
+  const list = available.map(name => {
+    const known = panelInfo?.workspaces?.find(w => w.root === name), color = /^#[0-9a-f]{6}$/i.test(known?.color || '') ? known.color : '#7c8594';
+    return `<li class="workspace-recent" data-workspace-color="${color}"><span class="workspace-dot" aria-hidden="true"></span><span class="workspace-recent-label"><strong>${esc(known?.name || name)}</strong><small>${esc(known ? 'Used before on this server' : 'Folder on this server')}</small></span><button type="button" data-welcome="open-folder" data-folder="${esc(name)}" title="Open ${esc(known?.name || name)}">Open</button></li>`;
+  }).join('');
+  if (list !== welcomeRendered[2]) {$('welcome-available-list').innerHTML = list; welcomeRendered[2] = list;}
+  $('welcome-available').hidden = !available.length;
 }
 async function adoptWorkspace(next) {
   const existing = wsByKey(workspaceKey(next));
@@ -1488,6 +1510,7 @@ for (const pane of panes) pane.el.welcome.addEventListener('click', run(async ev
   if (action === 'create-workspace') await createWorkspace();
   if (action === 'open-workspace') await choose();
   if (action === 'browse') sidebars.select('left', 'files');
+  if (action === 'open-folder') await openServerFolder(button.dataset.folder);
   if (!ws) return;
   if (action === 'new-article') {
     if (!edit) {edit = true; prefs.set('edit', 'true'); updateMode();}
@@ -1975,7 +1998,8 @@ function renderWorkspaceManager() {
   $('add-workspace').disabled = !client.writable || capable && workspaces.length >= (panelInfo?.maxOpen || 12);
   const recentHtml = recent.map(w => `<li class="workspace-recent" data-workspace-color="${/^#[0-9a-f]{6}$/i.test(w.color || '') ? w.color : '#7c8594'}"><span class="workspace-dot" aria-hidden="true"></span><span class="workspace-recent-label"><strong>${esc(w.name)}</strong><small title="${esc(w.root)}">${esc(w.root)}</small></span><button data-ws-reopen="${esc(w.id)}" title="Show ${esc(w.name)} and restore its tabs">Activate</button></li>`).join('');
   $('recent-workspaces').hidden = !recent.length; $('recent-workspace-list').innerHTML = recentHtml;
-  $('welcome-recent').hidden = !recent.length; $('welcome-recent-list').innerHTML = recentHtml; renderWelcome();
+  // A server lists every workspace folder, deactivated ones included, on its start page.
+  $('welcome-recent').hidden = !recent.length || listsServerFolders(); $('welcome-recent-list').innerHTML = recentHtml; renderWelcome();
   $('workspace-refresh-target-label').hidden = !multi();
   const target = $('workspace-refresh-target').value;
   $('workspace-refresh-target').innerHTML = workspaces.map(ws => `<option value="${esc(ws.key)}">${esc(workspaceName(ws))}</option>`).join('');
@@ -2033,6 +2057,7 @@ $('export-run').onclick = run(async () => {const ws = wsByKey($('export-workspac
 $('export-reveal').onclick = run(() => client.revealExport());
 async function loadControlPanel() {
   await serverControls.refresh();
+  if (client.serverFolders && client.writable) serverFolders = await client.serverFolders().catch(() => serverFolders);
   for (const button of document.querySelectorAll('[data-storage]')) button.disabled = !client.capabilities.storage || !client.chooseDirectory;
   if (client.capabilities.storage) {
     const info = await client.call('controlPanel', {scope: monitorWs()?.api.scope});

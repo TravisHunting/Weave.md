@@ -1596,3 +1596,54 @@ fn created_workspaces_start_with_history() {
     assert_eq!(status["snapshots"]["enabled"], true);
     assert_eq!(status["snapshots"]["push"], false);
 }
+#[test]
+fn automatic_fetch_reports_incoming_files() {
+    let mut f = Fixture::new();
+    if f.call("gitStatus", json!({})).unwrap()["available"] != true {
+        panic!("Git required for native acceptance");
+    }
+    let git = |cwd: &std::path::Path, args: &[&str]| {
+        let program = if cfg!(windows) { "C:/Program Files/Git/cmd/git.exe" } else { "git" };
+        let out = std::process::Command::new(program)
+            .args(["-c", "user.name=Peer", "-c", "user.email=peer@example.invalid", "-c", "commit.gpgsign=false"])
+            .args(args)
+            .current_dir(cwd)
+            .output()
+            .unwrap();
+        assert!(out.status.success(), "{}", String::from_utf8_lossy(&out.stderr));
+    };
+    let remote = f.temp.path().join("remote.git");
+    git(f.temp.path(), &["init", "--bare", "--initial-branch=main", remote.to_str().unwrap()]);
+    f.call("gitAction", json!({"action":"init"})).unwrap();
+    f.call("gitAction", json!({"action":"snapshot"})).unwrap();
+    f.call("gitAction", json!({"action":"addRemote","name":"origin","url":"https://example.invalid/notes.git"})).unwrap();
+    git(&f.root(), &["remote", "set-url", "origin", remote.to_str().unwrap()]);
+    git(&f.root(), &["push", "--set-upstream", "origin", "main"]);
+    let peer = f.temp.path().join("peer");
+    git(f.temp.path(), &["clone", remote.to_str().unwrap(), peer.to_str().unwrap()]);
+    fs::write(peer.join("Store.md"), "# Warehouse\n\nChanged by a colleague.\n").unwrap();
+    git(&peer, &["commit", "-am", "Colleague edit"]);
+    git(&peer, &["push"]);
+    let status = f.call("gitStatus", json!({})).unwrap();
+    assert_eq!(status["autoFetch"]["enabled"], false);
+    assert_eq!(status["autoFetch"]["minutes"], 10);
+    assert_eq!(status["behind"], 0);
+    assert!(f.call("gitAction", json!({"action":"configureAutoFetch","minutes":0})).is_err());
+    f.call("gitAction", json!({"action":"configureAutoFetch","enabled":true,"minutes":2})).unwrap();
+    let w = f.backend.current().unwrap();
+    assert!(!f.backend.fetch_due(&w));
+    w.fetching.lock().unwrap().fetched -= std::time::Duration::from_secs(121);
+    assert!(f.backend.fetch_due(&w));
+    f.backend.fetch_tick(&w);
+    assert!(!f.backend.fetch_due(&w));
+    let status = f.call("gitStatus", json!({})).unwrap();
+    assert_eq!(status["behind"], 1, "{status}");
+    assert_eq!(status["incomingFiles"], json!(["Store.md"]));
+    assert!(status["autoFetch"]["lastAutoFetch"].is_string());
+    assert!(status["autoFetch"]["fetchedAt"].is_string());
+    assert!(status["autoFetch"]["error"].is_null());
+    // Fetching never merges: the working tree is unchanged until Pull.
+    assert!(fs::read_to_string(f.root().join("Store.md")).unwrap().contains("Policy data"));
+    f.call("gitAction", json!({"action":"pull"})).unwrap();
+    assert_eq!(f.call("gitStatus", json!({})).unwrap()["incomingFiles"], json!([]));
+}

@@ -182,14 +182,17 @@ const gitList = document.createElement('div'); gitList.id = 'git-workspaces'; $(
 let gitPanelCount = 0, gitSectionsShown = 0;
 function createWorkspaceGit(ws) {
   const section = document.createElement('details'); section.className = 'git-workspace'; section.dataset.ws = ws.key;
-  section.innerHTML = '<summary><span class="workspace-dot" aria-hidden="true"></span><span class="git-workspace-name"></span><span class="git-workspace-count" hidden></span></summary><div class="git-workspace-body"></div>';
-  ws.gitSection = section; ws.gitCount = 0; ws.gitBusy = false;
+  section.innerHTML = '<summary><span class="workspace-dot" aria-hidden="true"></span><span class="git-workspace-name"></span><span class="git-workspace-incoming" hidden></span><span class="git-workspace-count" hidden></span></summary><div class="git-workspace-body"></div>';
+  ws.gitSection = section; ws.gitCount = 0; ws.gitBusy = false; ws.gitIncoming = 0; ws.incomingFiles = new Set();
   ws.git = createGitPanel({client: ws.api, container: section.querySelector('.git-workspace-body'), idSuffix: gitPanelCount++ ? '-' + gitPanelCount : '',
     openFile: file => openNote(file, null, {ws}),
     currentPath: () => active?.ws === ws.key && active.path ? active.path : null,
     onPendingCount: count => {ws.gitCount = count; renderGitSections();},
     onBusy: busy => {ws.gitBusy = busy; $('git-panel').setAttribute('aria-busy', String(workspaces.some(w => w.gitBusy)));},
-    onStatus: () => renderWelcome(),
+    onStatus: state => {
+      ws.gitIncoming = state?.repository ? state.behind || 0 : 0; ws.incomingFiles = new Set(state?.repository ? state.incomingFiles || [] : []);
+      renderGitSections(); updateIncoming(); renderWelcome();
+    },
     onSetup: () => run(setupGit)(ws),
     beforeAction: async () => {
       if (!workspaces.includes(ws)) throw new Error('This workspace is inactive.');
@@ -215,6 +218,7 @@ function renderGitSections() {
     ws.gitSection.style.setProperty('--workspace-color', workspaceColor(ws));
     ws.gitSection.querySelector('.git-workspace-name').textContent = workspaceName(ws);
     ws.gitSection.querySelector('summary').title = ws.catalog.root;
+    const incoming = ws.gitSection.querySelector('.git-workspace-incoming'); incoming.hidden = !ws.gitIncoming; incoming.textContent = '↓' + ws.gitIncoming; incoming.title = ws.gitIncoming + ' incoming ' + (ws.gitIncoming === 1 ? 'commit' : 'commits') + ' to pull';
     const count = ws.gitSection.querySelector('.git-workspace-count'); count.hidden = !ws.gitCount; count.textContent = String(ws.gitCount); count.title = ws.gitCount + ' pending ' + (ws.gitCount === 1 ? 'file' : 'files');
   }
   // A single workspace's section opens by default.
@@ -224,7 +228,9 @@ function renderGitSections() {
   if (!workspaces.length && !hint) {hint = document.createElement('p'); hint.className = 'hint'; hint.textContent = client.capabilities.git ? 'Open a workspace to manage its Git repository.' : 'Source control is available in the desktop application.'; gitList.append(hint);}
   if (workspaces.length) hint?.remove();
   const badge = $('git-pending-badge');
-  if (badge) {badge.textContent = String(total); badge.hidden = !total; badge.parentElement.title = total ? 'Source control · ' + total + ' pending ' + (total === 1 ? 'file' : 'files') : 'Source control';}
+  const behind = workspaces.reduce((sum, ws) => sum + (ws.gitIncoming || 0), 0), incomingBadge = $('git-incoming-badge');
+  if (incomingBadge) {incomingBadge.textContent = '↓' + behind; incomingBadge.hidden = !behind;}
+  if (badge) {badge.textContent = String(total); badge.hidden = !total; badge.parentElement.title = ['Source control', total ? total + ' pending ' + (total === 1 ? 'file' : 'files') : '', behind ? behind + ' incoming ' + (behind === 1 ? 'commit' : 'commits') + ' to pull' : ''].filter(Boolean).join(' · ');}
 }
 /** Expands the Git section of the workspace whose article is active; others collapse. */
 function focusGitSection(ws) {
@@ -303,7 +309,32 @@ function promptUser(title, description, {value, ok = 'Continue', secondary, conf
   });
 }
 const count = (value, noun) => (value || 0) + ' ' + noun + ((value || 0) === 1 ? '' : 's');
-function setDirty(value) { if (value && !dirty) {dirtySince = Date.now(); clearTimeout(dotTimer); dotTimer = setTimeout(updateTabDots, DOT_DELAY + 20);} if (!value) clearTimeout(dotTimer); dirty = value; client.dirty(dirty || drafts.size > 0)?.catch?.(() => {}); $('save-status').textContent = value ? 'Unsaved' : drafts.size ? count(drafts.size, 'other unsaved article') : 'Saved'; updateTabDots(); }
+function setDirty(value) { if (value && !dirty) warnIncoming(); if (value && !dirty) {dirtySince = Date.now(); clearTimeout(dotTimer); dotTimer = setTimeout(updateTabDots, DOT_DELAY + 20);} if (!value) clearTimeout(dotTimer); dirty = value; client.dirty(dirty || drafts.size > 0)?.catch?.(() => {}); $('save-status').textContent = value ? 'Unsaved' : drafts.size ? count(drafts.size, 'other unsaved article') : 'Saved'; updateTabDots(); updateIncoming(); }
+/** The open article's fetched incoming changes that are not pulled yet: a
+ * banner above it, which becomes a warning once it is being edited. */
+function updateIncoming() {
+  for (const pane of panes) {
+    const doc = paneActive(pane), ws = paneWs(pane), banner = pane.el['incoming-banner'];
+    const status = ws?.git?.status, incoming = !!(doc && ws?.incomingFiles?.has(doc.path));
+    // Unsaved, drafted or saved-but-uncommitted edits all risk a merge conflict.
+    const editing = incoming && ((pane === P ? dirty : drafts.has(docKey(doc))) || !!status?.files?.some(file => file.path === doc.path));
+    banner.hidden = !incoming; banner.classList.toggle('editing', editing); if (!incoming) continue;
+    const upstream = status?.upstream || 'the remote', blocked = editing || !!status?.files?.length || status?.ahead > 0;
+    banner.querySelector('.incoming-text').textContent = editing
+      ? `You are changing an article that also changed on ${upstream}, and those changes are not pulled yet. This can lead to a merge conflict: commit and sync in Source control to combine them.`
+      : `${upstream} has newer changes to this article that are not pulled yet. Pull before editing to avoid a merge conflict.`;
+    banner.querySelector('[data-incoming="pull"]').disabled = blocked || ws.gitBusy;
+    banner.querySelector('[data-incoming="pull"]').title = blocked ? 'This workspace has its own changes or commits: use Commit all & sync in Source control to combine them.' : 'Pull the incoming changes into this workspace';
+  }
+}
+const warnedIncoming = new Set();
+/** Warns once per fetched version when editing starts on an article with incoming changes. */
+function warnIncoming() {
+  const ws = paneWs(P), status = ws?.git?.status;
+  if (!active || !ws?.incomingFiles?.has(active.path)) return;
+  const key = [ws.key, active.path, status.upstream, status.behind].join('\n'); if (warnedIncoming.has(key)) return;
+  warnedIncoming.add(key); message(`${active.path} has incoming changes on ${status.upstream} that are not pulled yet. Pull first to avoid a merge conflict.`);
+}
 /** A dot replaces the close button of a tab whose article has unsaved changes. */
 function updateTabDots() {
   for (const node of panes.flatMap(pane => [...pane.el['file-tabs'].querySelectorAll('[data-tab-id]')])) {
@@ -1048,6 +1079,7 @@ async function openNote(file, line, {record = true, tabId = activeTab, searchTer
   if (evidenceSerial === evidenceAtStart && evidencePane === P) {evidenceSerial++; $('evidence-panel').hidden = true;}
   $p('welcome').hidden = true; $p('note-panel').hidden = false; mobileLayout.dismiss();
   $p('note-warning').textContent = [doc.warning || '', ...(doc.diagnostics || []).slice(0, 10).map(d => 'Line ' + d.line + ': ' + d.message)].filter(Boolean).join(' ');
+  updateIncoming();
   if (ws) {focusGitSection(ws); updateStatus(ws.status);}
   renderArticle(); kanban?.update(P); live.setSearchTerm(searchTerm); raw.setSearchTerm(searchTerm);
   if (draft) {setDirty(true); if (draft.hash !== doc.hash) $p('note-warning').textContent = 'This article changed on disk after your unsaved edits. Saving will report a conflict; copy your changes or reload.';}
@@ -1503,6 +1535,11 @@ $('file-menu').onclick = run(async e => {
 $('choose-workspace').onclick = run(choose);
 $('create-workspace').onclick = run(createWorkspace);
 $('menu-git-setup').onclick = run(() => setupGit(current()));
+for (const pane of panes) pane.el['incoming-banner'].addEventListener('click', run(async event => {
+  const button = event.target.closest('[data-incoming]'), ws = paneWs(pane); if (!button || button.disabled || !ws) return;
+  if (button.dataset.incoming === 'review') {sidebars.select('right', 'git'); focusGitSection(ws); ws.gitSection.open = true; return;}
+  const result = await ws.git.perform('pull', {remote: ws.git.status?.syncRemote}); message(result.message || 'Pulled incoming changes.');
+}));
 for (const pane of panes) pane.el.welcome.addEventListener('click', run(async event => {
   const button = event.target.closest('[data-welcome]'); if (!button || button.disabled) return;
   const ws = wsByKey(button.dataset.ws), action = button.dataset.welcome;

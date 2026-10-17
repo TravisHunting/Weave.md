@@ -221,7 +221,33 @@ try {
   const kept = (await git.history())[0]; assert.equal(kept.snapshot,'restore','the replaced version is kept in a snapshot first');
   assert.match((await service.call('gitCommitDiff',{id:kept.id,path:'Architecture.md'})).text,/An idea worth keeping/);
   await page.locator('#git-snapshot-dialog [data-snapshot-close]').click();
+  // Automatic fetch settings, incoming-change notices and the warning when editing an incoming article.
+  await git.action({action: 'snapshot'}).catch(() => {}); await command(root, 'push', 'origin', 'HEAD:main'); await command(peer, 'pull', '--ff-only');
+  await fs.writeFile(path.join(peer, 'Remote update.md'), '# Remote update\n\nEdited by a colleague.\n'); await command(peer, 'commit', '-am', 'Colleague edit'); await command(peer, 'push');
+  await page.locator('[aria-label="Refresh source control"]').click(); await idle();
+  await page.locator('#git-autofetch-enabled').check(); await idle();
+  await page.locator('#git-autofetch-minutes').fill('3'); await page.locator('#git-autofetch-minutes').dispatchEvent('change'); await idle();
+  assert.deepEqual((({enabled, minutes}) => ({enabled, minutes}))((await git.status()).autoFetch), {enabled: true, minutes: 3});
+  assert(await page.locator('#git-incoming').isHidden());
+  await page.locator('[data-git-action="fetch"]').click(); await idle();
+  await page.locator('#git-incoming').waitFor(); assert.match(await page.locator('#git-incoming').innerText(), /1 incoming commit[\s\S]*1 file changed on origin\/main/);
+  assert(await page.locator('#git-incoming-badge').isVisible(), 'the rail shows incoming changes'); assert.equal(await page.locator('#git-incoming-badge').innerText(), '↓1');
+  assert.match(await page.locator('#git-fetch-state').innerText(), /Last fetched just now/);
+  await page.locator('[data-tree-path="Remote update.md"]').click(); await page.locator('#incoming-banner').waitFor();
+  assert.equal(await page.locator('#incoming-banner.editing').count(), 0); assert(await page.locator('#incoming-banner [data-incoming="pull"]').isEnabled());
+  await page.screenshot({path: path.join(output, 'weave-git-incoming.png')});
+  if (await page.locator('#edit-mode').getAttribute('aria-pressed') !== 'true') await page.locator('#edit-mode').click();
+  await page.locator('#article .cm-content').click(); await page.keyboard.press('Control+End'); await page.keyboard.type(' Local thought.');
+  await page.locator('#incoming-banner.editing').waitFor();
+  assert.match(await page.locator('#message').innerText(), /incoming changes on origin\/main/);
+  assert(await page.locator('#incoming-banner [data-incoming="pull"]').isDisabled(), 'pulling waits for local edits to be combined');
+  await page.screenshot({path: path.join(output, 'weave-git-incoming-editing.png')});
+  await page.waitForFunction(() => document.getElementById('save-status').textContent === 'Saved');
+  await git.action({action: 'discard', path: 'Remote update.md', confirmed: true}); await page.locator('[aria-label="Refresh source control"]').click(); await idle();
+  await page.locator('#incoming-banner:not(.editing) [data-incoming="pull"]:not([disabled])').click();
+  await page.locator('#incoming-banner').waitFor({state: 'hidden'}); await page.locator('#git-incoming-badge').waitFor({state: 'hidden'});
+  assert.match(await fs.readFile(path.join(root, 'Remote update.md'), 'utf8'), /Edited by a colleague/);
   assert.deepEqual(errors, []); for (const op of ['gitStatus', 'gitDiff', 'gitAction', 'gitHistory', 'gitCommitDiff']) assert(invocations.includes(op));
-  console.log('Verified Source control UI: remote management, multiple push targets, timestamp commit defaults without prompts, split diffs, stage/unstage, push/fetch/pull, sync, pulled file diffs, branches, history, stash, discard, conflict resolution, stale-save protection, automatic snapshot settings and restoring from snapshots.');
+  console.log('Verified Source control UI: remote management, multiple push targets, timestamp commit defaults without prompts, split diffs, stage/unstage, push/fetch/pull, sync, pulled file diffs, branches, history, stash, discard, conflict resolution, stale-save protection, automatic snapshot settings and restoring from snapshots, automatic fetch settings and incoming-change notices and editing warnings.');
 } catch (error) {await page.screenshot({path: path.join(output, 'weave-git-failure.png')}).catch(() => {}); console.error(await page.locator('#git-panel').innerText().catch(() => '')); throw error;}
 finally {await browser.close(); await service.close(); await fs.rm(temporary, {recursive: true, force: true});}

@@ -103,6 +103,16 @@ Source control has one section per workspace. It needs Git installed separately 
 - **Recently pulled files** keeps the last five pulls with their diffs.
 - **Edit .gitignore** opens the repository's ignore file.
 
+### Incoming changes and automatic fetching
+
+**Fetch automatically every … min** (below the branch's sync status; off by default, 10 minutes when turned on) downloads the sync remote's new commits in the background. Fetching never changes your files: nothing is merged until you pull or sync. The note below it says when the repository was last fetched, by any means, and shows a failed automatic fetch.
+
+When fetched commits are waiting, Weave shows it in three places:
+
+- Source control shows **↓ N incoming commits** with the number of files they change and a **Pull** button. When the workspace has its own uncommitted changes or unpushed commits, use **Commit all & sync** instead.
+- The Source control icon in the rail and the workspace's section heading show **↓N**.
+- An article changed by the incoming commits shows a banner with **Pull now** and **Source control**. Once you start editing it, the banner turns into a warning (and the status bar says so once) because the two versions may conflict. Commit and sync to combine them.
+
 ### Automatic snapshots
 
 **Automatic snapshots** (in each workspace's Source control section) commit your changes for you, so earlier versions are always available without learning Git. They are off for existing repositories and on for workspaces created in Weave.

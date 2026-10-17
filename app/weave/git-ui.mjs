@@ -83,7 +83,8 @@ export function createGitPanel({client, container, beforeAction = async () => {}
   const conflictDialog = document.createElement('dialog'); conflictDialog.id = 'git-conflict-dialog' + idSuffix; conflictDialog.className = 'git-diff-dialog git-conflict-dialog'; conflictDialog.setAttribute('aria-labelledby', 'git-conflict-title'); document.body.append(conflictDialog);
   container.innerHTML = `<div class="git-toolbar" role="toolbar" aria-label="Source control actions">${iconButton('sync','Commit all & sync','id="git-commit-sync"')}${iconButton('commit','Commit staged changes','id="git-commit"')}${iconButton('stageAll','Stage all changes')}${iconButton('unstageAll','Unstage all changes')}${iconButton('push','Push branch to selected remotes')}${iconButton('pull','Pull (fast-forward only)')}${iconButton('fetch','Fetch remote updates')}${iconButton('refresh','Refresh source control')}</div>
     <div class="git-summary"><strong id="git-branch">Source control</strong></div><p id="git-repository-note" class="hint"></p><div id="git-notice" class="git-notice" role="status" aria-live="polite"></div><div id="git-setup" hidden></div><div id="git-connect" class="git-connect" hidden><p>This repository is not connected to GitHub or another remote yet.</p>${button('setup', 'Set up Git…', 'Connect this workspace to GitHub with a deploy key')}</div>
-    <div id="git-repository" hidden><form id="git-commit-form"><label for="git-commit-message" class="git-visually-hidden">Commit message</label><input id="git-commit-message" type="text" maxlength="10000" placeholder="Commit message (Ctrl+Enter)" aria-label="Commit message" title="Current UTC timestamp by default. Enter your own message to replace it." autocomplete="off"></form><p id="git-sync-status" class="hint"></p><div id="git-changes"></div>
+    <div id="git-repository" hidden><form id="git-commit-form"><label for="git-commit-message" class="git-visually-hidden">Commit message</label><input id="git-commit-message" type="text" maxlength="10000" placeholder="Commit message (Ctrl+Enter)" aria-label="Commit message" title="Current UTC timestamp by default. Enter your own message to replace it." autocomplete="off"></form><p id="git-sync-status" class="hint"></p><div id="git-incoming" class="git-incoming" role="status" hidden><div><strong id="git-incoming-title"></strong><small id="git-incoming-detail"></small></div>${button('pullIncoming', 'Pull', 'Pull the incoming changes (fast-forward only)')}</div>
+    <div class="git-fetch-settings"><label class="git-check"><input type="checkbox" id="git-autofetch-enabled"> Fetch automatically every</label><input id="git-autofetch-minutes" type="number" min="1" max="1440" step="1" aria-label="Minutes between automatic fetches"><span>min</span></div><p id="git-fetch-state" class="hint"></p><div id="git-changes"></div>
     <details id="git-snapshots" class="git-snapshots"><summary>Automatic snapshots <span id="git-snapshot-badge" class="git-snapshot-badge"></span></summary><p id="git-snapshot-state" class="hint"></p><p id="git-snapshot-warning" class="git-snapshot-warning" role="status"></p>
     <label class="git-check"><input type="checkbox" id="git-snapshot-enabled"> Commit changes automatically</label><div id="git-snapshot-options"><div class="git-snapshot-timing"><label for="git-snapshot-trigger">Snapshot</label><select id="git-snapshot-trigger" aria-label="When snapshots are taken"><option value="idle">after a quiet period of</option><option value="interval">at intervals of</option></select><input id="git-snapshot-minutes" type="number" min="1" max="1440" step="1" aria-label="Snapshot minutes"><span>min</span></div>
     <label class="git-check"><input type="checkbox" id="git-snapshot-close"> Snapshot when Weave closes</label><label class="git-check" id="git-snapshot-push-label"><input type="checkbox" id="git-snapshot-push"> Push snapshots to the remote</label><p class="hint">Snapshots respect .gitignore and wait while you stage a commit, merge or switch branches.</p></div>
@@ -156,6 +157,8 @@ export function createGitPanel({client, container, beforeAction = async () => {}
     container.querySelector('[data-git-action="snapshot"]').disabled = busy || !repo || !changes.length || state?.merging || state?.detached || state?.privateStaged || changes.some(file => file.conflict || !file.untracked && file.index !== '.');
     container.querySelector('[data-git-action="browseSnapshots"]').disabled = busy || !repo || state?.unborn;
     find('git-snapshot-push').disabled = busy || !repo || !remote;
+    container.querySelector('[data-git-action="pullIncoming"]').disabled = busy || !repo || !remote || changes.length > 0 || state?.ahead > 0 || state?.detached;
+    for (const id of ['git-autofetch-enabled', 'git-autofetch-minutes']) find(id).disabled = busy || !repo || !remote;
   }
   function fileGroup(title, files, staged) {
     if (!files.length) return '';
@@ -193,8 +196,21 @@ export function createGitPanel({client, container, beforeAction = async () => {}
     find('git-stashes').innerHTML = state.stashes.map(stash => `<div class="git-stash"><span>${esc(stash.message)}</span>${button('applyStash', 'Apply', 'Apply ' + stash.ref + ' (keep stash)', `data-ref="${esc(stash.ref)}"`)}</div>`).join('') || '<p class="hint">No saved stashes.</p>';
     if (state.privateStaged) announce('Private Weave data is staged. Unstage it in an external Git client before committing.', true);
     find('git-connect').hidden = !onSetup || state.remotes.length > 0;
-    renderSnapshotSettings();
+    renderSnapshotSettings(); renderIncoming();
     updateControls(); onStatus?.(state);
+  }
+  /** Fetched changes waiting to be pulled, and automatic fetch settings. */
+  function renderIncoming() {
+    const behind = state.behind || 0, files = state.incomingFileCount || 0, fetch = state.autoFetch || {};
+    find('git-incoming').hidden = !behind;
+    if (behind) {
+      find('git-incoming-title').textContent = `↓ ${behind} incoming ${behind === 1 ? 'commit' : 'commits'}`;
+      find('git-incoming-detail').textContent = `${files} ${files === 1 ? 'file' : 'files'} changed on ${state.upstream}, not pulled yet.` + (state.ahead ? ` This branch also has ${state.ahead} outgoing ${state.ahead === 1 ? 'commit' : 'commits'}: use Commit all & sync to combine them.` : state.files.length ? ' Commit or stash your changes to pull, or use Commit all & sync.' : '');
+    }
+    const set = (id, property, value) => {const node = find(id); if (document.activeElement !== node) node[property] = value;};
+    set('git-autofetch-enabled', 'checked', !!fetch.enabled); set('git-autofetch-minutes', 'value', String(fetch.minutes || 10));
+    const note = !state.remotes.length ? 'Add a remote to fetch incoming changes.' : fetch.enabled && fetch.error ? 'The last automatic fetch failed: ' + fetch.error : (fetch.fetchedAt ? 'Last fetched ' + ago(fetch.fetchedAt) + '.' : 'Not fetched yet.') + (fetch.enabled ? '' : ' Fetching only downloads changes; nothing is merged until you pull.');
+    find('git-fetch-state').textContent = note; find('git-fetch-state').classList.toggle('git-error', !!(fetch.enabled && fetch.error));
   }
   function renderSnapshotSettings() {
     const snap = state.snapshots || {}, set = (id, property, value) => {const node = find(id); if (document.activeElement !== node) node[property] = value;};
@@ -294,13 +310,13 @@ export function createGitPanel({client, container, beforeAction = async () => {}
   async function action(name, args = {}) {
     if (busy) return; const serial = generation; lock(true); announce(({fetch: 'Fetching remote updates…', pull: 'Pulling changes…', push: 'Pushing branch…', sync: 'Committing all changes and syncing…', commit: 'Committing staged changes…', snapshot: 'Taking a snapshot…', restoreFile: 'Restoring file…', restoreSnapshot: 'Restoring snapshot…'}[name]) || 'Updating repository…');
     try {
-      const settings = ['configureRemotes', 'configureSnapshots'].includes(name);
+      const settings = ['configureRemotes', 'configureSnapshots', 'configureAutoFetch'].includes(name);
       if (!settings) await beforeAction(name); if (serial !== generation) return; const result = await client.call('gitAction', {action: name, remote: selectedRemote, ...(['push', 'sync'].includes(name) ? {pushRemotes} : {}), ...args}); if (serial !== generation) return;
       state = result.status; if (name === 'commit' || name === 'sync' && result.committed) timestampMessage(true);
       if (name === 'addRemote') {find('git-remote-name').value = ''; find('git-remote-url').value = '';}
       historyLoaded = false; render(); announce(result.message || 'Done.');
       if (!settings) await afterMutation(name); if (find('git-history').open) await loadHistory();
-    } catch (error) {if (serial === generation) {announce(error.message, true); try {state = await client.call('gitStatus'); render(); if (!['configureRemotes', 'configureSnapshots'].includes(name)) await afterMutation(name);} catch {}}}
+    } catch (error) {if (serial === generation) {announce(error.message, true); try {state = await client.call('gitStatus'); render(); if (!['configureRemotes', 'configureSnapshots', 'configureAutoFetch'].includes(name)) await afterMutation(name);} catch {}}}
     finally {lock(false);}
   }
   function renderDiffDialog() {
@@ -390,12 +406,14 @@ export function createGitPanel({client, container, beforeAction = async () => {}
     }
     if (name === 'editIgnore') return editIgnore();
     if (name === 'browseSnapshots') return openSnapshots();
+    if (name === 'pullIncoming') return action('pull');
     if (name === 'setup') return onSetup?.();
     if (name === 'init' && !await ask(ui('Initialise repository?'), 'Create Git history for this workspace. Stage and commit selected files to record your first version.', {confirm: ui('Initialise')})) return;
     if (serial !== generation) return;
     await action(name, {path: target.closest('.git-file')?.dataset.path, ref: target.dataset.ref});
   });
   find('git-branches').onchange = () => action('switch', {branch: find('git-branches').value});
+  for (const id of ['git-autofetch-enabled', 'git-autofetch-minutes']) find(id).onchange = () => action('configureAutoFetch', {enabled: find('git-autofetch-enabled').checked, minutes: Math.min(1440, Math.max(1, Math.round(Number(find('git-autofetch-minutes').value)) || 10))});
   for (const id of ['git-snapshot-enabled', 'git-snapshot-trigger', 'git-snapshot-minutes', 'git-snapshot-push', 'git-snapshot-close']) find(id).onchange = () => action('configureSnapshots', snapshotSettings());
   find('git-remotes').onchange = () => action('configureRemotes', {remote: find('git-remotes').value, pushRemotes});
   find('git-push-remotes').onchange = () => action('configureRemotes', {pushRemotes: [...container.querySelectorAll('[data-push-remote]:checked')].map(input => input.dataset.pushRemote)});
@@ -404,7 +422,7 @@ export function createGitPanel({client, container, beforeAction = async () => {}
   find('git-commit-message').onkeydown = event => {if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {event.preventDefault(); if (!find('git-commit').disabled) action('commit', {message: commitMessage()});}};
   find('git-history').ontoggle = () => {if (find('git-history').open) loadHistory();};
   dialog.addEventListener('click', event => {if (event.target === dialog) {const rect = dialog.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();}});
-  const timer = setInterval(() => {if (!document.hidden) {if (!busy) timestampMessage(); if (state?.repository) renderSnapshotSettings(); refresh({quiet: true});}}, 6000);
+  const timer = setInterval(() => {if (!document.hidden) {if (!busy) timestampMessage(); if (state?.repository) {renderSnapshotSettings(); renderIncoming();} refresh({quiet: true});}}, 6000);
   /** Runs one Git action for the setup guide; errors are thrown to the caller. */
   async function perform(name, args = {}) {
     if (busy) throw new Error('Source control is busy. Try again in a moment.');

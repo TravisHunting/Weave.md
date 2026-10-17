@@ -12,7 +12,7 @@ export function createSidebars({prefs, onActivate = () => {}}) {
   const rail = right.querySelector('nav');
   for (const original of document.querySelectorAll('.rail button')) {
     const button = original.cloneNode(true); button.removeAttribute('id');
-    button.querySelector('.git-pending-badge')?.remove();
+    button.querySelector('.git-pending-badge')?.remove(); button.querySelector('.git-incoming-badge')?.remove();
     if (original.dataset.panel) {
       button.removeAttribute('data-panel'); button.dataset.rightPanel = original.dataset.panel;
       button.onclick = () => select('right', original.dataset.panel);

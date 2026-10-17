@@ -155,6 +155,31 @@ impl SnapshotClock {
                     .is_none_or(|at| at.elapsed() >= Duration::from_secs(60)))
     }
 }
+/// When a workspace's next automatic fetch is due; checked every monitor tick.
+pub(crate) struct FetchClock {
+    pub(crate) settings: Value,
+    pub(crate) fetched: Instant,
+    pub(crate) retry: Option<Instant>,
+}
+impl FetchClock {
+    fn new(settings: Value) -> Self {
+        Self {
+            settings,
+            fetched: Instant::now(),
+            retry: None,
+        }
+    }
+    fn due(&self) -> bool {
+        self.settings["enabled"] == true
+            && match self.retry {
+                Some(at) => Instant::now() >= at,
+                None => {
+                    self.fetched.elapsed()
+                        >= Duration::from_secs(self.settings["minutes"].as_u64().unwrap_or(10) * 60)
+                }
+            }
+    }
+}
 struct State {
     monitoring: Value,
     ready: bool,
@@ -214,6 +239,7 @@ pub struct Workspace {
     plan: Mutex<Option<Rename>>,
     git: Mutex<Git>,
     pub(crate) snapshots: Mutex<SnapshotClock>,
+    pub(crate) fetching: Mutex<FetchClock>,
     pending: Arc<Mutex<Pending>>,
     log: Mutex<ChangeLog>,
     closed: AtomicBool,
@@ -605,6 +631,7 @@ impl Backend {
             .with_keys(self.runtime.join("git-keys"), &id);
         let workspace = Arc::new(Workspace {
             snapshots: Mutex::new(SnapshotClock::new(git.snapshots.clone())),
+            fetching: Mutex::new(FetchClock::new(git.auto_fetch.clone())),
             git: Mutex::new(git),
             sensitive: detect_case(&root),
             id,
@@ -1889,6 +1916,11 @@ impl Backend {
                         *clock = SnapshotClock::new(Value::Null);
                     }
                     clock.settings = git.snapshots.clone();
+                    let mut fetching = guard(&w.fetching);
+                    if fetching.settings != git.auto_fetch {
+                        // Changed settings: the next fetch is one interval from now.
+                        *fetching = FetchClock::new(git.auto_fetch.clone());
+                    }
                     (result, git.saved())
                 };
                 self.database.save_workspace_value(&w.id, true, &saved)?;
@@ -1912,6 +1944,7 @@ impl Backend {
                     "push",
                     "createBranch",
                     "configureSnapshots",
+                    "configureAutoFetch",
                     "snapshot",
                 ];
                 // Restores name the files they rewrote: only those are reindexed.
@@ -2592,6 +2625,36 @@ impl Backend {
             clock.retry = None;
         }
     }
+    pub(crate) fn fetch_due(&self, w: &Workspace) -> bool {
+        guard(&w.fetching).due()
+    }
+    /// The monitor's automatic fetch for one workspace. A manual Git
+    /// operation in progress postpones it; fetch failures are kept for the
+    /// Source control panel and retried at the next interval.
+    pub(crate) fn fetch_tick(&self, w: &Workspace) {
+        let mut git = match w.git.try_lock() {
+            Ok(git) => git,
+            Err(std::sync::TryLockError::Poisoned(p)) => p.into_inner(),
+            Err(std::sync::TryLockError::WouldBlock) => {
+                guard(&w.fetching).retry = Some(Instant::now() + Duration::from_secs(30));
+                return;
+            }
+        };
+        let host = guard(&self.background_git).clone();
+        git.hardened = host["hardened"] == true;
+        git.hosts = host["gitHosts"]
+            .as_array()
+            .map(|a| a.iter().filter_map(|h| h.as_str().map(String::from)).collect())
+            .unwrap_or_default();
+        if git.repository().is_ok_and(|s| s["repository"] == true) {
+            let _ = git.auto_fetch_now();
+            let _ = self.database.save_workspace_value(&w.id, true, &git.saved());
+        }
+        drop(git);
+        let mut clock = guard(&w.fetching);
+        clock.fetched = Instant::now();
+        clock.retry = None;
+    }
     /// Before Weave exits: takes the snapshots of workspaces set to snapshot
     /// on close (without pushing, so exiting never waits for the network)
     /// and releases this process's leases. Call before `stopping` is set.
@@ -2684,6 +2747,7 @@ impl Monitor {
             // Automatic snapshots: one job per workspace at a time, apart
             // from indexing so neither delays the other.
             let mut snapshots: HashMap<u64, JoinHandle<()>> = HashMap::new();
+            let mut fetches: HashMap<u64, JoinHandle<()>> = HashMap::new();
             let mut reported: HashMap<u64, u64> = HashMap::new();
             let mut checkpointed = Instant::now();
             while !flag.load(Ordering::Relaxed) && !backend.stopping.load(Ordering::Relaxed) {
@@ -2696,6 +2760,7 @@ impl Monitor {
                 }
                 jobs.retain(|_, job| !job.is_finished());
                 snapshots.retain(|_, job| !job.is_finished());
+                fetches.retain(|_, job| !job.is_finished());
                 let open = backend.workspaces();
                 for w in &open {
                     if !snapshots.contains_key(&w.scope) && backend.snapshot_due(w) {
@@ -2704,6 +2769,10 @@ impl Monitor {
                             w.scope,
                             std::thread::spawn(move || b.snapshot_tick(&w)),
                         );
+                    }
+                    if !fetches.contains_key(&w.scope) && backend.fetch_due(w) {
+                        let (b, w) = (backend.clone(), w.clone());
+                        fetches.insert(w.scope, std::thread::spawn(move || b.fetch_tick(&w)));
                     }
                     if !jobs.contains_key(&w.scope) && w.due() {
                         let (b, w) = (backend.clone(), w.clone());
@@ -2723,7 +2792,7 @@ impl Monitor {
                 }
                 reported.retain(|scope, _| open.iter().any(|w| w.scope == *scope));
             }
-            for (_, job) in jobs.into_iter().chain(snapshots) {
+            for (_, job) in jobs.into_iter().chain(snapshots).chain(fetches) {
                 let _ = job.join();
             }
         });

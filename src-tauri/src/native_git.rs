@@ -34,6 +34,31 @@ pub struct Git {
     pub snapshots: Value,
     /// The latest snapshot and why the last attempt did not commit.
     pub snapshot_state: Value,
+    /// Automatic fetch settings (`fetch_settings`).
+    pub auto_fetch: Value,
+    /// The latest automatic fetch: when, and its error.
+    pub fetch_state: Value,
+}
+/// Validated automatic fetch settings: `enabled` and every `minutes`.
+pub fn fetch_settings(v: &Value) -> Result<Value> {
+    let mut out = json!({"enabled":false,"minutes":10});
+    if let Some(map) = v.as_object() {
+        for (key, value) in map {
+            match key.as_str() {
+                "enabled" => {
+                    out[key] = json!(value.as_bool().ok_or("Choose whether to fetch automatically.")?)
+                }
+                "minutes" => {
+                    out[key] = json!(value
+                        .as_u64()
+                        .filter(|m| (1..=1440).contains(m))
+                        .ok_or("Fetch intervals are between 1 and 1440 minutes.")?)
+                }
+                _ => return Err("Unknown fetch setting.".into()),
+            }
+        }
+    }
+    Ok(out)
 }
 /// Seconds after which another Weave process may take over a repository's
 /// snapshot lease that was not renewed.
@@ -212,6 +237,13 @@ impl Git {
             } else {
                 json!({})
             },
+            auto_fetch: fetch_settings(&saved["autoFetch"])
+                .unwrap_or_else(|_| fetch_settings(&Value::Null).unwrap()),
+            fetch_state: if saved["fetchState"].is_object() {
+                saved["fetchState"].clone()
+            } else {
+                json!({})
+            },
         }
     }
     /// Keeps this workspace's deploy key under `keys/<id>`.
@@ -321,7 +353,7 @@ impl Git {
         Ok(self.deploy_key())
     }
     pub fn saved(&self) -> Value {
-        json!({"preferences":self.preferences,"pulls":self.pulls,"snapshots":self.snapshots,"snapshotState":self.snapshot_state})
+        json!({"preferences":self.preferences,"pulls":self.pulls,"snapshots":self.snapshots,"snapshotState":self.snapshot_state,"autoFetch":self.auto_fetch,"fetchState":self.fetch_state})
     }
     fn executable() -> PathBuf {
         if cfg!(windows) {
@@ -686,6 +718,36 @@ impl Git {
             map.extend(state.clone());
         }
         info["snapshots"] = snapshots;
+        // Incoming changes already fetched but not merged: the files the
+        // upstream changed since the common ancestor, so the reader can warn
+        // before they are edited here.
+        let mut incoming = vec![];
+        let mut incoming_total = 0;
+        if info["behind"].as_i64().unwrap_or(0) > 0 {
+            for p in self
+                .output(&["diff", "--name-only", "--no-renames", "-z", "HEAD...HEAD@{upstream}", "--"])?
+                .split('\0')
+                .filter(|p| !p.is_empty() && !private(p))
+            {
+                incoming_total += 1;
+                if incoming.len() < 500 {
+                    incoming.push(json!(p));
+                }
+            }
+        }
+        info["incomingFiles"] = json!(incoming);
+        info["incomingFileCount"] = json!(incoming_total);
+        let mut fetching = self.auto_fetch.clone();
+        if let (Some(map), Some(state)) = (fetching.as_object_mut(), self.fetch_state.as_object()) {
+            map.extend(state.clone());
+        }
+        // The last fetch of any kind (manual, automatic or another Git client).
+        let fetch_head = self.output(&["rev-parse", "--git-path", "FETCH_HEAD"])?;
+        if let Ok(modified) = fs::metadata(self.root.join(fetch_head.trim())).and_then(|m| m.modified()) {
+            fetching["fetchedAt"] = json!(chrono::DateTime::<chrono::Utc>::from(modified)
+                .to_rfc3339_opts(chrono::SecondsFormat::Secs, true));
+        }
+        info["autoFetch"] = fetching;
         info["busy"] = Value::Null;
         Ok(info)
     }
@@ -1249,6 +1311,31 @@ impl Git {
         }
         Ok(result)
     }
+    /// Fetches the sync remote in the background, recording the outcome in
+    /// `fetch_state`. Never merges: incoming changes wait for Pull or Sync.
+    pub fn auto_fetch_now(&mut self) -> Result<Value> {
+        self.require()?;
+        let state = self.status()?;
+        let remote = s(&state, "syncRemote").to_string();
+        if remote.is_empty() {
+            self.fetch_state["error"] = Value::Null;
+            return Ok(json!({"fetched":false}));
+        }
+        let result = (|| -> Result<()> {
+            for r in state["remotes"].as_array().unwrap().iter().filter(|r| s(r, "name") == remote) {
+                for url in [s(r, "fetch"), s(r, "push")] {
+                    if !url.is_empty() {
+                        self.allowed_host(url)?;
+                    }
+                }
+            }
+            self.output(&["fetch", "--prune", "--", &remote]).map(|_| ())
+        })();
+        let at = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
+        self.fetch_state = json!({"lastAutoFetch":at,"error":result.as_ref().err()});
+        result?;
+        Ok(json!({"fetched":true}))
+    }
     /// A restore source: the commit itself, or with `before` its parent.
     fn restore_source(&self, args: &Value) -> Result<String> {
         let id = commit_id(s(args, "id"))?;
@@ -1347,6 +1434,23 @@ impl Git {
             }
         }
         match action {
+            "configureAutoFetch" => {
+                let mut next = self.auto_fetch.clone();
+                for key in ["enabled", "minutes"] {
+                    if let Some(v) = args.get(key) {
+                        next[key] = v.clone();
+                    }
+                }
+                self.auto_fetch = fetch_settings(&next)?;
+                if self.auto_fetch["enabled"] != true {
+                    self.fetch_state["error"] = Value::Null;
+                }
+                message = if self.auto_fetch["enabled"] == true {
+                    format!("Weave fetches every {} minutes.", self.auto_fetch["minutes"])
+                } else {
+                    "Automatic fetching is off.".into()
+                };
+            }
             "configureSnapshots" => {
                 let mut next = self.snapshots.clone();
                 for key in ["enabled", "trigger", "minutes", "push", "onClose"] {

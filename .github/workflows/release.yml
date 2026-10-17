@@ -1,5 +1,4 @@
-# Builds every packaged output and, for a pushed v* tag, attaches them to a
-# draft GitHub release:
+# Builds Weave's packaged outputs and attaches them to a draft GitHub release:
 #
 #   Windows x64     Weave-<v>-win-x64.zip            desktop app (Weave.exe + Weave Lite)
 #                   Weave-Server-<v>-win-x64.zip     headless server (weave-server.exe)
@@ -7,12 +6,18 @@
 #                   Weave-<v>-linux-<x64|arm64>.tar.gz  portable desktop app
 #                   Weave-Server-<v>-linux-<x64|arm64>.tar.gz  headless server
 #
+# Pushing a v* tag builds everything and creates a draft release for that tag.
+# Running it by hand (Actions › Release › Run workflow) builds only the outputs
+# ticked in the form; with "Create release" ticked it also tags the commit it
+# built (through the API) and creates a draft release with those files,
+# otherwise the packages are only workflow artifacts. Release tags are
+# v<package.json version>, optionally with a -suffix (v1.2.0-beta.1), which marks
+# the release as a pre-release.
+#
 # Toolchain versions come from scripts/linux/toolchain.env, the same pins the
 # local build machines use. Linux builds run on Ubuntu 22.04 (glibc 2.35), as
 # docs/LINUX.md requires; arm64 builds natively on GitHub's arm64 runners
-# rather than through the local podman cross-build. Run it by hand (Actions ›
-# Release › Run workflow) to get the packages as workflow artifacts without a
-# release.
+# rather than through the local podman cross-build.
 name: Release
 
 on:
@@ -20,7 +25,39 @@ on:
     tags: ['v*']
   workflow_dispatch:
     inputs:
-      skip-checks:
+      windows_desktop:
+        description: Windows desktop app (x64)
+        type: boolean
+        default: true
+      windows_server:
+        description: Windows server (x64)
+        type: boolean
+        default: true
+      linux_desktop:
+        description: Linux desktop app (.deb and .tar.gz)
+        type: boolean
+        default: true
+      linux_server:
+        description: Linux server
+        type: boolean
+        default: true
+      linux_amd64:
+        description: Linux builds for amd64 (x64)
+        type: boolean
+        default: true
+      linux_arm64:
+        description: Linux builds for arm64
+        type: boolean
+        default: true
+      create_release:
+        description: Create a draft GitHub release from these builds
+        type: boolean
+        default: false
+      tag:
+        description: Release tag (default v<package.json version>; a -suffix makes a pre-release)
+        type: string
+        default: ''
+      skip_checks:
         description: Skip unit and Rust tests
         type: boolean
         default: false
@@ -40,13 +77,98 @@ env:
   npm_config_fund: 'false'
 
 jobs:
+  # Turns the trigger into the set of builds: a tag push builds everything and
+  # releases; a manual run follows the form. Bad choices fail here, before any build.
+  plan:
+    name: Plan
+    runs-on: ubuntu-22.04
+    outputs:
+      windows: ${{ steps.plan.outputs.windows }}
+      windows_desktop: ${{ steps.plan.outputs.windows_desktop }}
+      windows_server: ${{ steps.plan.outputs.windows_server }}
+      linux: ${{ steps.plan.outputs.linux }}
+      linux_desktop: ${{ steps.plan.outputs.linux_desktop }}
+      linux_server: ${{ steps.plan.outputs.linux_server }}
+      linux_matrix: ${{ steps.plan.outputs.linux_matrix }}
+      checks_matrix: ${{ steps.plan.outputs.checks_matrix }}
+      release: ${{ steps.plan.outputs.release }}
+      tag: ${{ steps.plan.outputs.tag }}
+      prerelease: ${{ steps.plan.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: plan
+        env:
+          EVENT: ${{ github.event_name }}
+          WINDOWS_DESKTOP: ${{ inputs.windows_desktop }}
+          WINDOWS_SERVER: ${{ inputs.windows_server }}
+          LINUX_DESKTOP: ${{ inputs.linux_desktop }}
+          LINUX_SERVER: ${{ inputs.linux_server }}
+          LINUX_AMD64: ${{ inputs.linux_amd64 }}
+          LINUX_ARM64: ${{ inputs.linux_arm64 }}
+          CREATE_RELEASE: ${{ inputs.create_release }}
+          TAG: ${{ inputs.tag }}
+          SKIP_CHECKS: ${{ inputs.skip_checks }}
+        run: |
+          fail() { echo "::error::$*"; exit 1; }
+          version="$(node -p "require('./package.json').version")"
+          if [ "$EVENT" = push ]; then
+            WINDOWS_DESKTOP=true WINDOWS_SERVER=true LINUX_DESKTOP=true LINUX_SERVER=true
+            LINUX_AMD64=true LINUX_ARM64=true CREATE_RELEASE=true SKIP_CHECKS=false
+            TAG="$GITHUB_REF_NAME"
+          fi
+          TAG="$(printf '%s' "$TAG" | xargs)"; TAG="${TAG:-v$version}"
+          windows=false; { [ "$WINDOWS_DESKTOP" = true ] || [ "$WINDOWS_SERVER" = true ]; } && windows=true
+          arches=()
+          [ "$LINUX_AMD64" = true ] && arches+=('{"arch":"amd64","suffix":"x64","runner":"ubuntu-22.04"}')
+          [ "$LINUX_ARM64" = true ] && arches+=('{"arch":"arm64","suffix":"arm64","runner":"ubuntu-22.04-arm"}')
+          linux=false
+          if [ "$LINUX_DESKTOP" = true ] || [ "$LINUX_SERVER" = true ]; then
+            [ ${#arches[@]} -gt 0 ] || fail "Linux builds are ticked but neither amd64 nor arm64 is."
+            linux=true
+          fi
+          [ "$windows" = true ] || [ "$linux" = true ] || fail "Tick at least one build."
+          prerelease=false
+          if [ "$CREATE_RELEASE" = true ]; then
+            case "$TAG" in
+              "v$version") ;;
+              "v$version"-*) prerelease=true ;;
+              *) fail "Release tag $TAG must be v$version (the package.json version), optionally followed by -suffix." ;;
+            esac
+            printf '%s' "$TAG" | grep -Eq '^v[0-9A-Za-z.+-]+$' || fail "Release tag $TAG may contain only letters, digits, '.', '+' and '-'."
+            # An existing tag must already point at the commit being built.
+            existing="$(git ls-remote origin "refs/tags/$TAG" "refs/tags/$TAG^{}" | awk '{print $1}' | tail -1)"
+            if [ -n "$existing" ] && [ "$existing" != "$GITHUB_SHA" ]; then
+              fail "Tag $TAG already exists on $existing, not on the commit being built ($GITHUB_SHA)."
+            fi
+          fi
+          checks=()
+          if [ "$SKIP_CHECKS" != true ]; then
+            [ "$windows" = true ] && checks+=('"windows-latest"')
+            [ "$linux" = true ] && checks+=('"ubuntu-22.04"')
+          fi
+          join() { local IFS=,; echo "[$*]"; }
+          {
+            echo "windows=$windows"
+            echo "windows_desktop=$WINDOWS_DESKTOP"
+            echo "windows_server=$WINDOWS_SERVER"
+            echo "linux=$linux"
+            echo "linux_desktop=$LINUX_DESKTOP"
+            echo "linux_server=$LINUX_SERVER"
+            echo "linux_matrix=$(join "${arches[@]}")"
+            echo "checks_matrix=$(join "${checks[@]}")"
+            echo "release=$CREATE_RELEASE"
+            echo "tag=$TAG"
+            echo "prerelease=$prerelease"
+          } | tee -a "$GITHUB_OUTPUT"
+
   checks:
     name: Checks (${{ matrix.os }})
-    if: ${{ !inputs.skip-checks }}
+    needs: plan
+    if: ${{ needs.plan.outputs.checks_matrix != '[]' }}
     strategy:
       fail-fast: true
       matrix:
-        os: [windows-latest, ubuntu-22.04]
+        os: ${{ fromJSON(needs.plan.outputs.checks_matrix) }}
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -90,9 +212,12 @@ jobs:
 
   windows:
     name: Windows x64
-    needs: checks
-    if: ${{ !cancelled() && (needs.checks.result == 'success' || needs.checks.result == 'skipped') }}
+    needs: [plan, checks]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.windows == 'true' && (needs.checks.result == 'success' || needs.checks.result == 'skipped') }}
     runs-on: windows-latest
+    env:
+      DESKTOP: ${{ needs.plan.outputs.windows_desktop }}
+      SERVER: ${{ needs.plan.outputs.windows_server }}
     steps:
       - uses: actions/checkout@v4
       - name: Toolchain versions
@@ -116,18 +241,24 @@ jobs:
         run: |
           npm ci
           cargo fetch --locked --manifest-path src-tauri/Cargo.toml
+          mkdir -p release
       # Package-Windows.ps1 builds the frontend and the release Weave.exe and
       # assembles the portable folder; the checks job already ran the tests.
       - name: Desktop app
+        if: env.DESKTOP == 'true'
         run: |
           npm run package:windows -- -SkipChecks -NoZip
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $folder = Get-ChildItem -Directory dist\windows -Filter "Weave-$env:VERSION-win-x64-*" | Sort-Object LastWriteTime | Select-Object -Last 1
           $name = "Weave-$env:VERSION-win-x64"
-          New-Item -ItemType Directory -Force release | Out-Null
           Rename-Item -LiteralPath $folder.FullName -NewName $name
           Compress-Archive -LiteralPath (Join-Path $folder.Parent.FullName $name) -DestinationPath "release\$name.zip"
+      - name: Server frontend
+        if: env.SERVER == 'true' && env.DESKTOP != 'true'
+        shell: bash
+        run: npm run build:server
       - name: Headless server
+        if: env.SERVER == 'true'
         run: |
           cargo build --offline --locked --release --manifest-path src-tauri/Cargo.toml --no-default-features --features server --bin weave-server
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -153,31 +284,33 @@ jobs:
 
   linux:
     name: Linux ${{ matrix.arch }}
-    needs: checks
-    if: ${{ !cancelled() && (needs.checks.result == 'success' || needs.checks.result == 'skipped') }}
+    needs: [plan, checks]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.linux == 'true' && (needs.checks.result == 'success' || needs.checks.result == 'skipped') }}
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - arch: amd64
-            suffix: x64
-            runner: ubuntu-22.04
-          - arch: arm64
-            suffix: arm64
-            runner: ubuntu-22.04-arm
+        include: ${{ fromJSON(needs.plan.outputs.linux_matrix) }}
     runs-on: ${{ matrix.runner }}
+    env:
+      DESKTOP: ${{ needs.plan.outputs.linux_desktop }}
+      SERVER: ${{ needs.plan.outputs.linux_server }}
+      TZ: UTC
+      LC_ALL: C.UTF-8
     steps:
       - uses: actions/checkout@v4
       - name: Toolchain versions
         run: |
           grep -E '^(RUST|NODE)_VERSION=' scripts/linux/toolchain.env >> "$GITHUB_ENV"
           echo "SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)" >> "$GITHUB_ENV"
+      # The server needs only a C compiler; the desktop app also needs the
+      # GTK/WebKitGTK headers and the Debian packaging tools.
       - name: Build dependencies
         run: |
+          packages=(build-essential pkg-config file xz-utils)
+          [ "$DESKTOP" = true ] && packages+=(dpkg-dev fakeroot libayatana-appindicator3-dev libwebkit2gtk-4.1-dev \
+            libgtk-3-dev librsvg2-dev libsoup-3.0-dev libjavascriptcoregtk-4.1-dev)
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends build-essential pkg-config file xz-utils dpkg-dev fakeroot \
-            libayatana-appindicator3-dev libwebkit2gtk-4.1-dev libgtk-3-dev librsvg2-dev \
-            libsoup-3.0-dev libjavascriptcoregtk-4.1-dev
+          sudo apt-get install -y --no-install-recommends "${packages[@]}"
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -193,36 +326,39 @@ jobs:
           npm ci
           cargo fetch --locked --manifest-path src-tauri/Cargo.toml
           echo "VERSION=$(node -p "require('./package.json').version")" >> "$GITHUB_ENV"
+          mkdir -p release
       - name: Frontend
         run: |
-          npm run build
-          npm run build:desktop
-          npm run prepare:runtime
+          if [ "$DESKTOP" = true ]; then
+            npm run build
+            npm run build:desktop
+            npm run prepare:runtime
+          else
+            npm run build:server
+          fi
       # The same path remapping and stripping as scripts/linux/package-linux.sh.
       - name: Binaries
         env:
           CARGO_PROFILE_RELEASE_STRIP: symbols
-          TZ: UTC
-          LC_ALL: C.UTF-8
         run: |
           export RUSTFLAGS="--remap-path-prefix=$GITHUB_WORKSPACE=/weave --remap-path-prefix=$HOME/.cargo=/cargo --remap-path-prefix=$HOME/.rustup=/rustup"
-          cargo build --bin weave --release --offline --locked --manifest-path src-tauri/Cargo.toml --features custom-protocol
-          cargo build --bin weave-server --release --offline --locked --manifest-path src-tauri/Cargo.toml --no-default-features --features server
+          if [ "$DESKTOP" = true ]; then
+            cargo build --bin weave --release --offline --locked --manifest-path src-tauri/Cargo.toml --features custom-protocol
+          fi
+          if [ "$SERVER" = true ]; then
+            cargo build --bin weave-server --release --offline --locked --manifest-path src-tauri/Cargo.toml --no-default-features --features server
+          fi
       - name: Desktop packages
-        env:
-          TZ: UTC
-          LC_ALL: C.UTF-8
+        if: env.DESKTOP == 'true'
         run: |
           umask 022
-          mkdir -p release "$RUNNER_TEMP/work"
+          mkdir -p "$RUNNER_TEMP/work"
           bash scripts/linux/make-packages.sh "$GITHUB_WORKSPACE" "$GITHUB_WORKSPACE/src-tauri/target/release/weave" \
             "$VERSION" "$RUNNER_TEMP/work" "$GITHUB_WORKSPACE/release" "HEAD $(git rev-parse --short=12 HEAD)" "${{ matrix.arch }}"
           rm release/SHA256SUMS
           dpkg-deb --info "release/weave_${VERSION}_${{ matrix.arch }}.deb"
       - name: Headless server package
-        env:
-          TZ: UTC
-          LC_ALL: C.UTF-8
+        if: env.SERVER == 'true'
         run: |
           umask 022
           name="Weave-Server-$VERSION-linux-${{ matrix.suffix }}"
@@ -253,17 +389,20 @@ jobs:
 
   release:
     name: GitHub release
-    needs: [windows, linux]
-    if: ${{ !cancelled() && startsWith(github.ref, 'refs/tags/v') && needs.windows.result == 'success' && needs.linux.result == 'success' }}
+    needs: [plan, windows, linux]
+    # Every selected build must succeed; unselected ones are skipped.
+    if: >-
+      ${{ !cancelled() && needs.plan.outputs.release == 'true'
+      && (needs.windows.result == 'success' || (needs.windows.result == 'skipped' && needs.plan.outputs.windows != 'true'))
+      && (needs.linux.result == 'success' || (needs.linux.result == 'skipped' && needs.plan.outputs.linux != 'true')) }}
     runs-on: ubuntu-22.04
     permissions:
       contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ needs.plan.outputs.tag }}
+      PRERELEASE: ${{ needs.plan.outputs.prerelease }}
     steps:
-      - uses: actions/checkout@v4
-      - name: Tag matches package.json
-        run: |
-          version="$(node -p "require('./package.json').version")"
-          [ "$GITHUB_REF_NAME" = "v$version" ] || { echo "Tag $GITHUB_REF_NAME does not match package.json version $version." >&2; exit 1; }
       - uses: actions/download-artifact@v4
         with:
           pattern: packages-*
@@ -271,8 +410,20 @@ jobs:
           merge-multiple: true
       - name: Checksums
         run: cd release && sha256sum -- $(ls | LC_ALL=C sort) > SHA256SUMS && cat SHA256SUMS
+      # A manual run tags the commit it built, only now that every build has
+      # succeeded. Tags created with this token do not start another run.
+      - name: Tag
+        run: |
+          existing="$(gh api "repos/$GITHUB_REPOSITORY/git/matching-refs/tags/$TAG" --jq ".[] | select(.ref == \"refs/tags/$TAG\") | .object.sha")"
+          if [ -z "$existing" ]; then
+            gh api -X POST "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$TAG" -f sha="$GITHUB_SHA" > /dev/null
+            echo "Created tag $TAG on $GITHUB_SHA."
+          else
+            echo "Tag $TAG already exists."
+          fi
       # A draft, so the notes and files can be reviewed before publishing.
       - name: Create draft release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" release/* --draft --verify-tag --generate-notes --title "Weave $GITHUB_REF_NAME"
+        run: |
+          flags=(--draft --verify-tag --generate-notes --title "Weave $TAG" --repo "$GITHUB_REPOSITORY")
+          [ "$PRERELEASE" = true ] && flags+=(--prerelease)
+          gh release create "$TAG" release/* "${flags[@]}"

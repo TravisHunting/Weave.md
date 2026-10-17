@@ -31,7 +31,7 @@ try {
   assert.equal(await page.evaluate(() => typeof crypto.randomUUID), 'undefined', 'the page runs without crypto.randomUUID');
   assert.equal(await page.evaluate(() => document.documentElement.dataset.layout), 'mobile');
   assert.equal(await page.evaluate(() => document.documentElement.dataset.skin), 'aurora aurora-thin aurora-flow', 'the default skin applies');
-  assert.equal(await page.evaluate(() => document.documentElement.dataset.scheme), 'lavender', 'the default scheme applies');
+  assert.equal(await page.evaluate(() => document.documentElement.dataset.scheme), 'grey', 'the default scheme applies');
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 393, 'nothing scrolls sideways');
   // Without an article to show, the phone starts on Files so the workspace is in view at once.
   await page.waitForFunction(() => !document.body.classList.contains('sidebar-collapsed'));

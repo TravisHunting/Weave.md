@@ -13,7 +13,7 @@ Weave for Linux is the same Tauri application as on Windows: one executable that
 | `weave_<version>_arm64.deb`, `Weave-<version>-linux-arm64.tar.gz` | The same, on 64-bit ARM (ARM Chromebooks, ARM laptops, Raspberry Pi 4/5 with a desktop) | Built with `--arch arm64`; see [ARM builds](#arm-builds-arm64). |
 | `SHA256SUMS` | Everyone | Checksums of every package in the folder. |
 
-Upload the packages and `SHA256SUMS` to the GitHub release. They are written to `dist/linux/<version>-<tree>/`, where `<tree>` is the first 12 characters of the Git tree hash of the sources that were built.
+Upload the packages and `SHA256SUMS` to the GitHub release. They are written to `dist/linux/<version>-<tree>/`, where `<tree>` is the first 12 characters of the Git tree hash of the sources that were built. The release workflow ([scripts/README.md](../scripts/README.md#releases-github-actions)) builds the same packages, plus `Weave-Server-<version>-linux-<x64|arm64>.tar.gz`, on GitHub's Ubuntu 22.04 runners from a pushed `v*` tag.
 
 Application data lives in `$XDG_DATA_HOME/Weave/.weave` (normally `~/.local/share/Weave/.weave`) and moves with the Settings data-location option as on Windows.
 

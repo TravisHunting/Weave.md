@@ -10,6 +10,8 @@ export const schemes = {
   ocean: {name: 'Ocean', mode: 'dark', colors: ['#182731','#20333f','#e4eff4','#a5bdcb','#405764','#99cfe6','#304b5b','#29414e','#446d86','#668799','#20333f']},
   lavender: {name: 'Lavender', mode: 'light', colors: ['#eeebf2','#fcfaff','#36303f','#70667f','#d9d0e5','#735494','#e8e0f0','#eee8f4','#d2bce9','#ad9ebf','#fcfaff']}
 };
+// New installations and Restore defaults use Light grey (with the Aurora Flow skin).
+export const defaultScheme = 'grey';
 export const colorFields = {bg:'Sidebar & background',paper:'Article & panels',ink:'Text',muted:'Secondary text',line:'Borders',accent:'Links & accents',wash:'Selected & hover',code:'Code background',selection:'Text selection',tableBorder:'Table borders',titleBar:'Top bar'};
 export const fontFamilies = {system:'"Segoe UI", system-ui, Arial, sans-serif',serif:'Georgia, "Times New Roman", serif',sans:'Arial, Helvetica, sans-serif',mono:'Consolas, "Courier New", monospace',calibri:'Calibri, "Segoe UI", sans-serif',cambria:'Cambria, Georgia, serif',verdana:'Verdana, Geneva, sans-serif',tahoma:'Tahoma, "Segoe UI", sans-serif',trebuchet:'"Trebuchet MS", Arial, sans-serif',palatino:'"Palatino Linotype", Palatino, Georgia, serif',times:'"Times New Roman", Times, serif',cascadia:'"Cascadia Code", "Cascadia Mono", Consolas, monospace'};
 // Segoe UI is Windows' interface font; elsewhere system-ui is the desktop's own.
@@ -24,7 +26,7 @@ const mermaidSelect = (key,label,options) => `<label class="appearance-field" fo
 const limits = {fontSize:[12,28],fontWeight:[100,900],codeLineSpacing:[-.8,1.2],codeFontSize:[10,28],articleZoom:[50,200],articleIndent:[32,160],lineHeight:[1.2,2.4],paragraphSpacing:[0,1.5],width:[560,1400],lineNumberOpacity:[0,100],lineNumberSize:[7,20],spellOpacity:[10,100],spellThickness:[1,4],tabTintOpacity:[5,100],tablePadding:[2,18],tableBorderWidth:[0,3],tableHeaderTint:[0,100]};
 export function normalizeAppearance(value) {
   const input = value && typeof value === 'object' ? value : {};
-  const preset = Object.hasOwn(schemes,input.preset) ? input.preset : 'lavender';
+  const preset = Object.hasOwn(schemes,input.preset) ? input.preset : defaultScheme;
   const colors = Object.fromEntries(Object.keys(colorFields).map((key,i)=>[key,/^#[0-9a-f]{6}$/i.test(input.colors?.[key]) ? input.colors[key] : schemes[preset].colors[i]]));
   if (input.colors?.tableBorder === undefined && /^#[0-9a-f]{6}$/i.test(input.colors?.line)) colors.tableBorder = input.colors.line;
   const reading = {...readingDefaults};
@@ -102,7 +104,7 @@ export function weightStroke(family, weight) {
 /** The saved appearance, or the defaults (honouring the older light/dark `theme` preference). */
 export function savedAppearance(prefs) {
   let saved; try {saved = JSON.parse(prefs.get('appearance'));} catch {}
-  return normalizeAppearance(saved || {preset:prefs.get('theme') === 'dark' ? 'graphite' : prefs.get('theme') === 'light' ? 'grey' : 'lavender'});
+  return normalizeAppearance(saved || {preset:prefs.get('theme') === 'dark' ? 'graphite' : prefs.get('theme') === 'light' ? 'grey' : defaultScheme});
 }
 
 // Writes the appearance onto the root element: data attributes for the skin, scheme

@@ -108,7 +108,7 @@ Source control has one section per workspace. It needs Git installed separately 
 
 - **Skins** change shape, type, spacing and depth: Classic, Studio, Studio Flow, Compact, Slate, Editorial, Folio, Aurora, Aurora Thin and Aurora Flow (the default).
 - **Colour schemes** change the palette, and work with every skin. Edit individual colours and save your own themes.
-- Fonts, sizes, weight, spacing, line numbers, tables, diagrams, tab colours and file labels are all adjustable. **Restore defaults** returns to Aurora Flow and Lavender.
+- Fonts, sizes, weight, spacing, line numbers, tables, diagrams, tab colours and file labels are all adjustable. **Restore defaults** returns to Aurora Flow and Light grey.
 - Interface text follows your system's English: American spelling in the United States, British elsewhere.
 
 ## Phones and narrow windows

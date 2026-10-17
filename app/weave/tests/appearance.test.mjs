@@ -2,17 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {normalizeAppearance,normalizeSavedSchemes,saveColourScheme,readingDefaults,schemes,colorFields,fontFamilies,codeFontFamilies} from '../appearance.mjs';
 
-test('appearance defaults to Aurora Flow and Lavender without relying on the OS theme',()=>{
+test('appearance defaults to Aurora Flow and Light grey without relying on the OS theme',()=>{
   const settings=normalizeAppearance();
-  assert.equal(settings.preset,'lavender');assert.equal(schemes[settings.preset].mode,'light');
+  assert.equal(settings.preset,'grey');assert.equal(schemes[settings.preset].mode,'light');
   assert.deepEqual(settings.reading,readingDefaults);assert.equal(settings.skin,'aurora-flow');
-  assert.deepEqual(Object.values(settings.colors),schemes.lavender.colors);
+  assert.deepEqual(Object.values(settings.colors),schemes.grey.colors);
 });
 test('appearance validates persisted colors, font choices and bounded reading values',()=>{
   const settings=normalizeAppearance({preset:'ocean',colors:{ink:'#abcdef',paper:'url(https://bad.test)',bg:'red'},reading:{fontSize:999,lineHeight:0,paragraphSpacing:Infinity,font:'url(bad)',width:-5,readableWidth:true}});
   assert.equal(settings.colors.ink,'#abcdef');assert.equal(settings.colors.paper,schemes.ocean.colors[1]);
   assert.equal(settings.reading.fontSize,28);assert.equal(settings.reading.lineHeight,1.2);assert.equal(settings.reading.paragraphSpacing,0);assert.equal(settings.reading.width,560);assert.equal(settings.reading.font,'system');assert.equal(settings.reading.readableWidth,true);
-  assert.equal(normalizeAppearance({preset:'toString'}).preset,'lavender');
+  assert.equal(normalizeAppearance({preset:'toString'}).preset,'grey');
   for(const scheme of Object.values(schemes)){assert.equal(scheme.colors.length,Object.keys(colorFields).length);assert(scheme.colors.every(color=>/^#[a-f0-9]{6}$/.test(color)));}
 });
 

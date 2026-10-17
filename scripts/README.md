@@ -4,7 +4,18 @@ Building, testing, packaging and benchmarking Weave. [AGENTS.md](../AGENTS.md) l
 
 ## Requirements
 
-Node.js 24+ (for its built-in SQLite), npm, Rust (MSVC on Windows) and the Visual Studio C++ build tools. Installing dependencies may use the network; builds and tests then run offline. Browser suites use the repository's pinned Playwright with installed Edge (`WEAVE_BROWSER=chromium` or `webkit` picks another engine).
+Installing dependencies may use the network; builds and tests then run offline. The exact Node.js and Rust versions are pinned in [`scripts/linux/toolchain.env`](linux/toolchain.env) and used by every build machine and by the release workflow.
+
+| Output | Build on | Tools |
+| --- | --- | --- |
+| All outputs | any | Node.js 24 (pinned version) with npm, Rust via [rustup](https://rustup.rs) (pinned version, `rustup default <version>`), Git |
+| Windows desktop (`Weave.exe`) | Windows 10/11 x64 | Rust's `x86_64-pc-windows-msvc` toolchain; [Visual Studio 2022 Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) (or Visual Studio 2022) with the **Desktop development with C++** workload, which supplies MSVC v143 and a Windows 10/11 SDK; Windows PowerShell 5.1+; the Microsoft Edge WebView2 Runtime (built into Windows 11) to run it |
+| Windows server (`weave-server.exe`) | Windows 10/11 x64 | The same MSVC toolchain; no WebView2 needed |
+| Linux desktop (`.deb`, `.tar.gz`) | Ubuntu 22.04 (WSL `Ubuntu-22.04` locally) | `scripts/linux/setup-build-env.sh` installs everything: compilers, GTK 3 / WebKitGTK 4.1 headers, packaging and test tools, the pinned toolchains and podman for arm64 cross-builds. [docs/LINUX.md](../docs/LINUX.md) has the details |
+| Linux server (`weave-server`) | Linux, or Docker | A C compiler and `pkg-config` only (no GTK or WebKitGTK); the [Dockerfile](../Dockerfile) needs nothing but Docker or Podman |
+| Browser suites | any | The repository's pinned Playwright (a devDependency) with installed Edge; `WEAVE_BROWSER=chromium` or `webkit` picks another engine (`npx playwright install chromium webkit`) |
+
+On Windows, check the C++ tools with `rustup show` (the active toolchain must end in `-msvc`) and run builds from a normal PowerShell: Rust finds Visual Studio itself, so no developer prompt is needed.
 
 ```powershell
 npm ci
@@ -66,6 +77,14 @@ npm run package:windows          # add -NoZip, -PrepareDependencies or -SkipChec
 npm run package:windows:quick    # trial build with the quick checks, not for distribution
 npm run package:linux            # .deb and .tar.gz in WSL Ubuntu-22.04 (add -- -Arm64)
 npm run package:all              # Windows, then Linux amd64 and arm64
+```
+
+### Releases (GitHub Actions)
+
+[`.github/workflows/release.yml`](../.github/workflows/release.yml) builds every package on GitHub's runners: the Windows x64 desktop and server zips, and for Linux amd64 and arm64 the desktop `.deb` and `.tar.gz` plus a server `.tar.gz`. Pushing a tag `v<version>` (matching `package.json`) runs the unit and Rust tests on Windows and Linux, builds everything and creates a **draft** release with the files and a `SHA256SUMS`; publish it after reviewing. Running the workflow by hand (Actions › Release › Run workflow) builds the same packages as workflow artifacts without a release. Linux packages use `scripts/linux/make-packages.sh` like local builds, but arm64 builds natively on `ubuntu-22.04-arm` rather than in the cross-build container, and CI skips the browser suites, native launches and clean-distro install tests, so run the full local checks before distributing.
+
+```bash
+git tag v1.0.0 && git push origin v1.0.0
 ```
 
 [docs/LINUX.md](../docs/LINUX.md) records the Linux build machine and toolchain. The headless server builds with `npm run build:server:native`; see [docs/SERVER.md](../docs/SERVER.md).

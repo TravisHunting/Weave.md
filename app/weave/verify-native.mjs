@@ -400,7 +400,7 @@ try {
       await page.addInitScript(()=>{localStorage.setItem('weave.server.session.v1',JSON.stringify({open:[],sessions:{},layout:{}}));});
       await page.goto(serving.url);
       await page.waitForFunction(()=>JSON.parse(sessionStorage.getItem('weave.server.session.v1')||'{}').open?.length===2);
-      assert.equal(await page.locator('html').getAttribute('data-scheme'),'lavender');
+      assert.equal(await page.locator('html').getAttribute('data-scheme'),'grey');
       assert.equal((await page.locator('html').getAttribute('data-skin')).split(' ').at(-1),'aurora-flow');
       await menuItem(page,'choose-workspace');
       await page.locator('#server-workspace-picker .server-folder-name').first().waitFor();

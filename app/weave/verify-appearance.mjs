@@ -98,7 +98,7 @@ export async function verifySkins(page,output,mode) {
 }
 
 export async function verifyAppearance(page,output,mode) {
-  assert.equal(await page.locator('html').getAttribute('data-scheme'),'lavender');
+  assert.equal(await page.locator('html').getAttribute('data-scheme'),'grey');
   await verifyTitlebarTabs(page);
   await verifySkins(page,output,mode);
   await page.getByRole('button',{name:'Visual styling',exact:true}).click();
@@ -199,7 +199,7 @@ export async function verifyAppearance(page,output,mode) {
   await page.screenshot({path:path.join(output,'weave-'+mode+'-appearance-dark.png'),fullPage:true});
   await ensureAppearanceSection(page,'appearance-colours');
   await page.locator('#appearance-scheme').selectOption({label:'Evening notes'});assert.equal(await color('accent'),'#654b89');assert.equal((await metrics('#article')).size,'20px');
-  await page.locator('#reset-appearance').click();assert.equal(await page.locator('html').getAttribute('data-scheme'),'lavender');assert.equal((await page.locator('html').getAttribute('data-skin')).split(' ').at(-1),'aurora-flow');assert.equal((await metrics('#article')).size,'15px');assert.equal((await metrics('#article')).max,'none');
+  await page.locator('#reset-appearance').click();assert.equal(await page.locator('html').getAttribute('data-scheme'),'grey');assert.equal((await page.locator('html').getAttribute('data-skin')).split(' ').at(-1),'aurora-flow');assert.equal((await metrics('#article')).size,'15px');assert.equal((await metrics('#article')).max,'none');
   assert.equal(await page.locator('#saved-schemes option').count(),1,'restoring appearance defaults retains saved schemes');
   assert.equal(await page.locator('#reading-width').isDisabled(),true);
   assert.equal(await page.locator('#code-font').inputValue(),'cascadiaMono');assert.equal(await color('code-font-size'),'15px');assert.equal(await page.locator('#line-numbers').inputValue(),'both');assert.equal(await page.locator('#table-borders').inputValue(),'grid');
